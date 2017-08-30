@@ -1,0 +1,31 @@
+{
+    "name": "zero-gravity/zero-gravity-cms",
+    "description": "ZeroGravity CMS core library",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "ZeroGravity\\Cms\\": "src/"
+        }
+    },
+    "require": {
+        "symfony-cmf/routing-bundle": "^2.0",
+        "liip/imagine-bundle": "^1.8.0",
+        "symfony/finder": "^3.3",
+        "php": ">=7.1",
+        "mnapoli/front-yaml": "^1.5",
+        "cocur/slugify": "^2.5"
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.3",
+        "yzalis/identicon": "^1.1",
+        "knplabs/knp-menu": "^2.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Herrmann",
+            "email": "office@web-emerge.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}

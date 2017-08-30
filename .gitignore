@@ -1,0 +1,5 @@
+/.ci
+/tests/_output
+/tests/_support/_generated
+/vendor/
+composer.lock

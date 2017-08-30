@@ -1,0 +1,61 @@
+image: c33s/php:7.1
+
+stages:
+    - test
+    - check
+
+variables:
+    COMPOSER_ALLOW_SUPERUSER:       '1'
+    COMPOSER_NO_INTERACTION:        '1'
+    SYMFONY_DEPRECATIONS_HELPER:    'weak'
+    TIMEZONE:                       'Europe/Vienna'
+cache:
+    key: "$CI_BUILD_NAME/$CI_BUILD_REF_NAME"
+    paths:
+        - "$COMPOSER_HOME"
+        - "$CI_PROJECT_DIR/.ci"
+
+before_script:
+    - echo $CI_PROJECT_DIR
+    - php -v
+    - php -m
+    - pwd
+    - ls -lsa
+#    - DEBIAN_FRONTEND=noninteractive apt-get update -yqq
+#    - DEBIAN_FRONTEND=noninteractive apt-get install --quiet --yes --force-yes --no-install-recommends XXX
+    - robo init
+#    - ls -lsa $COMPOSER_HOME
+    - ls -lsa $CI_PROJECT_DIR/.ci
+
+####################################################################################################
+# _____         _
+#|_   _|__  ___| |_
+#  | |/ _ \/ __| __|
+#  | |  __/\__ \ |_
+#  |_|\___||___/\__|
+####################################################################################################
+test:
+    stage: test
+    script:
+        - robo test
+        - cat tests/_output/coverage.txt
+    artifacts:
+        paths:
+            - tests/_output/
+#  only:
+#    - triggers
+#    - tags
+#  except:
+#    - branches
+
+####################################################################################################
+#  ____ _               _
+# / ___| |__   ___  ___| | __
+#| |   | '_ \ / _ \/ __| |/ /
+#| |___| | | |  __/ (__|   <
+# \____|_| |_|\___|\___|_|\_\
+####################################################################################################
+check:
+    stage: check
+    script:
+        - robo check
