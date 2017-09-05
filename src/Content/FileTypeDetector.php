@@ -40,7 +40,7 @@ class FileTypeDetector
      */
     public function getType(string $filename): string
     {
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
+        $ext = mb_strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
         if (isset($this->extensionMap[$ext])) {
             return $this->extensionMap[$ext];

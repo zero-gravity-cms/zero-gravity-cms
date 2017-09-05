@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Path\Path;
@@ -60,12 +62,21 @@ class Page
     public function __construct(string $name, array $settings, Page $parent = null)
     {
         $this->name = $name;
-        $this->settings = $settings;
+        $this->settings = $this->parseSettings($settings);
         $this->parent = $parent;
 
         if (null !== $parent) {
             $parent->addChild($this);
         }
+    }
+
+    protected function parseSettings(array $settings)
+    {
+        if (isset($settings['published_at']) && !$settings['published_at'] instanceof DateTimeInterface) {
+            $settings['published_at'] = new DateTimeImmutable($settings['published_at']);
+        }
+
+        return $settings;
     }
 
     /**
@@ -378,6 +389,24 @@ class Page
         return $this->children;
     }
 
+    /**
+     * Page is considered a modular snippet, not a standalone page.
+     *
+     * @return DateTimeInterface
+     */
+    public function getPublishedAt(): ? DateTimeInterface
+    {
+        return $this->settings['published_at'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublished() : bool
+    {
+        return null === $this->getPublishedAt() || $this->getPublishedAt()->format('U') > time();
+    }
+
     protected function applyFileAliases()
     {
         foreach ($this->settings['file_aliases'] as $from => $to) {
@@ -430,6 +459,7 @@ class Page
             'is_visible' => false,
             'is_modular' => false,
             'file_aliases' => [],
+            'published_at' => null,
         ]);
         $resolver->setRequired([
             'slug',
@@ -438,5 +468,6 @@ class Page
         $resolver->setAllowedTypes('file_aliases', 'array');
         $resolver->setAllowedTypes('is_visible', 'bool');
         $resolver->setAllowedTypes('is_modular', 'bool');
+        $resolver->setAllowedTypes('published_at', ['null', \DateTimeInterface::class]);
     }
 }

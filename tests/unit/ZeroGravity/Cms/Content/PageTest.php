@@ -220,6 +220,7 @@ class PageTest extends BaseUnit
             'menu_id' => 'default',
             'menu_label' => null,
             'file_aliases' => [],
+            'published_at' => null,
             'extra' => [],
         ];
         $this->assertEquals($expectedSettings, $page->getSettings());
