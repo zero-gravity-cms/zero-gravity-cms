@@ -1,6 +1,7 @@
 image: c33s/php:7.1
 
 stages:
+    - packagist
     - test
     - check
 
@@ -26,6 +27,11 @@ before_script:
     - robo init
 #    - ls -lsa $COMPOSER_HOME
     - ls -lsa $CI_PROJECT_DIR/.ci
+
+packagist:
+    stage: packagist
+    script:
+        - curl -XPOST --header 'content-type:application/json' "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_API_TOKEN}" --data "{\"repository\":{\"url\":\"${PACKAGIST_REPOSITORY_URL}\"}}"
 
 ####################################################################################################
 # _____         _
