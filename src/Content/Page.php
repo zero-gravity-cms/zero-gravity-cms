@@ -417,8 +417,8 @@ class Page
     }
 
     /**
-     * @param string $name
-     * @param null   $default
+     * @param string     $name
+     * @param mixed|null $default
      *
      * @return mixed
      */

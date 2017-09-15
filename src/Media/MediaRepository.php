@@ -36,8 +36,4 @@ class MediaRepository
             return null;
         }
     }
-
-    public function resolvePath($path)
-    {
-    }
 }

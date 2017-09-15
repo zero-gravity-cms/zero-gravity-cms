@@ -82,7 +82,7 @@ class Metadata implements ArrayAccess
 
     public function offsetSet($offset, $value)
     {
-        return $this->setValue($offset, $value);
+        $this->setValue($offset, $value);
     }
 
     public function offsetUnset($offset)

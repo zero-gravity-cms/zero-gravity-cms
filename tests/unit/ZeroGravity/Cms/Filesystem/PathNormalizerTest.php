@@ -4,6 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Exception\UnsafePathException;
+use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\PathNormalizer;
 
 class PathNormalizerTest extends BaseUnit
@@ -15,9 +16,12 @@ class PathNormalizerTest extends BaseUnit
      * @param $path
      * @param $resolvedPath
      */
-    public function validPath(string $path, string $resolvedPath)
+    public function validPathIsNormalized(string $path, string $resolvedPath)
     {
-        $this->assertSame($resolvedPath, PathNormalizer::normalize($path));
+        $path = new Path($path);
+        PathNormalizer::normalizePath($path);
+
+        $this->assertSame($resolvedPath, $path->toString());
     }
 
     public function provideValidPaths()
@@ -25,9 +29,9 @@ class PathNormalizerTest extends BaseUnit
         return [
             ['foo/bar/file.ext', 'foo/bar/file.ext'],
             ['foo/bar///file.ext', 'foo/bar/file.ext'],
-            ['/foo/bar/../file.ext', 'foo/file.ext'],
+            ['/foo/bar/../file.ext', '/foo/file.ext'],
             ['foo/bar/../dir/../../file.ext', 'file.ext'],
-            ['/foo/bar/./dir/../../file.ext', 'foo/file.ext'],
+            ['/foo/bar/./dir/../../file.ext', '/foo/file.ext'],
             ['foo/bar//dir/../../file.ext', 'foo/file.ext'],
             ['', ''],
         ];
@@ -39,10 +43,12 @@ class PathNormalizerTest extends BaseUnit
      *
      * @param $path
      */
-    public function invalidPath(string $path)
+    public function invalidPathThrowsException(string $path)
     {
+        $path = new Path($path);
+
         $this->expectException(UnsafePathException::class);
-        PathNormalizer::normalize($path);
+        PathNormalizer::normalizePath($path);
     }
 
     public function provideInvalidPaths()
@@ -59,14 +65,18 @@ class PathNormalizerTest extends BaseUnit
      * @dataProvider providePathsWithInPath
      *
      * @param string $path
-     * @param string $inPath
+     * @param string $parentPath
      * @param string $resolvedPath
-     * @param string $resolvedInPath
+     * @param string $resolvedParentPath
      */
-    public function validPathAndInPath(string $path, string $inPath, string $resolvedPath, string $resolvedInPath)
+    public function validPathAndParentPathIsNormalized(string $path, string $parentPath, string $resolvedPath, string $resolvedParentPath)
     {
-        $this->assertSame($resolvedPath, PathNormalizer::normalize($path, $inPath));
-        $this->assertSame($resolvedInPath, $inPath);
+        $path = new Path($path);
+        $parentPath = new Path($parentPath);
+        PathNormalizer::normalizePath($path, $parentPath);
+
+        $this->assertSame($resolvedPath, $path->toString());
+        $this->assertSame($resolvedParentPath, $parentPath->toString());
     }
 
     public function providePathsWithInPath()
@@ -95,49 +105,6 @@ class PathNormalizerTest extends BaseUnit
                 'baz/dir',
                 'file.ext',
                 '',
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider provideRelativePaths
-     *
-     * @param string $from
-     * @param string $to
-     * @param string $expectedFrom
-     * @param string $expectedTo
-     */
-    public function testMoveRelativeParts(string $from, string $to, string $expectedFrom, string $expectedTo)
-    {
-    }
-
-    public function provideRelativePaths()
-    {
-        return [
-            [
-                'foo/bar.txt',
-                '',
-                'bar.txt',
-                'foo',
-            ],
-            [
-                'foo/laa/bar.txt',
-                '',
-                'bar.txt',
-                'foo/laa',
-            ],
-            [
-                'foo/laa/bar.txt',
-                'baz',
-                'bar.txt',
-                'baz/foo/laa',
-            ],
-            [
-                'images/person_?.png',
-                '',
-                'person_?.png',
-                'images',
             ],
         ];
     }

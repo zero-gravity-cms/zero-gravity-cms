@@ -159,13 +159,13 @@ class ParsedDirectory
     /**
      * Create Page from directory content.
      *
-     * @param bool  $convertMarkdown
-     * @param array $defaultPageSettings
-     * @param null  $parentPage
+     * @param bool      $convertMarkdown
+     * @param array     $defaultPageSettings
+     * @param Page|null $parentPage
      *
      * @return null|Page
      */
-    public function createPage(bool $convertMarkdown, array $defaultPageSettings, $parentPage = null)
+    public function createPage(bool $convertMarkdown, array $defaultPageSettings, Page $parentPage = null)
     {
         $groupedFiles = $this->groupAndValidateFiles();
 
@@ -211,7 +211,9 @@ class ParsedDirectory
     private function fetchPageSettings(array $files)
     {
         if (isset($files['yaml'])) {
-            return Yaml::parse(file_get_contents($files['yaml']->getFilesystemPathname())) ?: [];
+            $data = Yaml::parse(file_get_contents($files['yaml']->getFilesystemPathname()));
+
+            return is_array($data) ? $data : [];
         } elseif (isset($files['markdown'])) {
             $parser = new FrontYAMLParser();
             $document = $parser->parse(file_get_contents($files['markdown']->getFilesystemPathname()), false);
