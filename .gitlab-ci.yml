@@ -1,9 +1,9 @@
 image: c33s/php:7.1
 
 stages:
-    - packagist
     - test
     - check
+    - packagist
 
 variables:
     COMPOSER_ALLOW_SUPERUSER:       '1'
@@ -17,21 +17,8 @@ cache:
         - "$CI_PROJECT_DIR/.ci"
 
 before_script:
-    - echo $CI_PROJECT_DIR
-    - php -v
-    - php -m
     - pwd
     - ls -lsa
-#    - DEBIAN_FRONTEND=noninteractive apt-get update -yqq
-#    - DEBIAN_FRONTEND=noninteractive apt-get install --quiet --yes --force-yes --no-install-recommends XXX
-    - robo init
-#    - ls -lsa $COMPOSER_HOME
-    - ls -lsa $CI_PROJECT_DIR/.ci
-
-packagist:
-    stage: packagist
-    script:
-        - curl -XPOST --header 'content-type:application/json' "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_API_TOKEN}" --data "{\"repository\":{\"url\":\"${PACKAGIST_REPOSITORY_URL}\"}}"
 
 ####################################################################################################
 # _____         _
@@ -43,16 +30,13 @@ packagist:
 test:
     stage: test
     script:
+        - robo init
+        - ls -lsa $CI_PROJECT_DIR/.ci
         - robo test
         - cat tests/_output/coverage.txt
     artifacts:
         paths:
             - tests/_output/
-#  only:
-#    - triggers
-#    - tags
-#  except:
-#    - branches
 
 ####################################################################################################
 #  ____ _               _
@@ -64,4 +48,23 @@ test:
 check:
     stage: check
     script:
+        - robo init
+        - ls -lsa $CI_PROJECT_DIR/.ci
         - robo check
+
+####################################################################################################
+#  ____            _               _     _
+# |  _ \ __ _  ___| | ____ _  __ _(_)___| |_
+# | |_) / _` |/ __| |/ / _` |/ _` | / __| __|
+# |  __/ (_| | (__|   < (_| | (_| | \__ \ |_
+# |_|   \__,_|\___|_|\_\__,_|\__, |_|___/\__|
+#                            |___/
+####################################################################################################
+packagist:
+    stage: packagist
+    image: debian:stable-slim
+    script:
+        - DEBIAN_FRONTEND=noninteractive apt-get update -yqq
+        - DEBIAN_FRONTEND=noninteractive apt-get install --quiet --yes --force-yes --no-install-recommends ca-certificates curl
+        - curl -XPOST --header 'content-type:application/json' "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_API_TOKEN}" --data "{\"repository\":{\"url\":\"${PACKAGIST_REPOSITORY_URL}\"}}"
+
