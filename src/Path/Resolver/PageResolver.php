@@ -129,7 +129,6 @@ class PageResolver extends AbstractResolver
         if (null !== $parentPath) {
             $testPath = $parentPath->appendPath($path);
         } else {
-            $parentPath = new Path('');
             $testPath = clone $path;
         }
 
