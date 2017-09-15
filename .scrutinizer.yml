@@ -1,0 +1,27 @@
+build:
+    dependencies:
+        before:
+            - 'wget http://robo.li/robo.phar'
+            -
+                command: 'php robo.phar init'
+                environment:
+                    COMPOSER_ALLOW_SUPERUSER: 1
+                    COMPOSER_NO_INTERACTION: 1
+                    SYMFONY_DEPRECATIONS_HELPER: weak
+                    TIMEZONE: Europe/Vienna
+    tests:
+        override:
+            -
+                command: 'php robo.phar test'
+                coverage:
+                    file: 'tests/_output/coverage.xml'
+                    format: 'clover'
+
+checks:
+    php:
+        code_rating: true
+        duplication: true
+
+filter:
+    paths:
+        - 'src/*'
