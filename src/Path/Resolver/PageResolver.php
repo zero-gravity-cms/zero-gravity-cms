@@ -51,14 +51,14 @@ class PageResolver extends AbstractResolver
         return [];
 
         // TODO: this is outdated code that does not find any files.
-        $pages = $this->filterPagesByPath($path, $parentPath);
-
-        $found = [];
-        foreach ($pages as $page) {
-            $found[ltrim($page->getFilesystemPath()->toString(), '/')] = $this->pageToFile($page);
-        }
-
-        return $found;
+        // $pages = $this->filterPagesByPath($path, $parentPath);
+        //
+        // $found = [];
+        // foreach ($pages as $page) {
+        //     $found[ltrim($page->getFilesystemPath()->toString(), '/')] = $this->pageToFile($page);
+        // }
+        //
+        // return $found;
     }
 
     /**
