@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Content\Meta;
 
 use DateTimeImmutable;
 use DateTimeInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PageSettings
@@ -105,7 +106,22 @@ class PageSettings
         $resolver->setAllowedTypes('file_aliases', 'array');
         $resolver->setAllowedTypes('is_visible', 'bool');
         $resolver->setAllowedTypes('is_modular', 'bool');
-        $resolver->setAllowedTypes('published_at', ['null', \DateTimeInterface::class]);
+        $resolver->setAllowedTypes('published_at', ['null', 'string', DateTimeInterface::class]);
+
+        $normalizeDateTime = function (Options $options, $value) {
+            if (null === $value) {
+                return $value;
+            }
+            if ($value instanceof DateTimeImmutable) {
+                return $value;
+            } elseif ($value instanceof DateTimeInterface) {
+                $value = $value->format('c');
+            }
+
+            return new DateTimeImmutable((string) $value);
+        };
+
+        $resolver->setNormalizer('published_at', $normalizeDateTime);
     }
 
     /**

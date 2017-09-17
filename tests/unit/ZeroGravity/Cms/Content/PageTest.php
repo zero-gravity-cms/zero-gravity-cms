@@ -236,6 +236,21 @@ class PageTest extends BaseUnit
     }
 
     /**
+     * @test
+     */
+    public function publishDateIsCastToDateTimeImmutable()
+    {
+        $page = new Page('page');
+        $this->assertNull($page->getPublishedAt());
+
+        $page = new Page('page', ['published_at' => new \DateTime()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+
+        $page = new Page('page', ['published_at' => '2017-01-01 12:00:00']);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+    }
+
+    /**
      * @param array $fileNamesByType
      *
      * @return File[]
