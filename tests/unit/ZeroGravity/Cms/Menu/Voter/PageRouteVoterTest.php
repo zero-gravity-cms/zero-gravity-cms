@@ -56,7 +56,6 @@ class PageRouteVoterTest extends BaseUnit
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
-        $page->validateSettings();
 
         $request = new Request();
         $request->attributes->set('page', $page);
@@ -80,7 +79,6 @@ class PageRouteVoterTest extends BaseUnit
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
-        $page->validateSettings();
 
         $request = new Request();
         $request->attributes->set('page', $page);
@@ -105,7 +103,6 @@ class PageRouteVoterTest extends BaseUnit
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
-        $page->validateSettings();
 
         $request = new Request();
         $request->attributes->set('page', $page);
@@ -132,7 +129,6 @@ class PageRouteVoterTest extends BaseUnit
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
-        $page->validateSettings();
 
         $request = new Request();
         $request->attributes->set('page', $page);
@@ -159,7 +155,6 @@ class PageRouteVoterTest extends BaseUnit
         ;
 
         $page = new Page('test', ['slug' => 'another-slug'], null);
-        $page->validateSettings();
 
         $request = new Request();
         $request->attributes->set('page', $page);

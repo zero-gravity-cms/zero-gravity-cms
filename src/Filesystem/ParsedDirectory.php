@@ -184,7 +184,6 @@ class ParsedDirectory
         );
 
         $page = new Page($this->getName(), $settings, $parentPage);
-        $page->validateSettings();
         $page->setContent($content);
 
         $files = $this->getFiles();

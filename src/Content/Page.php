@@ -2,10 +2,9 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use DateTimeImmutable;
 use DateTimeInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Webmozart\Assert\Assert;
+use ZeroGravity\Cms\Content\Meta\PageFiles;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Path\Path;
 
 class Page
@@ -18,7 +17,7 @@ class Page
     private $name;
 
     /**
-     * @var array
+     * @var PageSettings
      */
     private $settings;
 
@@ -38,9 +37,9 @@ class Page
     private $parent;
 
     /**
-     * @var File[]
+     * @var PageFiles
      */
-    private $files = [];
+    private $files;
 
     /**
      * @var Path
@@ -59,24 +58,45 @@ class Page
      * @param array  $settings
      * @param Page   $parent
      */
-    public function __construct(string $name, array $settings, Page $parent = null)
+    public function __construct(string $name, array $settings = [], Page $parent = null)
     {
         $this->name = $name;
-        $this->settings = $this->parseSettings($settings);
         $this->parent = $parent;
-
+        $this->initSettings($settings);
         if (null !== $parent) {
             $parent->addChild($this);
         }
+
+        $this->init();
     }
 
-    protected function parseSettings(array $settings)
+    private function init()
     {
-        if (isset($settings['published_at']) && !$settings['published_at'] instanceof DateTimeInterface) {
-            $settings['published_at'] = new DateTimeImmutable($settings['published_at']);
-        }
+        $this->buildFilesystemPath();
+        $this->buildPath();
+        $this->setFiles([]);
+    }
 
-        return $settings;
+    /**
+     * @param array $settings
+     */
+    private function initSettings(array $settings): void
+    {
+        if (!array_key_exists('slug', $settings)) {
+            $settings['slug'] = $this->name;
+        }
+        $this->settings = new PageSettings($settings);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getSetting(string $name, $default = null)
+    {
+        return $this->settings->get($name, $default);
     }
 
     /**
@@ -92,9 +112,7 @@ class Page
      */
     public function setFiles(array $files): void
     {
-        Assert::allIsInstanceOf($files, File::class);
-        $this->files = $files;
-        $this->applyFileAliases();
+        $this->files = new PageFiles($files, $this->getSetting('file_aliases'));
     }
 
     /**
@@ -102,7 +120,7 @@ class Page
      */
     public function getFiles(): array
     {
-        return $this->files;
+        return $this->files->toArray();
     }
 
     /**
@@ -112,25 +130,7 @@ class Page
      */
     public function getFile(string $filename): ? File
     {
-        if (isset($this->files[$filename])) {
-            return $this->files[$filename];
-        }
-
-        return null;
-    }
-
-    /**
-     * Get all files for the given type.
-     *
-     * @param $type
-     *
-     * @return File[]
-     */
-    public function getFilesByType($type) : array
-    {
-        return array_filter($this->files, function (File $file) use ($type) {
-            return $file->getType() === $type;
-        });
+        return $this->files->get($filename);
     }
 
     /**
@@ -138,9 +138,9 @@ class Page
      *
      * @return File[]
      */
-    public function getImages(): array
+    public function getImages() : array
     {
-        return $this->getFilesByType(FileTypeDetector::TYPE_IMAGE);
+        return $this->files->getImages();
     }
 
     /**
@@ -150,7 +150,7 @@ class Page
      */
     public function getDocuments(): array
     {
-        return $this->getFilesByType(FileTypeDetector::TYPE_DOCUMENT);
+        return $this->files->getDocuments();
     }
 
     /**
@@ -160,12 +160,7 @@ class Page
      */
     public function getMarkdownFile(): ? File
     {
-        $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
-        if (count($files) > 0) {
-            return current($files);
-        }
-
-        return null;
+        return $this->files->getMarkdownFile();
     }
 
     /**
@@ -175,12 +170,7 @@ class Page
      */
     public function getYamlFile() : ? File
     {
-        $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
-        if (count($files) > 0) {
-            return current($files);
-        }
-
-        return null;
+        return $this->files->getYamlFile();
     }
 
     /**
@@ -190,12 +180,7 @@ class Page
      */
     public function getTwigFile() : ? File
     {
-        $files = $this->getFilesByType(FileTypeDetector::TYPE_TWIG);
-        if (count($files) > 0) {
-            return current($files);
-        }
-
-        return null;
+        return $this->files->getTwigFile();
     }
 
     /**
@@ -203,10 +188,6 @@ class Page
      */
     public function getPath() : Path
     {
-        if (null === $this->path) {
-            $this->buildPath();
-        }
-
         return $this->path;
     }
 
@@ -252,10 +233,6 @@ class Page
      */
     public function getFilesystemPath(): Path
     {
-        if (null === $this->filesystemPath) {
-            $this->buildFilesystemPath();
-        }
-
         return $this->filesystemPath;
     }
 
@@ -275,7 +252,7 @@ class Page
      */
     public function getTitle(): ? string
     {
-        return $this->settings['title'];
+        return $this->getSetting('title');
     }
 
     /**
@@ -291,7 +268,7 @@ class Page
      */
     public function getSlug() : string
     {
-        return (string) $this->settings['slug'];
+        return (string) $this->getSetting('slug');
     }
 
     /**
@@ -299,7 +276,7 @@ class Page
      */
     public function getSettings(): array
     {
-        return $this->settings;
+        return $this->settings->toArray();
     }
 
     /**
@@ -307,7 +284,7 @@ class Page
      */
     public function getExtra(): array
     {
-        return $this->settings['extra'];
+        return $this->getSetting('extra');
     }
 
     /**
@@ -315,7 +292,7 @@ class Page
      */
     public function getMenuId(): string
     {
-        return $this->settings['menu_id'];
+        return $this->getSetting('menu_id');
     }
 
     /**
@@ -323,8 +300,8 @@ class Page
      */
     public function getMenuLabel(): ? string
     {
-        if (!empty($this->settings['menu_label'])) {
-            return $this->settings['menu_label'];
+        if (!empty($this->getSetting('menu_label'))) {
+            return $this->getSetting('menu_label');
         }
         if (!empty($this->getTitle())) {
             return $this->getTitle();
@@ -340,7 +317,7 @@ class Page
      */
     public function isVisible() : bool
     {
-        return $this->settings['is_visible'];
+        return $this->getSetting('is_visible');
     }
 
     /**
@@ -350,7 +327,7 @@ class Page
      */
     public function isModular(): bool
     {
-        return $this->settings['is_modular'];
+        return $this->getSetting('is_modular');
     }
 
     /**
@@ -360,7 +337,7 @@ class Page
      */
     public function getTemplate(): ? string
     {
-        return $this->settings['template'];
+        return $this->getSetting('template');
     }
 
     /**
@@ -370,7 +347,7 @@ class Page
      */
     public function getController() : ? string
     {
-        return $this->settings['controller'];
+        return $this->getSetting('controller');
     }
 
     /**
@@ -396,7 +373,7 @@ class Page
      */
     public function getPublishedAt(): ? DateTimeInterface
     {
-        return $this->settings['published_at'];
+        return $this->getSetting('published_at');
     }
 
     /**
@@ -407,15 +384,6 @@ class Page
         return null === $this->getPublishedAt() || $this->getPublishedAt()->format('U') > time();
     }
 
-    protected function applyFileAliases()
-    {
-        foreach ($this->settings['file_aliases'] as $from => $to) {
-            if (isset($this->files[$to])) {
-                $this->files[$from] = $this->files[$to];
-            }
-        }
-    }
-
     /**
      * @param string     $name
      * @param mixed|null $default
@@ -424,50 +392,11 @@ class Page
      */
     public function getExtraValue(string $name, $default = null)
     {
-        if (array_key_exists($name, $this->settings['extra'])) {
-            return $this->settings['extra'][$name];
+        $extra = $this->getExtra();
+        if (array_key_exists($name, $extra)) {
+            return $extra[$name];
         }
 
         return $default;
-    }
-
-    /**
-     * Validate and resolve page settings.
-     */
-    public function validateSettings()
-    {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-
-        $this->settings = $resolver->resolve($this->settings);
-    }
-
-    /**
-     * Configure validation rules for page settings.
-     *
-     * @param OptionsResolver $resolver
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults([
-            'menu_label' => null,
-            'menu_id' => 'default',
-            'template' => null,
-            'controller' => null,
-            'title' => null,
-            'extra' => [],
-            'is_visible' => false,
-            'is_modular' => false,
-            'file_aliases' => [],
-            'published_at' => null,
-        ]);
-        $resolver->setRequired([
-            'slug',
-        ]);
-        $resolver->setAllowedTypes('extra', 'array');
-        $resolver->setAllowedTypes('file_aliases', 'array');
-        $resolver->setAllowedTypes('is_visible', 'bool');
-        $resolver->setAllowedTypes('is_modular', 'bool');
-        $resolver->setAllowedTypes('published_at', ['null', \DateTimeInterface::class]);
     }
 }

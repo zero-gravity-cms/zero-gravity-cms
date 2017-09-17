@@ -3,10 +3,10 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileTypeDetector;
+use ZeroGravity\Cms\Content\Meta\Metadata;
 use ZeroGravity\Cms\Content\Page;
 
 class PageTest extends BaseUnit
@@ -41,10 +41,6 @@ class PageTest extends BaseUnit
         $childPage = new Page('the_child', ['slug' => 'foo'], $parentPage);
         $childChildPage = new Page('one_more_child', ['slug' => 'bar'], $childPage);
 
-        $parentPage->validateSettings();
-        $childPage->validateSettings();
-        $childChildPage->validateSettings();
-
         $this->assertSame('/', $parentPage->getPath()->toString());
         $this->assertSame('/foo', $childPage->getPath()->toString());
         $this->assertSame('/foo/bar', $childChildPage->getPath()->toString());
@@ -53,26 +49,13 @@ class PageTest extends BaseUnit
     /**
      * @test
      */
-    public function slugIsRequired()
-    {
-        $page = new Page('page', [], null);
-
-        $this->expectException(MissingOptionsException::class);
-        $page->validateSettings();
-    }
-
-    /**
-     * @test
-     */
     public function fileAliasesAreApplied()
     {
         $page = new Page('page', [
-            'slug' => 'page',
             'file_aliases' => [
                 'my_alias' => 'some-image.jpg',
             ],
         ]);
-        $page->validateSettings();
 
         $page->setFiles($this->createFiles([
             FileTypeDetector::TYPE_IMAGE => [
@@ -91,8 +74,7 @@ class PageTest extends BaseUnit
      */
     public function filesCanBeFetchedByType()
     {
-        $page = new Page('page', ['slug' => 'page']);
-        $page->validateSettings();
+        $page = new Page('page');
 
         $page->setFiles($this->createFiles([
             FileTypeDetector::TYPE_IMAGE => [
@@ -136,8 +118,7 @@ class PageTest extends BaseUnit
      */
     public function filesByTypeReturnEmptyDefaults()
     {
-        $page = new Page('page', ['slug' => 'page']);
-        $page->validateSettings();
+        $page = new Page('page');
 
         $this->assertEmpty($page->getImages());
         $this->assertEmpty($page->getDocuments());
@@ -151,7 +132,7 @@ class PageTest extends BaseUnit
      */
     public function contentCanBeSetAndNullified()
     {
-        $page = new Page('page', ['slug' => 'page']);
+        $page = new Page('page');
 
         $this->assertNull($page->getContent());
         $page->setContent('This is the content');
@@ -189,7 +170,6 @@ class PageTest extends BaseUnit
                 'fancy_extra_settings' => 'are not validated',
             ],
         ]);
-        $page->validateSettings();
 
         $this->assertSame('Page title', $page->getTitle());
         $this->assertTrue($page->isVisible());
@@ -206,8 +186,7 @@ class PageTest extends BaseUnit
      */
     public function settingsAreDefaultedAndCanBeFetched()
     {
-        $page = new Page('page', ['slug' => 'page']);
-        $page->validateSettings();
+        $page = new Page('page');
 
         $expectedSettings = [
             'slug' => 'page',
@@ -230,9 +209,9 @@ class PageTest extends BaseUnit
      */
     public function childrenCanBeAssignedAndFetched()
     {
-        $parent = new Page('page', ['slug' => 'page']);
-        $child1 = new Page('child1', ['slug' => 'child1'], $parent);
-        $child2 = new Page('child2', ['slug' => 'child2'], $parent);
+        $parent = new Page('page');
+        $child1 = new Page('child1', [], $parent);
+        $child2 = new Page('child2', [], $parent);
 
         $this->assertSame([
             $child1,
@@ -246,12 +225,10 @@ class PageTest extends BaseUnit
     public function extraValuesCanBeFetched()
     {
         $page = new Page('page', [
-            'slug' => 'page',
             'extra' => [
                 'fancy_extra_settings' => 'are not validated',
             ],
         ]);
-        $page->validateSettings();
 
         $this->assertSame('are not validated', $page->getExtraValue('fancy_extra_settings'));
         $this->assertNull($page->getExtraValue('does_not_exist'));
@@ -269,7 +246,7 @@ class PageTest extends BaseUnit
         foreach ($fileNamesByType as $type => $fileNames) {
             foreach ($fileNames as $filename => $path) {
                 $fileInfo = new SplFileInfo($path, $path, $path);
-                $files[$filename] = new File($fileInfo, '', new \ZeroGravity\Cms\Content\Meta\Metadata([]), $type);
+                $files[$filename] = new File($fileInfo, '', new Metadata([]), $type);
             }
         }
 

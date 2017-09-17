@@ -113,7 +113,6 @@ class RouteProviderTest extends BaseUnit
     private function createSimplePage($name, Page $parent = null)
     {
         $page = new Page($name, ['slug' => $name], $parent);
-        $page->validateSettings();
 
         return $page;
     }

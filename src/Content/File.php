@@ -23,6 +23,7 @@ class File
      * @var string
      */
     private $type;
+
     /**
      * @var string
      */
