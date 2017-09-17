@@ -1,6 +1,6 @@
 <?php
 
-namespace ZeroGravity\Cms\Content;
+namespace ZeroGravity\Cms\Content\Meta;
 
 interface MetadataLoader
 {

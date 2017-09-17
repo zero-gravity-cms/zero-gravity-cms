@@ -4,7 +4,6 @@ namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
-use ZeroGravity\Cms\Content\Metadata;
 
 class FileTest extends BaseUnit
 {
@@ -13,7 +12,7 @@ class FileTest extends BaseUnit
      */
     public function fileHasVariousGetters()
     {
-        $metadata = new Metadata([
+        $metadata = new \ZeroGravity\Cms\Content\Meta\Metadata([
             'alt_text' => 'Sample alt text',
         ]);
 
@@ -35,7 +34,7 @@ class FileTest extends BaseUnit
      */
     public function pathnameAlwaysStartsWithSlash()
     {
-        $file = new File('foo/bar/baz/photo.jpg', '', new Metadata([]), 'image');
+        $file = new File('foo/bar/baz/photo.jpg', '', new \ZeroGravity\Cms\Content\Meta\Metadata([]), 'image');
         $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
     }
 }

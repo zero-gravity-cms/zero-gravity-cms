@@ -5,8 +5,8 @@ namespace ZeroGravity\Cms\Filesystem;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use ZeroGravity\Cms\Content\Metadata;
-use ZeroGravity\Cms\Content\MetadataLoader;
+use ZeroGravity\Cms\Content\Meta\Metadata;
+use ZeroGravity\Cms\Content\Meta\MetadataLoader;
 
 class YamlMetadataLoader implements MetadataLoader
 {

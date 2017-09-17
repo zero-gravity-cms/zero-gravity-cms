@@ -7,7 +7,6 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileTypeDetector;
-use ZeroGravity\Cms\Content\Metadata;
 use ZeroGravity\Cms\Content\Page;
 
 class PageTest extends BaseUnit
@@ -270,7 +269,7 @@ class PageTest extends BaseUnit
         foreach ($fileNamesByType as $type => $fileNames) {
             foreach ($fileNames as $filename => $path) {
                 $fileInfo = new SplFileInfo($path, $path, $path);
-                $files[$filename] = new File($fileInfo, '', new Metadata([]), $type);
+                $files[$filename] = new File($fileInfo, '', new \ZeroGravity\Cms\Content\Meta\Metadata([]), $type);
             }
         }
 

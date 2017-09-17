@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content;
 
+use ZeroGravity\Cms\Content\Meta\Metadata;
+
 /**
  * This class represents a file relative to a content base dir.
  */

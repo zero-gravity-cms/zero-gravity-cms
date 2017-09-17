@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Content;
 
 use Symfony\Component\Filesystem\Filesystem;
+use ZeroGravity\Cms\Content\Meta\MetadataLoader;
 use ZeroGravity\Cms\Exception\FilesystemException;
 
 class FileFactory
