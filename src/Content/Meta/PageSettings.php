@@ -79,11 +79,32 @@ class PageSettings
     }
 
     /**
+     * Get array copy of all settings.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return $this->values;
+    }
+
+    /**
      * Configure validation rules for page settings.
      *
      * @param OptionsResolver $resolver
      */
     private function configureOptions(OptionsResolver $resolver)
+    {
+        $this->configureDefaults($resolver);
+        $this->configureRequired($resolver);
+        $this->configureAllowedTypes($resolver);
+        $this->configureNormalizers($resolver);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'menu_label' => null,
@@ -97,17 +118,35 @@ class PageSettings
             'file_aliases' => [],
             'published_at' => null,
         ]);
+    }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function configureRequired(OptionsResolver $resolver): void
+    {
         $resolver->setRequired([
             'slug',
         ]);
+    }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function configureAllowedTypes(OptionsResolver $resolver): void
+    {
         $resolver->setAllowedTypes('extra', 'array');
         $resolver->setAllowedTypes('file_aliases', 'array');
         $resolver->setAllowedTypes('is_visible', 'bool');
         $resolver->setAllowedTypes('is_modular', 'bool');
         $resolver->setAllowedTypes('published_at', ['null', 'string', DateTimeInterface::class]);
+    }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function configureNormalizers(OptionsResolver $resolver): void
+    {
         $normalizeDateTime = function (Options $options, $value) {
             if (null === $value) {
                 return $value;
@@ -122,15 +161,5 @@ class PageSettings
         };
 
         $resolver->setNormalizer('published_at', $normalizeDateTime);
-    }
-
-    /**
-     * Get array copy of all settings.
-     *
-     * @return array
-     */
-    public function toArray(): array
-    {
-        return $this->values;
     }
 }

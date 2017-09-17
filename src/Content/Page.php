@@ -2,7 +2,7 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use DateTimeInterface;
+use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Meta\PageFiles;
 use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Path\Path;
@@ -252,7 +252,7 @@ class Page
      */
     public function getTitle(): ? string
     {
-        return $this->getSetting('title');
+        return (string) $this->getSetting('title');
     }
 
     /**
@@ -284,7 +284,7 @@ class Page
      */
     public function getExtra(): array
     {
-        return $this->getSetting('extra');
+        return (array) $this->getSetting('extra');
     }
 
     /**
@@ -292,7 +292,7 @@ class Page
      */
     public function getMenuId(): string
     {
-        return $this->getSetting('menu_id');
+        return (string) $this->getSetting('menu_id');
     }
 
     /**
@@ -301,7 +301,7 @@ class Page
     public function getMenuLabel(): ? string
     {
         if (!empty($this->getSetting('menu_label'))) {
-            return $this->getSetting('menu_label');
+            return (string) $this->getSetting('menu_label');
         }
         if (!empty($this->getTitle())) {
             return $this->getTitle();
@@ -317,7 +317,7 @@ class Page
      */
     public function isVisible() : bool
     {
-        return $this->getSetting('is_visible');
+        return (bool) $this->getSetting('is_visible');
     }
 
     /**
@@ -327,7 +327,7 @@ class Page
      */
     public function isModular(): bool
     {
-        return $this->getSetting('is_modular');
+        return (bool) $this->getSetting('is_modular');
     }
 
     /**
@@ -337,7 +337,7 @@ class Page
      */
     public function getTemplate(): ? string
     {
-        return $this->getSetting('template');
+        return (string) $this->getSetting('template');
     }
 
     /**
@@ -347,7 +347,7 @@ class Page
      */
     public function getController() : ? string
     {
-        return $this->getSetting('controller');
+        return (string) $this->getSetting('controller');
     }
 
     /**
@@ -369,9 +369,9 @@ class Page
     /**
      * Page is considered a modular snippet, not a standalone page.
      *
-     * @return DateTimeInterface
+     * @return DateTimeImmutable
      */
-    public function getPublishedAt(): ? DateTimeInterface
+    public function getPublishedAt(): ? DateTimeImmutable
     {
         return $this->getSetting('published_at');
     }
