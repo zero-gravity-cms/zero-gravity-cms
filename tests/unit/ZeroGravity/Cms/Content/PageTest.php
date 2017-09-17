@@ -246,6 +246,9 @@ class PageTest extends BaseUnit
         $page = new Page('page', ['published_at' => new \DateTime()]);
         $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
 
+        $page = new Page('page', ['published_at' => new \DateTimeImmutable()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+
         $page = new Page('page', ['published_at' => '2017-01-01 12:00:00']);
         $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
     }

@@ -61,12 +61,8 @@ class Page
     public function __construct(string $name, array $settings = [], Page $parent = null)
     {
         $this->name = $name;
+        $this->settings = new PageSettings($settings, $name);
         $this->parent = $parent;
-        $this->initSettings($settings);
-        if (null !== $parent) {
-            $parent->addChild($this);
-        }
-
         $this->init();
     }
 
@@ -75,28 +71,19 @@ class Page
         $this->buildFilesystemPath();
         $this->buildPath();
         $this->setFiles([]);
-    }
-
-    /**
-     * @param array $settings
-     */
-    private function initSettings(array $settings): void
-    {
-        if (!array_key_exists('slug', $settings)) {
-            $settings['slug'] = $this->name;
+        if (null !== $this->parent) {
+            $this->parent->addChild($this);
         }
-        $this->settings = new PageSettings($settings);
     }
 
     /**
      * @param string $name
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function getSetting(string $name, $default = null)
+    public function getSetting(string $name)
     {
-        return $this->settings->get($name, $default);
+        return $this->settings->get($name);
     }
 
     /**

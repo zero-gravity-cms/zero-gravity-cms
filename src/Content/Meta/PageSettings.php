@@ -15,67 +15,30 @@ class PageSettings
     private $values;
 
     /**
-     * @param array $values
+     * @var string
      */
-    public function __construct(array $values)
+    private $pageName;
+
+    /**
+     * @param array  $values
+     * @param string $pageName
+     */
+    public function __construct(array $values, string $pageName)
     {
-        $values = $this->parseValues($values);
+        $this->pageName = $pageName;
         $this->validate($values);
     }
 
     /**
-     * @param $name
-     *
-     * @return bool
-     */
-    public function has(string $name): bool
-    {
-        return array_key_exists($name, $this->values);
-    }
-
-    /**
-     * Get a single setting value or a default, if not defined.
+     * Get a single setting value.
      *
      * @param string $name
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function get(string $name, $default = null)
+    public function get(string $name)
     {
-        if ($this->has($name)) {
-            return $this->values[$name];
-        }
-
-        return $default;
-    }
-
-    /**
-     * Apply some simple default initializations.
-     *
-     * @param array $values
-     *
-     * @return array
-     */
-    private function parseValues(array $values)
-    {
-        if (isset($values['published_at']) && !$values['published_at'] instanceof DateTimeInterface) {
-            $values['published_at'] = new DateTimeImmutable($values['published_at']);
-        }
-
-        return $values;
-    }
-
-    /**
-     * Resolve and validate page settings.
-     * If everything was fine, assign them.
-     */
-    public function validate(array $values)
-    {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-
-        $this->values = $resolver->resolve($values);
+        return $this->values[$name];
     }
 
     /**
@@ -89,6 +52,20 @@ class PageSettings
     }
 
     /**
+     * Resolve and validate page settings.
+     * If everything was fine, assign them.
+     *
+     * @param array $values
+     */
+    public function validate(array $values)
+    {
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+
+        $this->values = $resolver->resolve($values);
+    }
+
+    /**
      * Configure validation rules for page settings.
      *
      * @param OptionsResolver $resolver
@@ -96,7 +73,6 @@ class PageSettings
     private function configureOptions(OptionsResolver $resolver)
     {
         $this->configureDefaults($resolver);
-        $this->configureRequired($resolver);
         $this->configureAllowedTypes($resolver);
         $this->configureNormalizers($resolver);
     }
@@ -107,26 +83,17 @@ class PageSettings
     private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'menu_label' => null,
-            'menu_id' => 'default',
-            'template' => null,
             'controller' => null,
-            'title' => null,
             'extra' => [],
-            'is_visible' => false,
-            'is_modular' => false,
             'file_aliases' => [],
+            'is_modular' => false,
+            'is_visible' => false,
+            'menu_id' => 'default',
+            'menu_label' => null,
             'published_at' => null,
-        ]);
-    }
-
-    /**
-     * @param OptionsResolver $resolver
-     */
-    private function configureRequired(OptionsResolver $resolver): void
-    {
-        $resolver->setRequired([
-            'slug',
+            'slug' => $this->pageName,
+            'template' => null,
+            'title' => null,
         ]);
     }
 
