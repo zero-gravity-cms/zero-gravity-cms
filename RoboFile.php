@@ -115,9 +115,9 @@ class RoboFile extends \Robo\Tasks
     public function update()
     {
         if ($this->isEnvironmentCi()) {
-            $this->_execPhp('php ./.ci/bin/composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader');
+            $this->_execPhp('php ./.ci/bin/composer.phar install --no-progress --no-suggest --prefer-dist --optimize-autoloader');
         } else {
-            $this->_execPhp('php ./.ci/bin/composer install');
+            $this->_execPhp('php ./.ci/bin/composer.phar install');
         }
     }
 
