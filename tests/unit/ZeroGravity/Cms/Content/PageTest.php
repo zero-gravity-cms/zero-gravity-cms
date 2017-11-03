@@ -216,7 +216,7 @@ class PageTest extends BaseUnit
         $this->assertSame([
             $child1,
             $child2,
-        ], $parent->getChildren());
+        ], $parent->getChildren()->toArray());
     }
 
     /**

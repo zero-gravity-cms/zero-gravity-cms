@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
+use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Meta\PageFiles;
 use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Path\Path;
@@ -346,11 +347,19 @@ class Page
     }
 
     /**
-     * @return Page[]
+     * @return PageFinder
      */
-    public function getChildren(): array
+    public function getChildren(): PageFinder
     {
-        return $this->children;
+        return PageFinder::create()->inPageList($this->children);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren(): bool
+    {
+        return count($this->children) > 0;
     }
 
     /**
