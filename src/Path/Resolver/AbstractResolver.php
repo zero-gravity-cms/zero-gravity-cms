@@ -59,7 +59,7 @@ abstract class AbstractResolver implements PathResolver
      *
      * @return Path
      */
-    protected function toRegexMatchStart(Path $path) : Path
+    protected function toRegexMatchStart(Path $path): Path
     {
         $glob = Glob::toRegex($path->toString(), true, true, '#');
 

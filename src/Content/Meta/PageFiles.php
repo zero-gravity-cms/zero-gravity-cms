@@ -67,7 +67,7 @@ class PageFiles
      *
      * @return File[]
      */
-    private function getFilesByType(string $type) : array
+    private function getFilesByType(string $type): array
     {
         return array_filter($this->files, function (File $file) use ($type) {
             return $file->getType() === $type;
@@ -114,7 +114,7 @@ class PageFiles
      *
      * @return File|null
      */
-    public function getYamlFile() : ? File
+    public function getYamlFile(): ? File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
         if (count($files) > 0) {
@@ -129,7 +129,7 @@ class PageFiles
      *
      * @return File|null
      */
-    public function getTwigFile() : ? File
+    public function getTwigFile(): ? File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_TWIG);
         if (count($files) > 0) {
@@ -142,7 +142,7 @@ class PageFiles
     /**
      * @return File[]
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return $this->files;
     }

@@ -123,7 +123,7 @@ class PageResolver extends AbstractResolver
      *
      * @return bool
      */
-    protected function pageMatchesPath(Page $page, Path $path, Path $parentPath = null) : bool
+    protected function pageMatchesPath(Page $page, Path $path, Path $parentPath = null): bool
     {
         $pagePathString = $page->getPath()->toString();
         if (null !== $parentPath) {

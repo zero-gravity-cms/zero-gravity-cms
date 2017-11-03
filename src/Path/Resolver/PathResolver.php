@@ -36,5 +36,5 @@ interface PathResolver
      *
      * @return null|File
      */
-    public function findOne(Path $path, Path $parentPath = null, bool $strict = true) : ? File;
+    public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ? File;
 }

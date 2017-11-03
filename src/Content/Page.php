@@ -125,7 +125,7 @@ class Page
      *
      * @return File[]
      */
-    public function getImages() : array
+    public function getImages(): array
     {
         return $this->files->getImages();
     }
@@ -155,7 +155,7 @@ class Page
      *
      * @return File|null
      */
-    public function getYamlFile() : ? File
+    public function getYamlFile(): ? File
     {
         return $this->files->getYamlFile();
     }
@@ -165,7 +165,7 @@ class Page
      *
      * @return File|null
      */
-    public function getTwigFile() : ? File
+    public function getTwigFile(): ? File
     {
         return $this->files->getTwigFile();
     }
@@ -173,7 +173,7 @@ class Page
     /**
      * @return Path
      */
-    public function getPath() : Path
+    public function getPath(): Path
     {
         return $this->path;
     }
@@ -198,7 +198,7 @@ class Page
     /**
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -245,7 +245,7 @@ class Page
     /**
      * @return string|null
      */
-    public function getContent() : ? string
+    public function getContent(): ? string
     {
         return $this->content;
     }
@@ -253,7 +253,7 @@ class Page
     /**
      * @return string
      */
-    public function getSlug() : string
+    public function getSlug(): string
     {
         return (string) $this->getSetting('slug');
     }
@@ -302,7 +302,7 @@ class Page
      *
      * @return bool
      */
-    public function isVisible() : bool
+    public function isVisible(): bool
     {
         return (bool) $this->getSetting('is_visible');
     }
@@ -332,7 +332,7 @@ class Page
      *
      * @return string|null
      */
-    public function getController() : ? string
+    public function getController(): ? string
     {
         return (string) $this->getSetting('controller');
     }
@@ -340,7 +340,7 @@ class Page
     /**
      * @param Page $childPage
      */
-    public function addChild(Page $childPage) : void
+    public function addChild(Page $childPage): void
     {
         $this->children[] = $childPage;
     }
@@ -366,7 +366,7 @@ class Page
     /**
      * @return bool
      */
-    public function isPublished() : bool
+    public function isPublished(): bool
     {
         return null === $this->getPublishedAt() || $this->getPublishedAt()->format('U') > time();
     }

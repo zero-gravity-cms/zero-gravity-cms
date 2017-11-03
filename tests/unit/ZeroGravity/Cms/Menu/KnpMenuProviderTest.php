@@ -134,10 +134,10 @@ class KnpMenuProviderTest extends BaseUnit
             if (!$argument instanceof BeforeBuildMenu) {
                 return false;
             }
-            if ($argument->getMenuName() !== 'default') {
+            if ('default' !== $argument->getMenuName()) {
                 return false;
             }
-            if ($argument->getRootItem()->getName() !== 'root') {
+            if ('root' !== $argument->getRootItem()->getName()) {
                 return false;
             }
 
@@ -154,13 +154,13 @@ class KnpMenuProviderTest extends BaseUnit
             if (!$argument instanceof BeforeAddItem) {
                 return false;
             }
-            if ($argument->getRootItem()->getName() !== 'root') {
+            if ('root' !== $argument->getRootItem()->getName()) {
                 return false;
             }
-            if ($argument->getItemToBeAdded()->getName() !== 'home') {
+            if ('home' !== $argument->getItemToBeAdded()->getName()) {
                 return false;
             }
-            if ($argument->getParentItem()->getName() !== 'root') {
+            if ('root' !== $argument->getParentItem()->getName()) {
                 return false;
             }
 
@@ -197,13 +197,13 @@ class KnpMenuProviderTest extends BaseUnit
             if (!$argument instanceof AfterAddItem) {
                 return false;
             }
-            if ($argument->getRootItem()->getName() !== 'root') {
+            if ('root' !== $argument->getRootItem()->getName()) {
                 return false;
             }
-            if ($argument->getAddedItem()->getName() !== 'second-child') {
+            if ('second-child' !== $argument->getAddedItem()->getName()) {
                 return false;
             }
-            if ($argument->getParentItem()->getName() !== 'first-sibling') {
+            if ('first-sibling' !== $argument->getParentItem()->getName()) {
                 return false;
             }
 

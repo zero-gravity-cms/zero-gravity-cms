@@ -126,7 +126,7 @@ class FilesystemResolver extends AbstractResolver
      *
      * @return string
      */
-    protected function buildBaseDir(Path $parentPath = null) : string
+    protected function buildBaseDir(Path $parentPath = null): string
     {
         if (null === $parentPath) {
             return $this->basePath;

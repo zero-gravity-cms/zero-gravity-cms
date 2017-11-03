@@ -126,7 +126,7 @@ class Path
         $this->isDirectory = (strlen($pathString) - 1 === strrpos($pathString, '/'));
 
         $parts = array_filter(explode('/', $pathString), function ($part) {
-            return !empty($part) && $part !== '.';
+            return !empty($part) && '.' !== $part;
         });
 
         $this->elements = array_map(function ($part) {
@@ -282,7 +282,7 @@ class Path
      */
     public function isSingleElement(): bool
     {
-        return count($this->getElements()) === 1;
+        return 1 === count($this->getElements());
     }
 
     /**
@@ -373,7 +373,7 @@ class Path
      *
      * @return PathElement|null
      */
-    public function getLastElement() : ? PathElement
+    public function getLastElement(): ? PathElement
     {
         if ($this->hasElements()) {
             return array_values(array_slice($this->elements, -1))[0];
@@ -385,7 +385,7 @@ class Path
     /**
      * Drop the last element from the path.
      */
-    public function dropLastElement() : void
+    public function dropLastElement(): void
     {
         array_pop($this->elements);
         $this->isDirectory = true;
