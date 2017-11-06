@@ -71,7 +71,7 @@ class KnpMenuProviderTest extends BaseUnit
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('default');
-        $child = $rootItem->getChild('first-sibling');
+        $child = $rootItem->getChild('First Sibling');
         $this->assertCount(2, $child->getChildren());
     }
 
@@ -93,14 +93,14 @@ class KnpMenuProviderTest extends BaseUnit
     public function itemUrisMatch()
     {
         $expectedItemUris = [
-            'home' => '/home',
-            'first-sibling' => '/first-sibling',
+            'Home' => '/home',
+            'First Sibling' => '/first-sibling',
             'custom second sibling label' => '/second-sibling',
         ];
         $expectedChildItemUris = [
-            'first-sibling' => [
-                'first-child' => '/first-sibling/first-child',
-                'second-child' => '/first-sibling/second-child',
+            'First Sibling' => [
+                'First Child' => '/first-sibling/first-child',
+                'Second Child' => '/first-sibling/second-child',
             ],
         ];
 
@@ -157,7 +157,7 @@ class KnpMenuProviderTest extends BaseUnit
             if ('root' !== $argument->getRootItem()->getName()) {
                 return false;
             }
-            if ('home' !== $argument->getItemToBeAdded()->getName()) {
+            if ('Home' !== $argument->getItemToBeAdded()->getName()) {
                 return false;
             }
             if ('root' !== $argument->getParentItem()->getName()) {
@@ -200,10 +200,10 @@ class KnpMenuProviderTest extends BaseUnit
             if ('root' !== $argument->getRootItem()->getName()) {
                 return false;
             }
-            if ('second-child' !== $argument->getAddedItem()->getName()) {
+            if ('Second Child' !== $argument->getAddedItem()->getName()) {
                 return false;
             }
-            if ('first-sibling' !== $argument->getParentItem()->getName()) {
+            if ('First Sibling' !== $argument->getParentItem()->getName()) {
                 return false;
             }
 

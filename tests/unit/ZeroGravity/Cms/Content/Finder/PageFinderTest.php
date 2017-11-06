@@ -6,6 +6,7 @@ use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\FilesystemParser;
 
 /**
@@ -14,9 +15,72 @@ use ZeroGravity\Cms\Filesystem\FilesystemParser;
 class PageFinderTest extends BaseUnit
 {
     /**
+     * @var PageFinder
+     */
+    private $finderPrototype;
+
+    public function _before()
+    {
+        $fileFactory = $this->getDefaultFileFactory();
+        $path = $this->getValidPagesDir();
+        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $repository = new ContentRepository($parser, new ArrayCache(), false);
+
+        $this->finderPrototype = $repository->getPageFinder();
+    }
+
+    /**
      * @test
      */
-    public function basicPageFinderReturnsAllPagesRecursively()
+    public function cannotIterateOverEmptyPageFinder()
+    {
+        $finder = new PageFinder();
+        $this->expectException(\LogicException::class);
+        count($finder);
+    }
+
+    /**
+     * @test
+     * @dataProvider provideFinderMethods
+     *
+     * @param string $method
+     * @param        $param
+     */
+    public function finderMethodReturnsThis(string $method, $param)
+    {
+        $finder = $this->getFinder();
+        $returnValue = $finder->$method($param);
+
+        $this->assertSame($finder, $returnValue);
+    }
+
+    public function provideFinderMethods()
+    {
+        return [
+            ['date', '> now'],
+            ['name', ''],
+            ['notName', ''],
+            ['slug', ''],
+            ['notSlug', ''],
+            ['depth', 0],
+            ['path', ''],
+            ['notPath', ''],
+            ['filesystemPath', ''],
+            ['notFilesystemPath', ''],
+            ['title', ''],
+            ['notTitle', ''],
+            ['contains', ''],
+            ['notContains', ''],
+            ['published', true],
+            ['modular', true],
+            ['module', true],
+        ];
+    }
+
+    /**
+     * @test
+     */
+    public function basicPageFinderReturnsAllPublishedPages()
     {
         $finder = $this->getFinder();
         $this->assertCount(11, $finder);
@@ -25,22 +89,62 @@ class PageFinderTest extends BaseUnit
     /**
      * @test
      */
-    public function pagesCanBeFilteredBySlug()
+    public function pagesCanBeFilteredByPublishState()
     {
         $finder = $this->getFinder()
-            ->slug('yaml_and_twig')
+            ->published(true)
         ;
-        $this->assertCount(1, $finder, 'String comparison');
+        $this->assertCount(11, $finder);
+        $finder = $this->getFinder()
+            ->published(false)
+        ;
+        $this->assertCount(1, $finder);
+        $finder = $this->getFinder()
+            ->published(null)
+        ;
+        $this->assertCount(12, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByModularState()
+    {
+        $finder = $this->getFinder()
+            ->modular(true)
+        ;
+        $this->assertCount(1, $finder);
 
         $finder = $this->getFinder()
-            ->slug('child?')
+            ->modular(false)
         ;
-        $this->assertCount(4, $finder, 'Glob comparison');
+        $this->assertCount(10, $finder);
 
         $finder = $this->getFinder()
-            ->slug('/.*Chil.*/i')
+            ->modular(null)
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(11, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByModuleState()
+    {
+        $finder = $this->getFinder()
+            ->module(true)
+        ;
+        $this->assertCount(2, $finder);
+
+        $finder = $this->getFinder()
+            ->module(false)
+        ;
+        $this->assertCount(9, $finder);
+
+        $finder = $this->getFinder()
+            ->module(null)
+        ;
+        $this->assertCount(11, $finder);
     }
 
     /**
@@ -52,14 +156,89 @@ class PageFinderTest extends BaseUnit
             ->name('04.with_children')
         ;
         $this->assertCount(1, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notName('04.with_children')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->name('0?.child?')
         ;
-        $this->assertCount(4, $finder, 'Glob comparison');
+        $this->assertCount(2, $finder, 'Glob comparison');
+        $finder = $this->getFinder()
+            ->notName('0?.child?')
+        ;
+        $this->assertCount(9, $finder, 'Glob comparison, negated');
 
         $finder = $this->getFinder()
             ->name('/.*Chil.*/i')
+        ;
+        $this->assertCount(5, $finder, 'Regex comparison');
+        $finder = $this->getFinder()
+            ->notName('/.*Chil.*/i')
+        ;
+        $this->assertCount(6, $finder, 'Regex comparison, negated');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredBySlug()
+    {
+        $finder = $this->getFinder()
+            ->slug('yaml_and_twig')
+        ;
+        $this->assertCount(1, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notSlug('yaml_and_twig')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->slug('child?')
+        ;
+        $this->assertCount(2, $finder, 'Glob comparison');
+        $finder = $this->getFinder()
+            ->notSlug('child?')
+        ;
+        $this->assertCount(9, $finder, 'Glob comparison, negated');
+
+        $finder = $this->getFinder()
+            ->slug('/.*Chil.*/i')
+        ;
+        $this->assertCount(5, $finder, 'Regex comparison');
+        $finder = $this->getFinder()
+            ->notSlug('/.*Chil.*/i')
+        ;
+        $this->assertCount(6, $finder, 'Regex comparison, negated');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByTitle()
+    {
+        $finder = $this->getFinder()
+            ->title('Yaml And Twig')
+        ;
+        $this->assertCount(1, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notTitle('Yaml And Twig')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->title('testtitle')
+        ;
+        $this->assertCount(1, $finder, 'String comparison, custom title');
+
+        $finder = $this->getFinder()
+            ->title('Child?')
+        ;
+        $this->assertCount(2, $finder, 'Glob comparison');
+
+        $finder = $this->getFinder()
+            ->title('/.*Chil.*/i')
         ;
         $this->assertCount(5, $finder, 'Regex comparison');
     }
@@ -85,6 +264,16 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(11, $finder, 'Depth >= 0');
 
         $finder = $this->getFinder()
+            ->depth('< 1')
+        ;
+        $this->assertCount(7, $finder, 'Depth > 0');
+
+        $finder = $this->getFinder()
+            ->depth('<= 1')
+        ;
+        $this->assertCount(11, $finder, 'Depth >= 0');
+
+        $finder = $this->getFinder()
             ->depth(1)
         ;
         $this->assertCount(4, $finder, 'Depth 1');
@@ -96,22 +285,142 @@ class PageFinderTest extends BaseUnit
     }
 
     /**
+     * @test
+     */
+    public function pagesCanBeFilteredByPath()
+    {
+        $finder = $this->getFinder()
+            ->path('/with_children/_child1')
+        ;
+        $this->assertCount(1, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notPath('/with_children/_child1')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->path('/with_children/_child?')
+        ;
+        $this->assertCount(2, $finder, 'Glob comparison');
+        $finder = $this->getFinder()
+            ->notPath('/with_children/_child?')
+        ;
+        $this->assertCount(9, $finder, 'Glob comparison, negated');
+
+        $finder = $this->getFinder()
+            ->path('/*children/_child1')
+        ;
+        $this->assertCount(1, $finder, 'Glob comparison with leading wildcard *');
+
+        $finder = $this->getFinder()
+            ->path('/.*Chil.*/i')
+        ;
+        $this->assertCount(5, $finder, 'Regex comparison');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByFilesystemPath()
+    {
+        $finder = $this->getFinder()
+            ->filesystemPath('/04.with_children/_child1')
+        ;
+        $this->assertCount(1, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notFilesystemPath('/04.with_children/_child1')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->filesystemPath('/04.with_children/_child?')
+        ;
+        $this->assertCount(2, $finder, 'Glob comparison');
+        $finder = $this->getFinder()
+            ->notFilesystemPath('/04.with_children/_child?')
+        ;
+        $this->assertCount(9, $finder, 'Glob comparison, negated');
+
+        $finder = $this->getFinder()
+            ->filesystemPath('/*children/_child1')
+        ;
+        $this->assertCount(1, $finder, 'Glob comparison with leading wildcard *');
+
+        $finder = $this->getFinder()
+            ->filesystemPath('/.*Chil.*/i')
+        ;
+        $this->assertCount(5, $finder, 'Regex comparison');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByDate()
+    {
+        $finder = $this->getFinder()
+            ->date('> 2016-12-31')
+        ;
+        $this->assertCount(1, $finder);
+
+        $finder = $this->getFinder()
+            ->date('< 2017-01-02')
+        ;
+        $this->assertCount(2, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByContent()
+    {
+        $finder = $this->getFinder()
+            ->contains('This is the content of page 02.')
+        ;
+        $this->assertCount(1, $finder, 'String comparison');
+
+        $finder = $this->getFinder()
+            ->notContains('This is the content of page 02.')
+        ;
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->contains('*page 02*')
+        ;
+        $this->assertCount(1, $finder, 'Glob comparison');
+    }
+
+    /**
+     * @test
+     */
+    public function findersCanBeAppended()
+    {
+        $finder = $this->getFinder();
+        $finder->append($this->getFinder());
+        $this->assertCount(22, $finder);
+
+        $finder = PageFinder::create();
+        $finder
+            ->append(new Page('single page'))
+            ->append([
+                new Page('page2'),
+                new Page('page3'),
+            ])
+        ;
+        $this->assertCount(3, $finder);
+
+        $finder = $this->getFinder();
+        $finder->append($this->getFinder()->getIterator());
+        $this->assertCount(22, $finder);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $finder->append('string');
+    }
+
+    /**
      * @return PageFinder
      */
     private function getFinder()
     {
-        return $this->getRepository()->getPageFinder();
-    }
-
-    /**
-     * @return ContentRepository
-     */
-    private function getRepository()
-    {
-        $fileFactory = $this->getDefaultFileFactory();
-        $path = $this->getValidPagesDir();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
-
-        return new ContentRepository($parser, new ArrayCache(), false);
+        return clone $this->finderPrototype;
     }
 }

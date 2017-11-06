@@ -33,6 +33,6 @@ class FilesystemParserTest extends BaseUnit
 
         $pages = $parser->parse();
         $this->assertContainsOnlyInstancesOf(Page::class, $pages);
-        $this->assertCount(7, $pages);
+        $this->assertCount(8, $pages);
     }
 }

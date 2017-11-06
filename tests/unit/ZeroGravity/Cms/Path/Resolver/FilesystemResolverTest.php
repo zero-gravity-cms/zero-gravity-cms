@@ -94,7 +94,7 @@ class FilesystemResolverTest extends BaseUnit
     {
         $resolver = $this->getValidPagesResolver();
 
-        $resolved = $resolver->get(new Path('../../images/person_a.png'), new Path('04.with_children/01.child1'));
+        $resolved = $resolver->get(new Path('../../images/person_a.png'), new Path('04.with_children/_child1'));
         $this->assertInstanceOf(File::class, $resolved);
         $this->assertSame('/images/person_a.png', $resolved->getPathname(), 'pathname matches');
     }
@@ -118,7 +118,7 @@ class FilesystemResolverTest extends BaseUnit
             ['root_file1'],
             ['01.yaml_only/'],
             ['01.yaml_only'],
-            ['04.with_children/01.child1/'],
+            ['04.with_children/_child1/'],
         ];
     }
 
@@ -202,7 +202,7 @@ class FilesystemResolverTest extends BaseUnit
                 null,
                 [
                     '01.yaml_only/file1.png',
-                    '04.with_children/01.child1/child_file1.png',
+                    '04.with_children/_child1/child_file1.png',
                     'images/file1.png',
                     'root_file1.png',
                 ],
@@ -232,34 +232,34 @@ class FilesystemResolverTest extends BaseUnit
                 'child_file{3,4,5}.png',
                 null,
                 [
-                    '04.with_children/01.child1/child_file3.png',
-                    '04.with_children/01.child1/child_file4.png',
                     '04.with_children/03.empty/child_file5.png',
+                    '04.with_children/_child1/child_file3.png',
+                    '04.with_children/_child1/child_file4.png',
                 ],
             ],
             [
                 'child_file{3,4,5}.png',
                 '04.with_children',
                 [
-                    '04.with_children/01.child1/child_file3.png',
-                    '04.with_children/01.child1/child_file4.png',
                     '04.with_children/03.empty/child_file5.png',
+                    '04.with_children/_child1/child_file3.png',
+                    '04.with_children/_child1/child_file4.png',
                 ],
             ],
             [
-                '04.with_children/01.child1/child_file{3,4,5}.png',
+                '04.with_children/_child1/child_file{3,4,5}.png',
                 null,
                 [
-                    '04.with_children/01.child1/child_file3.png',
-                    '04.with_children/01.child1/child_file4.png',
+                    '04.with_children/_child1/child_file3.png',
+                    '04.with_children/_child1/child_file4.png',
                 ],
             ],
             [
-                '#04\\.with_children/01\\.child1/child_file[3,4,5]{1}\\.png#',
+                '#04\\.with_children/_child1/child_file[3,4,5]{1}\\.png#',
                 null,
                 [
-                    '04.with_children/01.child1/child_file3.png',
-                    '04.with_children/01.child1/child_file4.png',
+                    '04.with_children/_child1/child_file3.png',
+                    '04.with_children/_child1/child_file4.png',
                 ],
             ],
             [
@@ -271,7 +271,7 @@ class FilesystemResolverTest extends BaseUnit
             ],
             [
                 '../../images/person_?.png',
-                '04.with_children/01.child',
+                '04.with_children/_child',
                 [
                     'images/person_a.png',
                     'images/person_b.png',

@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Content\Finder;
 
 use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
+use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\Page;
 
@@ -12,18 +13,18 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PageFinder implements \IteratorAggregate, \Countable
 {
-    private $mode = 0;
+    private $published;
+    private $modular;
+    private $module;
     private $names = [];
     private $notNames = [];
     private $slugs = [];
     private $notSlugs = [];
-    private $exclude = [];
+    private $titles = [];
+    private $notTitles = [];
     private $filters = [];
     private $depths = [];
-    private $sizes = [];
-    private $followLinks = false;
     private $sort = false;
-    private $ignore = 0;
     private $pageLists = [];
     private $dates = [];
     private $iterators = [];
@@ -31,7 +32,8 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notContains = [];
     private $paths = [];
     private $notPaths = [];
-    private $ignoreUnreadableDirs = false;
+    private $filesystemPaths = [];
+    private $notFilesystemPaths = [];
 
     /**
      * Creates a new Finder.
@@ -41,6 +43,53 @@ class PageFinder implements \IteratorAggregate, \Countable
     public static function create()
     {
         return new static();
+    }
+
+    public function __construct()
+    {
+        $this->published(true);
+    }
+
+    /**
+     * Restrict to published or unpublished pages.
+     *
+     * @param bool|null $published true for published pages, false for unpublished, null to ignore setting
+     *
+     * @return $this
+     */
+    public function published($published)
+    {
+        $this->published = $published;
+
+        return $this;
+    }
+
+    /**
+     * Restrict to modular or non-modular pages.
+     *
+     * @param bool|null $modular true for modular pages, false for non-modular, null to ignore setting
+     *
+     * @return $this
+     */
+    public function modular($modular)
+    {
+        $this->modular = $modular;
+
+        return $this;
+    }
+
+    /**
+     * Restrict to module or non-module pages.
+     *
+     * @param bool|null $module true for module pages, false for non-module, null to ignore setting
+     *
+     * @return $this
+     */
+    public function module($module)
+    {
+        $this->module = $module;
+
+        return $this;
     }
 
     /**
@@ -66,7 +115,7 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds tests for file dates (last modified).
+     * Adds tests for page dates (if defined in page metadata).
      *
      * The date must be something that strtotime() is able to parse:
      *
@@ -167,7 +216,46 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds tests that file contents must match.
+     * Adds rules that pages must match.
+     *
+     * You can use patterns (delimited with / sign), globs or simple strings.
+     *
+     * $finder->title('foo title')
+     * $finder->title('foo *')
+     * $finder->title('/foo [a-z]{1,4}/')
+     *
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
+     *
+     * @return $this
+     *
+     * @see TitleFilterIterator
+     */
+    public function title($pattern)
+    {
+        $this->titles[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages must not match.
+     *
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
+     *
+     * @return $this
+     *
+     * @see TitleFilterIterator
+     */
+    public function notTitle($pattern)
+    {
+        $this->notTitles[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds tests that page contents must match.
+     * This will be matched against the raw (HTML or markdown) content.
      *
      * Strings or PCRE patterns can be used:
      *
@@ -188,7 +276,8 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds tests that file contents must not match.
+     * Adds tests that page contents must not match.
+     * This will be matched against the raw (HTML or markdown) content.
      *
      * Strings or PCRE patterns can be used:
      *
@@ -209,12 +298,11 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds rules that filenames must match.
+     * Adds rules that page paths must match.
      *
      * You can use patterns (delimited with / sign) or simple strings.
      *
-     * $finder->path('some/special/dir')
-     * $finder->path('/some\/special\/dir/') // same as above
+     * $finder->path('/some/special/dir/')
      *
      * Use only / as dirname separator.
      *
@@ -232,12 +320,11 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Adds rules that filenames must not match.
+     * Adds rules that page paths must not match.
      *
      * You can use patterns (delimited with / sign) or simple strings.
      *
-     * $finder->notPath('some/special/dir')
-     * $finder->notPath('/some\/special\/dir/') // same as above
+     * $finder->notPath('/some/special/dir/')
      *
      * Use only / as dirname separator.
      *
@@ -255,17 +342,45 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Excludes directories.
+     * Adds rules that page filesystem paths must match.
      *
-     * @param string|array $names A directory path or an array of directories
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     * $finder->path('/some/special/dir/')
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string $pattern A pattern (a regexp or a string)
      *
      * @return $this
      *
-     * @see ExcludeDirectoryFilterIterator
+     * @see FilenameFilterIterator
      */
-    public function exclude($names)
+    public function filesystemPath($pattern)
     {
-        $this->exclude = array_merge($this->exclude, (array) $names);
+        $this->filesystemPaths[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that page filesystem paths must not match.
+     *
+     * You can use patterns (delimited with / sign) or simple strings.
+     *
+     * $finder->notPath('/some/special/dir/')
+     *
+     * Use only / as dirname separator.
+     *
+     * @param string $pattern A pattern (a regexp or a string)
+     *
+     * @return $this
+     *
+     * @see FilenameFilterIterator
+     */
+    public function notFilesystemPath($pattern)
+    {
+        $this->notFilesystemPaths[] = $pattern;
 
         return $this;
     }
@@ -283,9 +398,9 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Appends an existing set of files/directories to the finder.
+     * Appends an existing set of pages to the finder.
      *
-     * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
+     * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
      * @param mixed $iterator
      *
@@ -301,12 +416,17 @@ class PageFinder implements \IteratorAggregate, \Countable
             $this->iterators[] = $iterator;
         } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
             $it = new \ArrayIterator();
-            foreach ($iterator as $file) {
-                $it->append($file instanceof \SplFileInfo ? $file : new \SplFileInfo($file));
+            foreach ($iterator as $page) {
+                Assert::isInstanceOf($page, Page::class);
+                $it->append($page);
             }
             $this->iterators[] = $it;
+        } elseif ($iterator instanceof Page) {
+            $it = new \ArrayIterator();
+            $it->append($iterator);
+            $this->iterators[] = $it;
         } else {
-            throw new \InvalidArgumentException('Finder::append() method wrong argument type.');
+            throw new \InvalidArgumentException('PageFinder::append() method wrong argument type.');
         }
 
         return $this;
@@ -397,6 +517,42 @@ class PageFinder implements \IteratorAggregate, \Countable
             $iterator = new Iterator\SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
+        if ($this->titles || $this->notTitles) {
+            $iterator = new Iterator\TitleFilterIterator($iterator, $this->titles, $this->notTitles);
+        }
+
+        if ($this->paths || $this->notPaths) {
+            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+        }
+
+        if ($this->filesystemPaths || $this->notFilesystemPaths) {
+            $iterator = new Iterator\FilesystemPathFilterIterator(
+                $iterator,
+                $this->filesystemPaths,
+                $this->notFilesystemPaths
+            );
+        }
+
+        if ($this->contains || $this->notContains) {
+            $iterator = new Iterator\ContentFilterIterator($iterator, $this->contains, $this->notContains);
+        }
+
+        if ($this->dates) {
+            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
+        }
+
+        if (null !== $this->modular) {
+            $iterator = new Iterator\ModularFilterIterator($iterator, $this->modular);
+        }
+
+        if (null !== $this->module) {
+            $iterator = new Iterator\ModuleFilterIterator($iterator, $this->module);
+        }
+
+        if (null !== $this->published) {
+            $iterator = new Iterator\PublishedFilterIterator($iterator, $this->published);
+        }
+
         return $iterator;
         /*
         if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
@@ -417,32 +573,12 @@ class PageFinder implements \IteratorAggregate, \Countable
 
         $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
 
-        if ($minDepth > 0 || $maxDepth < PHP_INT_MAX) {
-            $iterator = new Iterator\DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
-        }
-
-        if ($this->mode) {
-            $iterator = new Iterator\FileTypeFilterIterator($iterator, $this->mode);
-        }
-
-        if ($this->contains || $this->notContains) {
-            $iterator = new Iterator\FilecontentFilterIterator($iterator, $this->contains, $this->notContains);
-        }
-
         if ($this->sizes) {
             $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
         }
 
-        if ($this->dates) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
-        }
-
         if ($this->filters) {
             $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
-        }
-
-        if ($this->paths || $this->notPaths) {
-            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
         if ($this->sort) {
@@ -459,6 +595,6 @@ class PageFinder implements \IteratorAggregate, \Countable
      */
     public function toArray(): array
     {
-        return iterator_to_array($this);
+        return iterator_to_array($this, false);
     }
 }

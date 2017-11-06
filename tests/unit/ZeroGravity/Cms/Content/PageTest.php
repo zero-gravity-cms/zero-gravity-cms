@@ -160,8 +160,8 @@ class PageTest extends BaseUnit
         $page = new Page('page', [
             'slug' => 'page',
             'title' => 'Page title',
-            'is_visible' => true,
-            'is_modular' => true,
+            'visible' => true,
+            'modular' => true,
             'template' => 'main.html.twig',
             'controller' => 'CustomBundle:Custom:action',
             'menu_id' => 'custom_id',
@@ -190,16 +190,21 @@ class PageTest extends BaseUnit
 
         $expectedSettings = [
             'slug' => 'page',
-            'title' => null,
-            'is_visible' => false,
-            'is_modular' => false,
+            'title' => 'Page',
+            'visible' => false,
+            'modular' => false,
+            'module' => false,
             'template' => null,
             'controller' => null,
             'menu_id' => 'default',
             'menu_label' => null,
             'file_aliases' => [],
-            'published_at' => null,
+            'date' => null,
+            'publish' => true,
+            'publish_date' => null,
+            'unpublish_date' => null,
             'extra' => [],
+            'taxonomy' => [],
         ];
         $this->assertEquals($expectedSettings, $page->getSettings());
     }
@@ -241,16 +246,180 @@ class PageTest extends BaseUnit
     public function publishDateIsCastToDateTimeImmutable()
     {
         $page = new Page('page');
-        $this->assertNull($page->getPublishedAt());
+        $this->assertNull($page->getPublishDate());
 
-        $page = new Page('page', ['published_at' => new \DateTime()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+        $page = new Page('page', ['publish_date' => new \DateTime()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
 
-        $page = new Page('page', ['published_at' => new \DateTimeImmutable()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+        $page = new Page('page', ['publish_date' => new \DateTimeImmutable()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
 
-        $page = new Page('page', ['published_at' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishedAt());
+        $page = new Page('page', ['publish_date' => '2017-01-01 12:00:00']);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
+    }
+
+    /**
+     * @test
+     */
+    public function unpublishDateIsCastToDateTimeImmutable()
+    {
+        $page = new Page('page');
+        $this->assertNull($page->getUnpublishDate());
+
+        $page = new Page('page', ['unpublish_date' => new \DateTime()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+
+        $page = new Page('page', ['unpublish_date' => new \DateTimeImmutable()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+
+        $page = new Page('page', ['unpublish_date' => '2017-01-01 12:00:00']);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+    }
+
+    /**
+     * @test
+     */
+    public function dateIsCastToDateTimeImmutable()
+    {
+        $page = new Page('page');
+        $this->assertNull($page->getDate());
+
+        $page = new Page('page', ['date' => new \DateTime()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+
+        $page = new Page('page', ['date' => new \DateTimeImmutable()]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+
+        $page = new Page('page', ['date' => '2017-01-01 12:00:00']);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+    }
+
+    /**
+     * @test
+     */
+    public function pageIsPublishedByDefault()
+    {
+        $page = new Page('page');
+        $this->assertTrue($page->isPublished());
+    }
+
+    /**
+     * @test
+     */
+    public function publishingCanBeControlledByDates()
+    {
+        $page = new Page('page', [
+            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+        ]);
+        $this->assertTrue($page->isPublished());
+
+        $page = new Page('page', [
+            'publish_date' => new \DateTimeImmutable('+10 seconds'),
+        ]);
+        $this->assertFalse($page->isPublished());
+
+        $page = new Page('page', [
+            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+            'unpublish_date' => new \DateTimeImmutable('+10 seconds'),
+        ]);
+        $this->assertTrue($page->isPublished());
+
+        $page = new Page('page', [
+            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+            'unpublish_date' => new \DateTimeImmutable('-5 seconds'),
+        ]);
+        $this->assertFalse($page->isPublished());
+
+        $page = new Page('page', [
+            'unpublish_date' => new \DateTimeImmutable('-5 seconds'),
+        ]);
+        $this->assertFalse($page->isPublished());
+    }
+
+    /**
+     * @test
+     */
+    public function pageCanBeUnpublishedAndDatesAreIgnored()
+    {
+        $page = new Page('page', [
+            'publish' => false,
+        ]);
+        $this->assertFalse($page->isPublished());
+
+        $page = new Page('page', [
+            'publish' => false,
+            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+        ]);
+        $this->assertFalse($page->isPublished());
+
+        $page = new Page('page', [
+            'publish' => false,
+            'unpublish_date' => new \DateTimeImmutable('+10 seconds'),
+        ]);
+        $this->assertFalse($page->isPublished());
+    }
+
+    /**
+     * @test
+     */
+    public function defaultTitleIsGeneratedBasedOnName()
+    {
+        $page = new Page('page');
+        $this->assertSame('Page', $page->getTitle());
+
+        $page = new Page('name-with_dashes_and_underscores');
+        $this->assertSame('Name With Dashes And Underscores', $page->getTitle());
+    }
+
+    /**
+     * @test
+     */
+    public function taxonomyIsNormalizedToArrays()
+    {
+        $page = new Page('page', [
+            'taxonomy' => [
+                'tag' => ['foo', 'bar'],
+                'category' => 'baz',
+            ],
+        ]);
+
+        $this->assertSame([
+            'tag' => ['foo', 'bar'],
+            'category' => ['baz'],
+        ], $page->getTaxonomies());
+    }
+
+    /**
+     * @test
+     */
+    public function taxonomyGetterDefaultsEmpty()
+    {
+        $page = new Page('page', [
+            'taxonomy' => [
+                'tag' => ['foo', 'bar'],
+            ],
+        ]);
+
+        $this->assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
+        $this->assertSame([], $page->getTaxonomy('category'));
+    }
+
+    /**
+     * @test
+     */
+    public function taxonomyProvidesQuickGetters()
+    {
+        $page = new Page('page', [
+            'taxonomy' => [
+                'tag' => ['foo', 'bar'],
+                'category' => 'baz',
+                'author' => ['David', 'Julian'],
+            ],
+        ]);
+
+        $this->assertSame(['foo', 'bar'], $page->getTags());
+        $this->assertSame(['baz'], $page->getCategories());
+        $this->assertSame(['David', 'Julian'], $page->getAuthors());
     }
 
     /**

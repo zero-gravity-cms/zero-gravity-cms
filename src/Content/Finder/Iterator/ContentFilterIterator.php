@@ -3,9 +3,9 @@
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 /**
- * SlugFilterIterator filters pages by slug patterns (a regexp, a glob, or a string).
+ * ContentFilterIterator filters pages by content patterns (a regexp, a glob, or a string).
  */
-class SlugFilterIterator extends MultipleGlobFilterIterator
+class ContentFilterIterator extends MultipleGlobFilterIterator
 {
     /**
      * Filters the iterator values.
@@ -14,6 +14,6 @@ class SlugFilterIterator extends MultipleGlobFilterIterator
      */
     public function accept()
     {
-        return $this->isAccepted($this->current()->getSlug());
+        return $this->isAccepted($this->current()->getContent());
     }
 }

@@ -205,18 +205,6 @@ class Page
     }
 
     /**
-     * @return string
-     */
-    public function getNameWithoutSortingPrefix(): string
-    {
-        if (preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
-            return $matches[1];
-        }
-
-        return $this->getName();
-    }
-
-    /**
      * @return Path
      */
     public function getFilesystemPath(): Path
@@ -260,6 +248,57 @@ class Page
     }
 
     /**
+     * Get all defined taxonomy keys and values.
+     *
+     * @return array
+     */
+    public function getTaxonomies(): array
+    {
+        return $this->getSetting('taxonomy');
+    }
+
+    /**
+     * Get values for a single taxonomy key.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getTaxonomy($name): array
+    {
+        $taxonomy = $this->getSetting('taxonomy');
+        if (isset($taxonomy[$name])) {
+            return (array) $taxonomy[$name];
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags(): array
+    {
+        return $this->getTaxonomy('tag');
+    }
+
+    /**
+     * @return array
+     */
+    public function getCategories(): array
+    {
+        return $this->getTaxonomy('category');
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuthors(): array
+    {
+        return $this->getTaxonomy('author');
+    }
+
+    /**
      * @return array
      */
     public function getSettings(): array
@@ -284,18 +323,15 @@ class Page
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMenuLabel(): ? string
+    public function getMenuLabel(): string
     {
         if (!empty($this->getSetting('menu_label'))) {
             return (string) $this->getSetting('menu_label');
         }
-        if (!empty($this->getTitle())) {
-            return $this->getTitle();
-        }
 
-        return $this->getNameWithoutSortingPrefix();
+        return $this->getTitle();
     }
 
     /**
@@ -305,7 +341,17 @@ class Page
      */
     public function isVisible(): bool
     {
-        return (bool) $this->getSetting('is_visible');
+        return (bool) $this->getSetting('visible');
+    }
+
+    /**
+     * Page is considered a modular page, not a content page.
+     *
+     * @return bool
+     */
+    public function isModular(): bool
+    {
+        return (bool) $this->getSetting('modular');
     }
 
     /**
@@ -313,9 +359,9 @@ class Page
      *
      * @return bool
      */
-    public function isModular(): bool
+    public function isModule(): bool
     {
-        return (bool) $this->getSetting('is_modular');
+        return (bool) $this->getSetting('module');
     }
 
     /**
@@ -363,13 +409,33 @@ class Page
     }
 
     /**
-     * Page is considered a modular snippet, not a standalone page.
+     * Get optional date information of this page.
      *
      * @return DateTimeImmutable
      */
-    public function getPublishedAt(): ? DateTimeImmutable
+    public function getDate(): ? DateTimeImmutable
     {
-        return $this->getSetting('published_at');
+        return $this->getSetting('date');
+    }
+
+    /**
+     * Get optional publishing date of this page.
+     *
+     * @return DateTimeImmutable
+     */
+    public function getPublishDate(): ? DateTimeImmutable
+    {
+        return $this->getSetting('publish_date');
+    }
+
+    /**
+     * Get optional un-publishing date of this page.
+     *
+     * @return DateTimeImmutable
+     */
+    public function getUnpublishDate(): ? DateTimeImmutable
+    {
+        return $this->getSetting('unpublish_date');
     }
 
     /**
@@ -377,7 +443,18 @@ class Page
      */
     public function isPublished(): bool
     {
-        return null === $this->getPublishedAt() || $this->getPublishedAt()->format('U') > time();
+        if (!$this->getSetting('publish')) {
+            return false;
+        }
+        $now = time();
+        if (null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > $now) {
+            return false;
+        }
+        if (null !== $this->getUnpublishDate() && $now > $this->getUnpublishDate()->format('U')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

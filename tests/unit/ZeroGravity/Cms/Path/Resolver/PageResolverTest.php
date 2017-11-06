@@ -43,14 +43,14 @@ class PageResolverTest extends BaseUnit
                 '/01.yaml_only/file2.png',
             ],
             [
-                'with_children/child1/child_file3.png',
+                'with_children/_child1/child_file3.png',
                 null,
-                '/04.with_children/01.child1/child_file3.png',
+                '/04.with_children/_child1/child_file3.png',
             ],
             [
-                'child1/child_file3.png',
+                '_child1/child_file3.png',
                 'with_children/',
-                '/04.with_children/01.child1/child_file3.png',
+                '/04.with_children/_child1/child_file3.png',
             ],
             [
                 'with_children/03.empty/sub/dir/child_file7.png',
@@ -128,14 +128,14 @@ class PageResolverTest extends BaseUnit
                 'child?',
                 null,
                 [
-                    '04.with_children/01.child1',
-                    '04.with_children/02.child2',
+                    '04.with_children/_child1',
+                    '04.with_children/_child2',
                     '06.yaml_and_twig/01.child1',
                     '06.yaml_and_twig/02.child2',
                 ],
                 [
-                    '04.with_children/01.child1' => '04.with_children',
-                    '04.with_children/02.child2' => '04.with_children',
+                    '04.with_children/_child1' => '04.with_children',
+                    '04.with_children/_child2' => '04.with_children',
                     '06.yaml_and_twig/01.child1' => '06.yaml_and_twig',
                     '06.yaml_and_twig/02.child2' => '06.yaml_and_twig',
                 ],
@@ -166,7 +166,7 @@ class PageResolverTest extends BaseUnit
                 'child2',
                 null,
                 [
-                    '04.with_children/02.child2',
+                    '04.with_children/_child2',
                     '06.yaml_and_twig/02.child2',
                 ],
             ],
