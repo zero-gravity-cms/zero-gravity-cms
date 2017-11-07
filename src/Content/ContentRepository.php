@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Content;
 
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use ZeroGravity\Cms\Content\Finder\PageFinder;
 
 class ContentRepository
 {
@@ -125,7 +126,7 @@ class ContentRepository
     {
         foreach ($pages as $page) {
             $this->pagesByPath[$page->getPath()->toString()] = $page;
-            $this->doFlattenPages($page->getChildren());
+            $this->doFlattenPages($page->getChildren()->toArray());
         }
     }
 
@@ -166,5 +167,13 @@ class ContentRepository
         }
 
         return null;
+    }
+
+    /**
+     * @return PageFinder
+     */
+    public function getPageFinder()
+    {
+        return PageFinder::create()->inPageList($this->getPageTree());
     }
 }

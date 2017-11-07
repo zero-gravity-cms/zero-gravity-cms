@@ -176,8 +176,8 @@ class ParsedDirectory
         $content = $this->fetchPageContent($groupedFiles, $convertMarkdown);
         $settings = array_merge([
                 'slug' => $this->getSlug(),
-                'is_visible' => $this->hasSortingPrefix(),
-                'is_modular' => $this->hasUnderscorePrefix(),
+                'visible' => $this->hasSortingPrefix() && !$this->hasUnderscorePrefix(),
+                'module' => $this->hasUnderscorePrefix(),
             ],
             $defaultPageSettings,
             $this->fetchPageSettings($groupedFiles)
@@ -235,7 +235,7 @@ class ParsedDirectory
             $parser = new FrontYAMLParser();
             $document = $parser->parse(file_get_contents($files['markdown']->getFilesystemPathname()), $convertMarkdown);
 
-            return $document->getContent();
+            return trim($document->getContent());
         }
 
         return '';

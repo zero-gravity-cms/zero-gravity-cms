@@ -1,0 +1,6 @@
+publish_date: 2016-01-03
+taxonomy:
+    tag:
+        - tag1
+extra:
+    custom: custom_value

@@ -9,7 +9,7 @@ class FileTypeDetector
         'image' => ['jpg', 'jpeg', 'png', 'gif'],
         'markdown' => ['md'],
         'twig' => ['twig'],
-        'document' => ['pdf', 'docx', 'xlsx'],
+        'document' => ['pdf', 'docx', 'xlsx', 'txt'],
     ];
 
     const TYPE_YAML = 'yaml';
