@@ -150,7 +150,7 @@ class PageSettings
                 $name = $matches[1];
             }
 
-            return ucwords(str_replace(['-', '_'], ' ', $name));
+            return trim(ucwords(str_replace(['-', '_'], ' ', $name)));
         };
 
         $normalizeTaxonomy = function (Options $options, $value) {

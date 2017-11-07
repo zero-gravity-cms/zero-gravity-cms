@@ -270,7 +270,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->title('Child?')
         ;
-        $this->assertCount(2, $finder, 'Glob comparison');
+        $this->assertCount(4, $finder, 'Glob comparison');
 
         $finder = $this->getFinder()
             ->title('/.*Chil.*/i')
@@ -401,6 +401,19 @@ class PageFinderTest extends BaseUnit
             ->date('< 2017-01-02')
         ;
         $this->assertCount(2, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByCustomCallback()
+    {
+        $finder = $this->getFinder()
+            ->filter(function (Page $page) {
+                return 'yaml_and_twig' === $page->getSlug();
+            })
+        ;
+        $this->assertCount(1, $finder);
     }
 
     /**

@@ -392,7 +392,7 @@ class Page
      */
     public function addChild(Page $childPage): void
     {
-        $this->children[] = $childPage;
+        $this->children[$childPage->getPath()->toString()] = $childPage;
     }
 
     /**

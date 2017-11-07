@@ -219,8 +219,8 @@ class PageTest extends BaseUnit
         $child2 = new Page('child2', [], $parent);
 
         $this->assertSame([
-            $child1,
-            $child2,
+            '/page/child1' => $child1,
+            '/page/child2' => $child2,
         ], $parent->getChildren()->toArray());
     }
 

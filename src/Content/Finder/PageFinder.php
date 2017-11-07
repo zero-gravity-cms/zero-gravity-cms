@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Content\Finder;
 
 use Symfony\Component\Finder\Comparator;
+use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
@@ -658,6 +659,141 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Filters the iterator with an anonymous function.
+     *
+     * The anonymous function receives a Page and must return false
+     * to remove pages.
+     *
+     * @param \Closure $closure An anonymous function
+     *
+     * @return $this
+     *
+     * @see CustomFilterIterator
+     */
+    public function filter(\Closure $closure)
+    {
+        $this->filters[] = $closure;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by an anonymous function.
+     *
+     * The anonymous function receives two Page instances to compare.
+     *
+     * @param \Closure $closure An anonymous function
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sort(\Closure $closure)
+    {
+        $this->sort = $closure;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by name.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByName()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_NAME;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by name.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortBySlug()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_SLUG;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by title.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByTitle()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_TITLE;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by date.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByDate()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_DATE;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by publish date.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByPublishDate()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_PUBLISH_DATE;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by path.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByPath()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_PATH;
+
+        return $this;
+    }
+
+    /**
+     * Sorts pages by filesystem path.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByFilesystemPath()
+    {
+        $this->sort = Iterator\SortableIterator::SORT_BY_FILESYSTEM_PATH;
+
+        return $this;
+    }
+
+    /**
      * @param Page[] $pages
      *
      * @return $this
@@ -687,16 +823,14 @@ class PageFinder implements \IteratorAggregate, \Countable
         } elseif ($iterator instanceof \Iterator) {
             $this->iterators[] = $iterator;
         } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
-            $it = new \ArrayIterator();
+            $pages = [];
             foreach ($iterator as $page) {
                 Assert::isInstanceOf($page, Page::class);
-                $it->append($page);
+                $pages[$page->getPath()->toString()] = $page;
             }
-            $this->iterators[] = $it;
+            $this->iterators[] = new \ArrayIterator($pages);
         } elseif ($iterator instanceof Page) {
-            $it = new \ArrayIterator();
-            $it->append($iterator);
-            $this->iterators[] = $it;
+            $this->iterators[] = new \ArrayIterator([$iterator->getPath()->toString() => $iterator]);
         } else {
             throw new \InvalidArgumentException('PageFinder::append() method wrong argument type.');
         }
@@ -865,32 +999,8 @@ class PageFinder implements \IteratorAggregate, \Countable
             $iterator = new Iterator\PublishedFilterIterator($iterator, $this->published);
         }
 
-        return $iterator;
-        /*
-        if (static::IGNORE_VCS_FILES === (static::IGNORE_VCS_FILES & $this->ignore)) {
-            $this->exclude = array_merge($this->exclude, self::$vcsPatterns);
-        }
-
-        if (static::IGNORE_DOT_FILES === (static::IGNORE_DOT_FILES & $this->ignore)) {
-            $this->notPaths[] = '#(^|/)\..+(/|$)#';
-        }
-
-        $flags = \RecursiveDirectoryIterator::SKIP_DOTS;
-
-        $iterator = new Iterator\RecursiveDirectoryIterator($pageList, $flags, $this->ignoreUnreadableDirs);
-
-        if ($this->exclude) {
-            $iterator = new Iterator\ExcludeDirectoryFilterIterator($iterator, $this->exclude);
-        }
-
-        $iterator = new \RecursiveIteratorIterator($iterator, \RecursiveIteratorIterator::SELF_FIRST);
-
-        if ($this->sizes) {
-            $iterator = new Iterator\SizeRangeFilterIterator($iterator, $this->sizes);
-        }
-
         if ($this->filters) {
-            $iterator = new Iterator\CustomFilterIterator($iterator, $this->filters);
+            $iterator = new CustomFilterIterator($iterator, $this->filters);
         }
 
         if ($this->sort) {
@@ -899,7 +1009,6 @@ class PageFinder implements \IteratorAggregate, \Countable
         }
 
         return $iterator;
-        */
     }
 
     /**
@@ -907,6 +1016,6 @@ class PageFinder implements \IteratorAggregate, \Countable
      */
     public function toArray(): array
     {
-        return iterator_to_array($this, false);
+        return iterator_to_array($this, true);
     }
 }
