@@ -4,3 +4,5 @@ taxonomy:
         - tag2
     category:
         - category2
+extra:
+    custom: custom_value

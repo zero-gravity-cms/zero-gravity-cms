@@ -41,6 +41,10 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notFilesystemPaths = [];
     private $taxonomies = [];
     private $notTaxonomies = [];
+    private $extras = [];
+    private $notExtras = [];
+    private $settings = [];
+    private $notSettings = [];
     private $filters = [];
     private $sort = false;
     private $iterators = [];
@@ -263,6 +267,74 @@ class PageFinder implements \IteratorAggregate, \Countable
     public function notName($pattern)
     {
         $this->notNames[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages extra setting values must match.
+     *
+     * $finder->extra('my_extra', 'value')
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function extra($name, $value)
+    {
+        $this->extras[] = [$name, $value];
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages extra setting values must not match.
+     *
+     * $finder->notExtra('my_extra', 'value')
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function notExtra($name, $value)
+    {
+        $this->notExtras[] = [$name, $value];
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages setting values must match.
+     *
+     * $finder->setting('my_setting', 'value')
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setting($name, $value)
+    {
+        $this->settings[] = [$name, $value];
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages setting values must not match.
+     *
+     * $finder->notSetting('my_setting', 'value')
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function notSetting($name, $value)
+    {
+        $this->notSettings[] = [$name, $value];
 
         return $this;
     }
@@ -731,6 +803,14 @@ class PageFinder implements \IteratorAggregate, \Countable
                 $this->filesystemPaths,
                 $this->notFilesystemPaths
             );
+        }
+
+        if ($this->extras || $this->notExtras) {
+            $iterator = new Iterator\ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
+        }
+
+        if ($this->settings || $this->notSettings) {
+            $iterator = new Iterator\SettingFilterIterator($iterator, $this->settings, $this->notSettings);
         }
 
         if ($this->taxonomies || $this->notTaxonomies) {

@@ -49,7 +49,7 @@ class PageFinderTest extends BaseUnit
     public function finderMethodReturnsThisForChaining(string $method, $param)
     {
         $finder = $this->getFinder();
-        $returnValue = $finder->$method($param);
+        $returnValue = $finder->$method($param, null);
 
         $this->assertSame($finder, $returnValue);
     }
@@ -84,6 +84,10 @@ class PageFinderTest extends BaseUnit
             ['modular', true],
             ['module', true],
             ['visible', true],
+            ['extra', ''],
+            ['notExtra', ''],
+            ['setting', ''],
+            ['notSetting', ''],
         ];
     }
 
@@ -529,6 +533,43 @@ class PageFinderTest extends BaseUnit
             ->numDocuments('> 0')
         ;
         $this->assertCount(2, $finder, 'More than 0 documents');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByExtra()
+    {
+        $finder = $this->getFinder()
+            ->extra('custom', 'custom_value')
+        ;
+        $this->assertCount(2, $finder);
+
+        $finder = $this->getFinder()
+            ->notExtra('custom', 'custom_value')
+        ;
+        $this->assertCount(9, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredBySetting()
+    {
+        $finder = $this->getFinder()
+            ->setting('visible', true)
+        ;
+        $this->assertCount(8, $finder);
+
+        $finder = $this->getFinder()
+            ->notSetting('visible', true)
+        ;
+        $this->assertCount(3, $finder);
+
+        $finder = $this->getFinder()
+            ->setting('menu_id', 'default')
+        ;
+        $this->assertCount(11, $finder);
     }
 
     /**

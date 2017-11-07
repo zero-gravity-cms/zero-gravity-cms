@@ -8,3 +8,5 @@ taxonomy:
         - category1
     author:
         - john
+extra:
+    custom: another_custom_value
