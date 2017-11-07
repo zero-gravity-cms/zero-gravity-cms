@@ -46,7 +46,7 @@ class PageFinderTest extends BaseUnit
      * @param string $method
      * @param        $param
      */
-    public function finderMethodReturnsThis(string $method, $param)
+    public function finderMethodReturnsThisForChaining(string $method, $param)
     {
         $finder = $this->getFinder();
         $returnValue = $finder->$method($param);
@@ -63,6 +63,9 @@ class PageFinderTest extends BaseUnit
             ['slug', ''],
             ['notSlug', ''],
             ['depth', 0],
+            ['numFiles', 0],
+            ['numImages', 0],
+            ['numDocuments', 0],
             ['path', ''],
             ['notPath', ''],
             ['filesystemPath', ''],
@@ -488,6 +491,44 @@ class PageFinderTest extends BaseUnit
             ->notAuthor(['john', 'mary'], PageFinder::TAXONOMY_OR)
         ;
         $this->assertCount(8, $finder, 'Multiple authors, OR, negated');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByNumFiles()
+    {
+        $finder = $this->getFinder()
+            ->numFiles('> 0')
+        ;
+        $this->assertCount(11, $finder, 'More than 0 files');
+
+        $finder = $this->getFinder()
+            ->numFiles('> 1')
+        ;
+        $this->assertCount(6, $finder, 'More than 1 file');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByNumImages()
+    {
+        $finder = $this->getFinder()
+            ->numImages('>= 1')
+        ;
+        $this->assertCount(3, $finder, 'At least 1 image');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByNumDocuments()
+    {
+        $finder = $this->getFinder()
+            ->numDocuments('> 0')
+        ;
+        $this->assertCount(2, $finder, 'More than 0 documents');
     }
 
     /**

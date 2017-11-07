@@ -27,12 +27,12 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notSlugs = [];
     private $titles = [];
     private $notTitles = [];
-    private $filters = [];
     private $depths = [];
-    private $sort = false;
     private $pageLists = [];
     private $dates = [];
-    private $iterators = [];
+    private $numFiles = [];
+    private $numImages = [];
+    private $numDocuments = [];
     private $contains = [];
     private $notContains = [];
     private $paths = [];
@@ -41,6 +41,9 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notFilesystemPaths = [];
     private $taxonomies = [];
     private $notTaxonomies = [];
+    private $filters = [];
+    private $sort = false;
+    private $iterators = [];
 
     /**
      * Creates a new Finder.
@@ -131,6 +134,72 @@ class PageFinder implements \IteratorAggregate, \Countable
     public function depth($level)
     {
         $this->depths[] = new Comparator\NumberComparator($level);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for files count.
+     *
+     * Usage:
+     *
+     *   $finder->filesCount(2)      // Page contains exactly 2 files
+     *   $finder->filesCount('>= 2') // Page contains at least 2 files
+     *   $finder->filesCount('< 3')  // Page contains no more than 2 files
+     *
+     * @param string|int $numFiles The file count expression
+     *
+     * @return $this
+     *
+     * @see NumberComparator
+     */
+    public function numFiles($numFiles)
+    {
+        $this->numFiles[] = new Comparator\NumberComparator($numFiles);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for images count.
+     *
+     * Usage:
+     *
+     *   $finder->imagesCount(2)      // Page contains exactly 2 images
+     *   $finder->imagesCount('>= 2') // Page contains at least 2 images
+     *   $finder->imagesCount('< 3')  // Page contains no more than 2 images
+     *
+     * @param string|int $numImages The image count expression
+     *
+     * @return $this
+     *
+     * @see NumberComparator
+     */
+    public function numImages($numImages)
+    {
+        $this->numImages[] = new Comparator\NumberComparator($numImages);
+
+        return $this;
+    }
+
+    /**
+     * Adds tests for documents count.
+     *
+     * Usage:
+     *
+     *   $finder->documentsCount(2)      // Page contains exactly 2 documents
+     *   $finder->documentsCount('>= 2') // Page contains at least 2 documents
+     *   $finder->documentsCount('< 3')  // Page contains no more than 2 documents
+     *
+     * @param string|int $numDocuments The document count expression
+     *
+     * @return $this
+     *
+     * @see NumberComparator
+     */
+    public function numDocuments($numDocuments)
+    {
+        $this->numDocuments[] = new Comparator\NumberComparator($numDocuments);
 
         return $this;
     }
@@ -674,6 +743,30 @@ class PageFinder implements \IteratorAggregate, \Countable
 
         if ($this->dates) {
             $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
+        }
+
+        if ($this->numFiles) {
+            $iterator = new Iterator\FileCountFilterIterator(
+                $iterator,
+                $this->numFiles,
+                Iterator\FileCountFilterIterator::MODE_FILES
+            );
+        }
+
+        if ($this->numImages) {
+            $iterator = new Iterator\FileCountFilterIterator(
+                $iterator,
+                $this->numImages,
+                Iterator\FileCountFilterIterator::MODE_IMAGES
+            );
+        }
+
+        if ($this->numDocuments) {
+            $iterator = new Iterator\FileCountFilterIterator(
+                $iterator,
+                $this->numDocuments,
+                Iterator\FileCountFilterIterator::MODE_DOCUMENTS
+            );
         }
 
         if (null !== $this->modular) {
