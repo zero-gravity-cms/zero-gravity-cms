@@ -6,6 +6,7 @@ use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
+use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -13,9 +14,13 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PageFinder implements \IteratorAggregate, \Countable
 {
+    const TAXONOMY_AND = 'AND';
+    const TAXONOMY_OR = 'OR';
+
     private $published;
     private $modular;
     private $module;
+    private $visible;
     private $names = [];
     private $notNames = [];
     private $slugs = [];
@@ -34,6 +39,8 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notPaths = [];
     private $filesystemPaths = [];
     private $notFilesystemPaths = [];
+    private $taxonomies = [];
+    private $notTaxonomies = [];
 
     /**
      * Creates a new Finder.
@@ -88,6 +95,20 @@ class PageFinder implements \IteratorAggregate, \Countable
     public function module($module)
     {
         $this->module = $module;
+
+        return $this;
+    }
+
+    /**
+     * Restrict to visible or hidden pages.
+     *
+     * @param bool|null $visible true for visible pages, false for hidden, null to ignore setting
+     *
+     * @return $this
+     */
+    public function visible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }
@@ -175,6 +196,116 @@ class PageFinder implements \IteratorAggregate, \Countable
         $this->notNames[] = $pattern;
 
         return $this;
+    }
+
+    /**
+     * Add taxonomies that pages must provide.
+     *
+     * @param string       $name
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function taxonomy($name, $values, $mode = self::TAXONOMY_AND)
+    {
+        $this->taxonomies[] = new TaxonomyTester($name, (array) $values, $mode);
+
+        return $this;
+    }
+
+    /**
+     * Add taxonomies that pages must not provide.
+     *
+     * @param string       $name
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function notTaxonomy($name, $values, $mode = self::TAXONOMY_AND)
+    {
+        $this->notTaxonomies[] = new TaxonomyTester($name, (array) $values, $mode);
+
+        return $this;
+    }
+
+    /**
+     * Add tag or tags that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function tag($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->taxonomy(Page::TAXONOMY_TAG, $values, $mode);
+    }
+
+    /**
+     * Add tag or tags that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function notTag($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->notTaxonomy(Page::TAXONOMY_TAG, $values, $mode);
+    }
+
+    /**
+     * Add category or categories that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function category($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->taxonomy(Page::TAXONOMY_CATEGORY, $values, $mode);
+    }
+
+    /**
+     * Add category or categories that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function notCategory($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->notTaxonomy(Page::TAXONOMY_CATEGORY, $values, $mode);
+    }
+
+    /**
+     * Add author or authors that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function author($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->taxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
+    }
+
+    /**
+     * Add author or authors that pages must provide.
+     *
+     * @param string|array $values
+     * @param string       $mode   'AND' or 'OR'. Only applies to this set of taxonomies.
+     *
+     * @return $this
+     */
+    public function notAuthor($values, $mode = self::TAXONOMY_AND)
+    {
+        return $this->notTaxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
     }
 
     /**
@@ -533,6 +664,10 @@ class PageFinder implements \IteratorAggregate, \Countable
             );
         }
 
+        if ($this->taxonomies || $this->notTaxonomies) {
+            $iterator = new Iterator\TaxonomiesFilterIterator($iterator, $this->taxonomies, $this->notTaxonomies);
+        }
+
         if ($this->contains || $this->notContains) {
             $iterator = new Iterator\ContentFilterIterator($iterator, $this->contains, $this->notContains);
         }
@@ -547,6 +682,10 @@ class PageFinder implements \IteratorAggregate, \Countable
 
         if (null !== $this->module) {
             $iterator = new Iterator\ModuleFilterIterator($iterator, $this->module);
+        }
+
+        if (null !== $this->visible) {
+            $iterator = new Iterator\VisibleFilterIterator($iterator, $this->visible);
         }
 
         if (null !== $this->published) {

@@ -71,9 +71,16 @@ class PageFinderTest extends BaseUnit
             ['notTitle', ''],
             ['contains', ''],
             ['notContains', ''],
+            ['tag', ''],
+            ['notTag', ''],
+            ['category', ''],
+            ['notCategory', ''],
+            ['author', ''],
+            ['notAuthor', ''],
             ['published', true],
             ['modular', true],
             ['module', true],
+            ['visible', true],
         ];
     }
 
@@ -143,6 +150,27 @@ class PageFinderTest extends BaseUnit
 
         $finder = $this->getFinder()
             ->module(null)
+        ;
+        $this->assertCount(11, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByVisibleState()
+    {
+        $finder = $this->getFinder()
+            ->visible(true)
+        ;
+        $this->assertCount(8, $finder);
+
+        $finder = $this->getFinder()
+            ->visible(false)
+        ;
+        $this->assertCount(3, $finder);
+
+        $finder = $this->getFinder()
+            ->visible(null)
         ;
         $this->assertCount(11, $finder);
     }
@@ -387,6 +415,79 @@ class PageFinderTest extends BaseUnit
             ->contains('*page 02*')
         ;
         $this->assertCount(1, $finder, 'Glob comparison');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByTags()
+    {
+        $finder = $this->getFinder()
+            ->tag('tag1')
+        ;
+        $this->assertCount(3, $finder, 'Single tag');
+
+        $finder = $this->getFinder()
+            ->tag(['tag1', 'tag2'])
+        ;
+        $this->assertCount(1, $finder, 'Multiple tags');
+
+        $finder = $this->getFinder()
+            ->tag(['tag1', 'tag2'], PageFinder::TAXONOMY_OR)
+        ;
+        $this->assertCount(4, $finder, 'Multiple tags, OR');
+
+        $finder = $this->getFinder()
+            ->notTag('tag1')
+        ;
+        $this->assertCount(8, $finder, 'Single tag, negated');
+
+        $finder = $this->getFinder()
+            ->notTag(['tag1', 'tag2'])
+        ;
+        $this->assertCount(10, $finder, 'Multiple tags, negated');
+
+        $finder = $this->getFinder()
+            ->notTag(['tag1', 'tag2'], PageFinder::TAXONOMY_OR)
+        ;
+        $this->assertCount(7, $finder, 'Multiple tags, OR, negated');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByCategories()
+    {
+        $finder = $this->getFinder()
+            ->category(['category1', 'category2'])
+        ;
+        $this->assertCount(1, $finder, 'Multiple categories');
+
+        $finder = $this->getFinder()
+            ->notCategory(['category1', 'category2'])
+        ;
+        $this->assertCount(10, $finder, 'Multiple categories, negated');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByAuthors()
+    {
+        $finder = $this->getFinder()
+            ->author('mary')
+        ;
+        $this->assertCount(2, $finder, 'Single author');
+
+        $finder = $this->getFinder()
+            ->author(['john', 'mary'])
+        ;
+        $this->assertCount(1, $finder, 'Multiple authors');
+
+        $finder = $this->getFinder()
+            ->notAuthor(['john', 'mary'], PageFinder::TAXONOMY_OR)
+        ;
+        $this->assertCount(8, $finder, 'Multiple authors, OR, negated');
     }
 
     /**

@@ -11,6 +11,9 @@ use ZeroGravity\Cms\Path\Path;
 class Page
 {
     const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+    const TAXONOMY_TAG = 'tag';
+    const TAXONOMY_CATEGORY = 'category';
+    const TAXONOMY_AUTHOR = 'author';
 
     /**
      * @var string
@@ -279,7 +282,7 @@ class Page
      */
     public function getTags(): array
     {
-        return $this->getTaxonomy('tag');
+        return $this->getTaxonomy(self::TAXONOMY_TAG);
     }
 
     /**
@@ -287,7 +290,7 @@ class Page
      */
     public function getCategories(): array
     {
-        return $this->getTaxonomy('category');
+        return $this->getTaxonomy(self::TAXONOMY_CATEGORY);
     }
 
     /**
@@ -295,7 +298,7 @@ class Page
      */
     public function getAuthors(): array
     {
-        return $this->getTaxonomy('author');
+        return $this->getTaxonomy(self::TAXONOMY_AUTHOR);
     }
 
     /**

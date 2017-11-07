@@ -1,1 +1,7 @@
 date: 2016-10-01
+taxonomy:
+    tag:
+        - tag1
+    category:
+        - category1
+        - category2

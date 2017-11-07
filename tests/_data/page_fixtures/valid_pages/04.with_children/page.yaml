@@ -1,1 +1,6 @@
 modular: true
+taxonomy:
+    tag:
+        - tag2
+    category:
+        - category2
