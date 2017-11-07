@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use ZeroGravity\Cms\Content\Page;
 
 class PageSettings
 {
@@ -86,14 +87,19 @@ class PageSettings
             'controller' => null,
             'extra' => [],
             'file_aliases' => [],
-            'is_modular' => false,
-            'is_visible' => false,
+            'modular' => false,
+            'module' => false,
+            'visible' => false,
             'menu_id' => 'default',
             'menu_label' => null,
-            'published_at' => null,
+            'date' => null,
+            'publish' => true,
+            'publish_date' => null,
+            'unpublish_date' => null,
             'slug' => $this->pageName,
             'template' => null,
             'title' => null,
+            'taxonomy' => [],
         ]);
     }
 
@@ -104,9 +110,15 @@ class PageSettings
     {
         $resolver->setAllowedTypes('extra', 'array');
         $resolver->setAllowedTypes('file_aliases', 'array');
-        $resolver->setAllowedTypes('is_visible', 'bool');
-        $resolver->setAllowedTypes('is_modular', 'bool');
-        $resolver->setAllowedTypes('published_at', ['null', 'string', DateTimeInterface::class]);
+        $resolver->setAllowedTypes('taxonomy', 'array');
+        $resolver->setAllowedTypes('visible', 'bool');
+        $resolver->setAllowedTypes('modular', 'bool');
+        $resolver->setAllowedTypes('module', 'bool');
+
+        $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
+        $resolver->setAllowedTypes('publish_date', $dateTypes);
+        $resolver->setAllowedTypes('unpublish_date', $dateTypes);
+        $resolver->setAllowedTypes('date', $dateTypes);
     }
 
     /**
@@ -122,11 +134,41 @@ class PageSettings
                 return $value;
             } elseif ($value instanceof DateTimeInterface) {
                 $value = $value->format('c');
+            } elseif (is_int($value)) {
+                $value = '@'.$value;
             }
 
             return new DateTimeImmutable((string) $value);
         };
 
-        $resolver->setNormalizer('published_at', $normalizeDateTime);
+        $normalizeTitle = function (Options $options, $value) {
+            if (null !== $value) {
+                return $value;
+            }
+            $name = $this->pageName;
+            if (preg_match(Page::SORTING_PREFIX_PATTERN, $name, $matches)) {
+                $name = $matches[1];
+            }
+
+            return trim(ucwords(str_replace(['-', '_'], ' ', $name)));
+        };
+
+        $normalizeTaxonomy = function (Options $options, $value) {
+            if (null === $value) {
+                return [];
+            }
+            $taxonomies = [];
+            foreach ($value as $name => $taxonomy) {
+                $taxonomies[$name] = array_values((array) $taxonomy);
+            }
+
+            return $taxonomies;
+        };
+
+        $resolver->setNormalizer('date', $normalizeDateTime);
+        $resolver->setNormalizer('publish_date', $normalizeDateTime);
+        $resolver->setNormalizer('unpublish_date', $normalizeDateTime);
+        $resolver->setNormalizer('title', $normalizeTitle);
+        $resolver->setNormalizer('taxonomy', $normalizeTaxonomy);
     }
 }

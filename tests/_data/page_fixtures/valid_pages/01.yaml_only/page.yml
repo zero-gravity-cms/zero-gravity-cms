@@ -1,1 +1,12 @@
 title: testtitle
+date: 2017-01-01
+taxonomy:
+    tag:
+        - tag1
+        - tag2
+    category:
+        - category1
+    author:
+        - john
+extra:
+    custom: another_custom_value

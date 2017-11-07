@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
+use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Meta\PageFiles;
 use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Path\Path;
@@ -10,6 +11,9 @@ use ZeroGravity\Cms\Path\Path;
 class Page
 {
     const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+    const TAXONOMY_TAG = 'tag';
+    const TAXONOMY_CATEGORY = 'category';
+    const TAXONOMY_AUTHOR = 'author';
 
     /**
      * @var string
@@ -204,18 +208,6 @@ class Page
     }
 
     /**
-     * @return string
-     */
-    public function getNameWithoutSortingPrefix(): string
-    {
-        if (preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
-            return $matches[1];
-        }
-
-        return $this->getName();
-    }
-
-    /**
      * @return Path
      */
     public function getFilesystemPath(): Path
@@ -259,6 +251,57 @@ class Page
     }
 
     /**
+     * Get all defined taxonomy keys and values.
+     *
+     * @return array
+     */
+    public function getTaxonomies(): array
+    {
+        return $this->getSetting('taxonomy');
+    }
+
+    /**
+     * Get values for a single taxonomy key.
+     *
+     * @param string $name
+     *
+     * @return array
+     */
+    public function getTaxonomy($name): array
+    {
+        $taxonomy = $this->getSetting('taxonomy');
+        if (isset($taxonomy[$name])) {
+            return (array) $taxonomy[$name];
+        }
+
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getTags(): array
+    {
+        return $this->getTaxonomy(self::TAXONOMY_TAG);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCategories(): array
+    {
+        return $this->getTaxonomy(self::TAXONOMY_CATEGORY);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAuthors(): array
+    {
+        return $this->getTaxonomy(self::TAXONOMY_AUTHOR);
+    }
+
+    /**
      * @return array
      */
     public function getSettings(): array
@@ -283,18 +326,15 @@ class Page
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getMenuLabel(): ? string
+    public function getMenuLabel(): string
     {
         if (!empty($this->getSetting('menu_label'))) {
             return (string) $this->getSetting('menu_label');
         }
-        if (!empty($this->getTitle())) {
-            return $this->getTitle();
-        }
 
-        return $this->getNameWithoutSortingPrefix();
+        return $this->getTitle();
     }
 
     /**
@@ -304,7 +344,17 @@ class Page
      */
     public function isVisible(): bool
     {
-        return (bool) $this->getSetting('is_visible');
+        return (bool) $this->getSetting('visible');
+    }
+
+    /**
+     * Page is considered a modular page, not a content page.
+     *
+     * @return bool
+     */
+    public function isModular(): bool
+    {
+        return (bool) $this->getSetting('modular');
     }
 
     /**
@@ -312,9 +362,9 @@ class Page
      *
      * @return bool
      */
-    public function isModular(): bool
+    public function isModule(): bool
     {
-        return (bool) $this->getSetting('is_modular');
+        return (bool) $this->getSetting('module');
     }
 
     /**
@@ -342,25 +392,53 @@ class Page
      */
     public function addChild(Page $childPage): void
     {
-        $this->children[] = $childPage;
+        $this->children[$childPage->getPath()->toString()] = $childPage;
     }
 
     /**
-     * @return Page[]
+     * @return PageFinder
      */
-    public function getChildren(): array
+    public function getChildren(): PageFinder
     {
-        return $this->children;
+        return PageFinder::create()->inPageList($this->children);
     }
 
     /**
-     * Page is considered a modular snippet, not a standalone page.
+     * @return bool
+     */
+    public function hasChildren(): bool
+    {
+        return count($this->children) > 0;
+    }
+
+    /**
+     * Get optional date information of this page.
      *
      * @return DateTimeImmutable
      */
-    public function getPublishedAt(): ? DateTimeImmutable
+    public function getDate(): ? DateTimeImmutable
     {
-        return $this->getSetting('published_at');
+        return $this->getSetting('date');
+    }
+
+    /**
+     * Get optional publishing date of this page.
+     *
+     * @return DateTimeImmutable
+     */
+    public function getPublishDate(): ? DateTimeImmutable
+    {
+        return $this->getSetting('publish_date');
+    }
+
+    /**
+     * Get optional un-publishing date of this page.
+     *
+     * @return DateTimeImmutable
+     */
+    public function getUnpublishDate(): ? DateTimeImmutable
+    {
+        return $this->getSetting('unpublish_date');
     }
 
     /**
@@ -368,7 +446,18 @@ class Page
      */
     public function isPublished(): bool
     {
-        return null === $this->getPublishedAt() || $this->getPublishedAt()->format('U') > time();
+        if (!$this->getSetting('publish')) {
+            return false;
+        }
+        $now = time();
+        if (null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > $now) {
+            return false;
+        }
+        if (null !== $this->getUnpublishDate() && $now > $this->getUnpublishDate()->format('U')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

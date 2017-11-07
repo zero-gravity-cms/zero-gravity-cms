@@ -67,7 +67,7 @@ class FilesystemParser implements StructureParser
             $page = $subDir->createPage($this->convertMarkdown, $this->defaultPageSettings);
 
             if (null !== $page) {
-                $pages[$page->getSlug()] = $page;
+                $pages[$page->getPath()->toString()] = $page;
             }
         }
 

@@ -1,0 +1,8 @@
+modular: true
+taxonomy:
+    tag:
+        - tag2
+    category:
+        - category2
+extra:
+    custom: custom_value
