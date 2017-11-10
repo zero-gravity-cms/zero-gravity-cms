@@ -22,13 +22,18 @@ class SortableIterator implements \IteratorAggregate
 
     /**
      * @param \Traversable    $iterator The Iterator to filter
-     * @param string|callable $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP callback)
+     * @param string|\Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP closure)
      *
      * @throws \InvalidArgumentException
      */
     public function __construct(\Traversable $iterator, $sort)
     {
         $this->iterator = $iterator;
+        if ($sort instanceof \Closure) {
+            $this->sort = $sort;
+
+            return;
+        }
 
         switch ($sort) {
             case self::SORT_BY_NAME:
@@ -77,11 +82,7 @@ class SortableIterator implements \IteratorAggregate
                 break;
 
             default:
-                if (is_callable($sort)) {
-                    $this->sort = $sort;
-                } else {
-                    throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
-                }
+                throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
         }
     }
 
