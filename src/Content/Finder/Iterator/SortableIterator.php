@@ -69,14 +69,10 @@ class SortableIterator implements \IteratorAggregate
                 break;
 
             case self::SORT_BY_PATH:
-                $this->sort = function (Page $pageA, Page $pageB) {
-                    return strcasecmp($pageA->getPath()->toString(), $pageB->getPath()->toString());
-                };
-                break;
-
             case self::SORT_BY_FILESYSTEM_PATH:
-                $this->sort = function (Page $pageA, Page $pageB) {
-                    return strcasecmp($pageA->getFilesystemPath()->toString(), $pageB->getFilesystemPath()->toString());
+                $getter = 'get'.ucfirst($sort);
+                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+                    return strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
                 };
                 break;
 
