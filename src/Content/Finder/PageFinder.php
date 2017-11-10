@@ -47,7 +47,7 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $settings = [];
     private $notSettings = [];
     private $filters = [];
-    private $sort = false;
+    private $sort;
     private $iterators = [];
 
     /**
@@ -1003,7 +1003,7 @@ class PageFinder implements \IteratorAggregate, \Countable
             $iterator = new CustomFilterIterator($iterator, $this->filters);
         }
 
-        if (false !== $this->sort) {
+        if (null !== $this->sort) {
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
         }
