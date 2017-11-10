@@ -915,23 +915,23 @@ class PageFinder implements \IteratorAggregate, \Countable
             $iterator = new DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
         }
 
-        if ($this->names || $this->notNames) {
+        if (!empty($this->names) || !empty($this->notNames)) {
             $iterator = new Iterator\NameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
-        if ($this->slugs || $this->notSlugs) {
+        if (!empty($this->slugs) || !empty($this->notSlugs)) {
             $iterator = new Iterator\SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
-        if ($this->titles || $this->notTitles) {
+        if (!empty($this->titles) || !empty($this->notTitles)) {
             $iterator = new Iterator\TitleFilterIterator($iterator, $this->titles, $this->notTitles);
         }
 
-        if ($this->paths || $this->notPaths) {
+        if (!empty($this->paths) || !empty($this->notPaths)) {
             $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
-        if ($this->filesystemPaths || $this->notFilesystemPaths) {
+        if (!empty($this->filesystemPaths) || !empty($this->notFilesystemPaths)) {
             $iterator = new Iterator\FilesystemPathFilterIterator(
                 $iterator,
                 $this->filesystemPaths,
@@ -939,27 +939,27 @@ class PageFinder implements \IteratorAggregate, \Countable
             );
         }
 
-        if ($this->extras || $this->notExtras) {
+        if (!empty($this->extras) || !empty($this->notExtras)) {
             $iterator = new Iterator\ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
         }
 
-        if ($this->settings || $this->notSettings) {
+        if (!empty($this->settings) || !empty($this->notSettings)) {
             $iterator = new Iterator\SettingFilterIterator($iterator, $this->settings, $this->notSettings);
         }
 
-        if ($this->taxonomies || $this->notTaxonomies) {
+        if (!empty($this->taxonomies) || !empty($this->notTaxonomies)) {
             $iterator = new Iterator\TaxonomiesFilterIterator($iterator, $this->taxonomies, $this->notTaxonomies);
         }
 
-        if ($this->contains || $this->notContains) {
+        if (!empty($this->contains) || !empty($this->notContains)) {
             $iterator = new Iterator\ContentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
-        if ($this->dates) {
+        if (!empty($this->dates)) {
             $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
         }
 
-        if ($this->numFiles) {
+        if (!empty($this->numFiles)) {
             $iterator = new Iterator\FileCountFilterIterator(
                 $iterator,
                 $this->numFiles,
@@ -967,7 +967,7 @@ class PageFinder implements \IteratorAggregate, \Countable
             );
         }
 
-        if ($this->numImages) {
+        if (!empty($this->numImages)) {
             $iterator = new Iterator\FileCountFilterIterator(
                 $iterator,
                 $this->numImages,
@@ -975,7 +975,7 @@ class PageFinder implements \IteratorAggregate, \Countable
             );
         }
 
-        if ($this->numDocuments) {
+        if (!empty($this->numDocuments)) {
             $iterator = new Iterator\FileCountFilterIterator(
                 $iterator,
                 $this->numDocuments,
@@ -999,11 +999,11 @@ class PageFinder implements \IteratorAggregate, \Countable
             $iterator = new Iterator\PublishedFilterIterator($iterator, $this->published);
         }
 
-        if ($this->filters) {
+        if (!empty($this->filters)) {
             $iterator = new CustomFilterIterator($iterator, $this->filters);
         }
 
-        if ($this->sort) {
+        if (false !== $this->sort) {
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
         }
