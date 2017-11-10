@@ -58,18 +58,6 @@ class FileFactory
     }
 
     /**
-     * Get the full filesystem path to the given file.
-     *
-     * @param File $file
-     *
-     * @return string
-     */
-    public function getFilesystemPathname(File $file): string
-    {
-        return sprintf('%s/%s', rtrim($this->basePath, '/'), $file->getPathname());
-    }
-
-    /**
      * @return string
      */
     public function getBasePath(): string
