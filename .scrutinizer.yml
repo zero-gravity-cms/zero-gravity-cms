@@ -25,3 +25,6 @@ checks:
 filter:
     paths:
         - 'src/*'
+    excluded_paths:
+        # PageFinder is huge but much more readable and concise than if it were dynamic or split up
+        - 'src/Content/Finder/PageFinder.php'
