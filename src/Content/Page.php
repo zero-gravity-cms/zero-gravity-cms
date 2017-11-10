@@ -229,7 +229,7 @@ class Page
     /**
      * @return string
      */
-    public function getTitle(): ? string
+    public function getTitle(): string
     {
         return (string) $this->getSetting('title');
     }

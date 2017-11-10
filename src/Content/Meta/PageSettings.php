@@ -114,6 +114,7 @@ class PageSettings
         $resolver->setAllowedTypes('visible', 'bool');
         $resolver->setAllowedTypes('modular', 'bool');
         $resolver->setAllowedTypes('module', 'bool');
+        $resolver->setAllowedTypes('title', ['null', 'string']);
 
         $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
         $resolver->setAllowedTypes('publish_date', $dateTypes);
@@ -143,7 +144,7 @@ class PageSettings
 
         $normalizeTitle = function (Options $options, $value) {
             if (null !== $value) {
-                return $value;
+                return (string) $value;
             }
             $name = $this->pageName;
             if (preg_match(Page::SORTING_PREFIX_PATTERN, $name, $matches)) {
