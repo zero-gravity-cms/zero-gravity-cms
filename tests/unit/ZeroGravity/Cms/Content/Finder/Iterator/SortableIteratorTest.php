@@ -7,8 +7,12 @@ use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\Iterator\SortableIterator;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\FilesystemParser;
 
+/**
+ * @group sort
+ */
 class SortableIteratorTest extends BaseUnit
 {
     /**
@@ -35,10 +39,13 @@ class SortableIteratorTest extends BaseUnit
      */
     public function sortMethodWorks($method, array $expectedElements)
     {
-        $sortMethod = 'sortBy'.ucfirst($method);
-        $finder = $this->getFinder()
-            ->$sortMethod()
-        ;
+        $finder = $this->getFinder();
+        if (is_string($method)) {
+            $sortMethod = 'sortBy'.ucfirst($method);
+            $finder->$sortMethod();
+        } elseif (is_callable($method)) {
+            $finder->sort($method);
+        }
 
         $expectedKeys = array_keys($expectedElements);
         $keys = array_keys($finder->toArray());
@@ -53,6 +60,7 @@ class SortableIteratorTest extends BaseUnit
     public function provideSortResults()
     {
         $pagesSortedByName = [
+            '/not_published/child1' => '01.child1',
             '/yaml_and_twig/child1' => '01.child1',
             '/yaml_only' => '01.yaml_only',
             '/yaml_and_twig/child2' => '02.child2',
@@ -68,6 +76,7 @@ class SortableIteratorTest extends BaseUnit
         $pagesSortedBySlug = [
             '/with_children/_child1' => '_child1',
             '/with_children/_child2' => '_child2',
+            '/not_published/child1' => 'child1',
             '/yaml_and_twig/child1' => 'child1',
             '/yaml_and_twig/child2' => 'child2',
             '/markdown_only' => 'markdown_only',
@@ -79,6 +88,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_only' => 'yaml_only',
         ];
         $pagesSortedByTitle = [
+            '/not_published/child1' => 'Child1',
             '/with_children/_child1' => 'Child1',
             '/yaml_and_twig/child1' => 'Child1',
             '/with_children/_child2' => 'Child2',
@@ -101,6 +111,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => null,
             '/yaml_and_twig/child1' => null,
             '/yaml_and_twig/child2' => null,
+            '/not_published/child1' => '2016-10-01 00:00:00.000000',
             '/yaml_and_markdown' => '2016-10-01 00:00:00.000000',
             '/yaml_only' => '2017-01-01 00:00:00.000000',
         ];
@@ -112,6 +123,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_markdown' => null,
             '/yaml_and_twig' => null,
             '/yaml_only' => null,
+            '/not_published/child1' => '2016-01-01 00:00:00.000000',
             '/yaml_and_twig/child1' => '2016-01-01 00:00:00.000000',
             '/yaml_and_twig/child2' => '2016-01-02 00:00:00.000000',
             '/with_children/_child1' => '2016-01-03 00:00:00.000000',
@@ -120,6 +132,7 @@ class SortableIteratorTest extends BaseUnit
         $pagesSortedByPath = [
             '/markdown_only' => '/markdown_only',
             '/no_sorting_prefix' => '/no_sorting_prefix',
+            '/not_published/child1' => '/not_published/child1',
             '/twig_only' => '/twig_only',
             '/with_children' => '/with_children',
             '/with_children/_child1' => '/with_children/_child1',
@@ -141,8 +154,27 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => '/06.yaml_and_twig',
             '/yaml_and_twig/child1' => '/06.yaml_and_twig/01.child1',
             '/yaml_and_twig/child2' => '/06.yaml_and_twig/02.child2',
+            '/not_published/child1' => '/not_published/01.child1',
             '/no_sorting_prefix' => '/no_sorting_prefix',
         ];
+        $pagesSortedByCustomFunction = [
+            '/yaml_and_twig/child1' => 'Child1',
+            '/with_children/_child1' => 'Child1',
+            '/not_published/child1' => 'Child1',
+            '/with_children/_child2' => 'Child2',
+            '/yaml_and_twig/child2' => 'Child2',
+            '/markdown_only' => 'Markdown Only',
+            '/no_sorting_prefix' => 'No Sorting Prefix',
+            '/twig_only' => 'Twig Only',
+            '/with_children' => 'With Children',
+            '/yaml_and_markdown' => 'Yaml And Markdown',
+            '/yaml_and_twig' => 'Yaml And Twig',
+            '/yaml_only' => 'testtitle',
+        ];
+
+        $customFunction = function (Page $a, Page $b) {
+            return strcmp($a->getTitle(), $b->getTitle());
+        };
 
         return [
             SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName],
@@ -152,7 +184,17 @@ class SortableIteratorTest extends BaseUnit
             SortableIterator::SORT_BY_PUBLISH_DATE => [SortableIterator::SORT_BY_PUBLISH_DATE, $pagesSortedByPublishDate],
             SortableIterator::SORT_BY_PATH => [SortableIterator::SORT_BY_PATH, $pagesSortedByPath],
             SortableIterator::SORT_BY_FILESYSTEM_PATH => [SortableIterator::SORT_BY_FILESYSTEM_PATH, $pagesSortedByFilesystemPath],
+            'custom callback' => [$customFunction, $pagesSortedByCustomFunction],
         ];
+    }
+
+    /**
+     * @test
+     */
+    public function invalidSortMethodThrowsException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new SortableIterator(new \ArrayIterator([]), 'invalid method');
     }
 
     /**
