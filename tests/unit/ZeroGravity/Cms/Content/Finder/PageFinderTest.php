@@ -97,7 +97,7 @@ class PageFinderTest extends BaseUnit
     public function basicPageFinderReturnsAllPublishedPages()
     {
         $finder = $this->getFinder();
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
     }
 
     /**
@@ -108,7 +108,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->published(true)
         ;
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
         $finder = $this->getFinder()
             ->published(false)
         ;
@@ -116,7 +116,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->published(null)
         ;
-        $this->assertCount(12, $finder);
+        $this->assertCount(13, $finder);
     }
 
     /**
@@ -132,12 +132,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->modular(false)
         ;
-        $this->assertCount(10, $finder);
+        $this->assertCount(11, $finder);
 
         $finder = $this->getFinder()
             ->modular(null)
         ;
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
     }
 
     /**
@@ -153,12 +153,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->module(false)
         ;
-        $this->assertCount(9, $finder);
+        $this->assertCount(10, $finder);
 
         $finder = $this->getFinder()
             ->module(null)
         ;
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
     }
 
     /**
@@ -169,7 +169,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->visible(true)
         ;
-        $this->assertCount(8, $finder);
+        $this->assertCount(9, $finder);
 
         $finder = $this->getFinder()
             ->visible(false)
@@ -179,7 +179,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->visible(null)
         ;
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
     }
 
     /**
@@ -194,12 +194,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notName('04.with_children')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->name('0?.child?')
         ;
-        $this->assertCount(2, $finder, 'Glob comparison');
+        $this->assertCount(3, $finder, 'Glob comparison');
         $finder = $this->getFinder()
             ->notName('0?.child?')
         ;
@@ -208,7 +208,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->name('/.*Chil.*/i')
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(6, $finder, 'Regex comparison');
         $finder = $this->getFinder()
             ->notName('/.*Chil.*/i')
         ;
@@ -227,12 +227,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notSlug('yaml_and_twig')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->slug('child?')
         ;
-        $this->assertCount(2, $finder, 'Glob comparison');
+        $this->assertCount(3, $finder, 'Glob comparison');
         $finder = $this->getFinder()
             ->notSlug('child?')
         ;
@@ -241,7 +241,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->slug('/.*Chil.*/i')
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(6, $finder, 'Regex comparison');
         $finder = $this->getFinder()
             ->notSlug('/.*Chil.*/i')
         ;
@@ -260,7 +260,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notTitle('Yaml And Twig')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->title('testtitle')
@@ -270,12 +270,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->title('Child?')
         ;
-        $this->assertCount(4, $finder, 'Glob comparison');
+        $this->assertCount(5, $finder, 'Glob comparison');
 
         $finder = $this->getFinder()
             ->title('/.*Chil.*/i')
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(6, $finder, 'Regex comparison');
     }
 
     /**
@@ -291,12 +291,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->depth('> 0')
         ;
-        $this->assertCount(4, $finder, 'Depth > 0');
+        $this->assertCount(5, $finder, 'Depth > 0');
 
         $finder = $this->getFinder()
             ->depth('>= 0')
         ;
-        $this->assertCount(11, $finder, 'Depth >= 0');
+        $this->assertCount(12, $finder, 'Depth >= 0');
 
         $finder = $this->getFinder()
             ->depth('< 1')
@@ -306,12 +306,12 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->depth('<= 1')
         ;
-        $this->assertCount(11, $finder, 'Depth >= 0');
+        $this->assertCount(12, $finder, 'Depth >= 0');
 
         $finder = $this->getFinder()
             ->depth(1)
         ;
-        $this->assertCount(4, $finder, 'Depth 1');
+        $this->assertCount(5, $finder, 'Depth 1');
 
         $finder = $this->getFinder()
             ->depth(2)
@@ -331,7 +331,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notPath('/with_children/_child1')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->path('/with_children/_child?')
@@ -340,7 +340,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notPath('/with_children/_child?')
         ;
-        $this->assertCount(9, $finder, 'Glob comparison, negated');
+        $this->assertCount(10, $finder, 'Glob comparison, negated');
 
         $finder = $this->getFinder()
             ->path('/*children/_child1')
@@ -350,7 +350,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->path('/.*Chil.*/i')
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(6, $finder, 'Regex comparison');
     }
 
     /**
@@ -365,7 +365,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notFilesystemPath('/04.with_children/_child1')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->filesystemPath('/04.with_children/_child?')
@@ -374,7 +374,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notFilesystemPath('/04.with_children/_child?')
         ;
-        $this->assertCount(9, $finder, 'Glob comparison, negated');
+        $this->assertCount(10, $finder, 'Glob comparison, negated');
 
         $finder = $this->getFinder()
             ->filesystemPath('/*children/_child1')
@@ -384,7 +384,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->filesystemPath('/.*Chil.*/i')
         ;
-        $this->assertCount(5, $finder, 'Regex comparison');
+        $this->assertCount(6, $finder, 'Regex comparison');
     }
 
     /**
@@ -400,7 +400,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->date('< 2017-01-02')
         ;
-        $this->assertCount(2, $finder);
+        $this->assertCount(3, $finder);
     }
 
     /**
@@ -429,7 +429,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notContains('This is the content of page 02.')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(11, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->contains('*page 02*')
@@ -460,17 +460,17 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notTag('tag1')
         ;
-        $this->assertCount(8, $finder, 'Single tag, negated');
+        $this->assertCount(9, $finder, 'Single tag, negated');
 
         $finder = $this->getFinder()
             ->notTag(['tag1', 'tag2'])
         ;
-        $this->assertCount(10, $finder, 'Multiple tags, negated');
+        $this->assertCount(11, $finder, 'Multiple tags, negated');
 
         $finder = $this->getFinder()
             ->notTag(['tag1', 'tag2'], PageFinder::TAXONOMY_OR)
         ;
-        $this->assertCount(7, $finder, 'Multiple tags, OR, negated');
+        $this->assertCount(8, $finder, 'Multiple tags, OR, negated');
     }
 
     /**
@@ -486,7 +486,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notCategory(['category1', 'category2'])
         ;
-        $this->assertCount(10, $finder, 'Multiple categories, negated');
+        $this->assertCount(11, $finder, 'Multiple categories, negated');
     }
 
     /**
@@ -507,7 +507,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notAuthor(['john', 'mary'], PageFinder::TAXONOMY_OR)
         ;
-        $this->assertCount(8, $finder, 'Multiple authors, OR, negated');
+        $this->assertCount(9, $finder, 'Multiple authors, OR, negated');
     }
 
     /**
@@ -518,7 +518,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->numFiles('> 0')
         ;
-        $this->assertCount(11, $finder, 'More than 0 files');
+        $this->assertCount(12, $finder, 'More than 0 files');
 
         $finder = $this->getFinder()
             ->numFiles('> 1')
@@ -561,7 +561,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->notExtra('custom', 'custom_value')
         ;
-        $this->assertCount(9, $finder);
+        $this->assertCount(10, $finder);
     }
 
     /**
@@ -572,7 +572,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->setting('visible', true)
         ;
-        $this->assertCount(8, $finder);
+        $this->assertCount(9, $finder);
 
         $finder = $this->getFinder()
             ->notSetting('visible', true)
@@ -582,7 +582,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->setting('menu_id', 'default')
         ;
-        $this->assertCount(11, $finder);
+        $this->assertCount(12, $finder);
     }
 
     /**
@@ -592,7 +592,7 @@ class PageFinderTest extends BaseUnit
     {
         $finder = $this->getFinder();
         $finder->append($this->getFinder());
-        $this->assertCount(22, $finder);
+        $this->assertCount(24, $finder);
 
         $finder = PageFinder::create();
         $finder
@@ -606,7 +606,7 @@ class PageFinderTest extends BaseUnit
 
         $finder = $this->getFinder();
         $finder->append($this->getFinder()->getIterator());
-        $this->assertCount(22, $finder);
+        $this->assertCount(24, $finder);
 
         $this->expectException(\InvalidArgumentException::class);
         $finder->append('string');
