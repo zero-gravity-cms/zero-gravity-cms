@@ -30,76 +30,62 @@ class SortableIterator implements \IteratorAggregate
     {
         $this->iterator = $iterator;
 
-        if (self::SORT_BY_NAME === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                if (mb_strtolower($a->getName()) === mb_strtolower($b->getName())) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
+        switch ($sort) {
+            case self::SORT_BY_NAME:
+            case self::SORT_BY_SLUG:
+            case self::SORT_BY_TITLE:
+                $getter = 'get'.ucfirst($sort);
+                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+                    $valueA = $pageA->$getter();
+                    $valueB = $pageB->$getter();
+                    if (mb_strtolower($valueA) === mb_strtolower($valueB)) {
+                        return strcasecmp($pageA->getPath(), $pageB->getPath());
+                    }
 
-                return strcasecmp($a->getName(), $b->getName());
-            };
-        } elseif (self::SORT_BY_SLUG === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                if (mb_strtolower($a->getSlug()) === mb_strtolower($b->getSlug())) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
+                    return strcasecmp($valueA, $valueB);
+                };
+                break;
 
-                return strcasecmp($a->getSlug(), $b->getSlug());
-            };
-        } elseif (self::SORT_BY_TITLE === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                if (mb_strtolower($a->getTitle()) === mb_strtolower($b->getTitle())) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
+            case self::SORT_BY_DATE:
+            case self::SORT_BY_PUBLISH_DATE:
+                $getter = 'get'.ucfirst($sort);
+                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+                    $valueA = $pageA->$getter();
+                    $valueB = $pageB->$getter();
+                    if (null !== $valueA && null === $valueB) {
+                        return 1;
+                    }
+                    if (null === $valueA && null !== $valueB) {
+                        return -1;
+                    }
+                    if ((null === $valueA && null === $valueB)
+                        || ($valueA->format('U') === $valueB->format('U'))
+                    ) {
+                        return strcasecmp($pageA->getPath(), $pageB->getPath());
+                    }
 
-                return strcasecmp($a->getTitle(), $b->getTitle());
-            };
-        } elseif (self::SORT_BY_DATE === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                if (null !== $a->getDate() && null === $b->getDate()) {
-                    return 1;
-                }
-                if (null === $a->getDate() && null !== $b->getDate()) {
-                    return -1;
-                }
-                if (null === $a->getDate() && null === $b->getDate()) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
-                if ($a->getDate()->format('U') === $b->getDate()->format('U')) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
+                    return $valueA->format('U') - $valueB->format('U');
+                };
+                break;
 
-                return $a->getDate()->format('U') - $b->getDate()->format('U');
-            };
-        } elseif (self::SORT_BY_PUBLISH_DATE === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                if (null !== $a->getPublishDate() && null === $b->getPublishDate()) {
-                    return 1;
-                }
-                if (null === $a->getPublishDate() && null !== $b->getPublishDate()) {
-                    return -1;
-                }
-                if (null === $a->getPublishDate() && null === $b->getPublishDate()) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
-                if ($a->getPublishDate()->format('U') === $b->getPublishDate()->format('U')) {
-                    return strcasecmp($a->getPath(), $b->getPath());
-                }
+            case self::SORT_BY_PATH:
+                $this->sort = function (Page $pageA, Page $pageB) {
+                    return strcasecmp($pageA->getPath()->toString(), $pageB->getPath()->toString());
+                };
+                break;
 
-                return $a->getPublishDate()->format('U') - $b->getPublishDate()->format('U');
-            };
-        } elseif (self::SORT_BY_PATH === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                return strcasecmp($a->getPath(), $b->getPath());
-            };
-        } elseif (self::SORT_BY_FILESYSTEM_PATH === $sort) {
-            $this->sort = function (Page $a, Page $b) {
-                return strcasecmp($a->getFilesystemPath(), $b->getFilesystemPath());
-            };
-        } elseif (is_callable($sort)) {
-            $this->sort = $sort;
-        } else {
-            throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
+            case self::SORT_BY_FILESYSTEM_PATH:
+                $this->sort = function (Page $pageA, Page $pageB) {
+                    return strcasecmp($pageA->getFilesystemPath()->toString(), $pageB->getFilesystemPath()->toString());
+                };
+                break;
+
+            default:
+                if (is_callable($sort)) {
+                    $this->sort = $sort;
+                } else {
+                    throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
+                }
         }
     }
 
