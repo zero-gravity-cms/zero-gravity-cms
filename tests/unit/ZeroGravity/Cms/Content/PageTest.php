@@ -196,7 +196,7 @@ class PageTest extends BaseUnit
             'module' => false,
             'template' => null,
             'controller' => null,
-            'menu_id' => 'default',
+            'menu_id' => 'zero-gravity',
             'menu_label' => null,
             'file_aliases' => [],
             'date' => null,

@@ -90,7 +90,7 @@ class PageSettings
             'modular' => false,
             'module' => false,
             'visible' => false,
-            'menu_id' => 'default',
+            'menu_id' => 'zero-gravity',
             'menu_label' => null,
             'date' => null,
             'publish' => true,

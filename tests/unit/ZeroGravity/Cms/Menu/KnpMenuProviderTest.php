@@ -48,7 +48,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('default');
+        $rootItem = $provider->get('zero-gravity');
         $this->assertInstanceOf(ItemInterface::class, $rootItem);
     }
 
@@ -59,7 +59,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('default');
+        $rootItem = $provider->get('zero-gravity');
         $this->assertCount(3, $rootItem->getChildren());
     }
 
@@ -70,7 +70,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('default');
+        $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('First Sibling');
         $this->assertCount(2, $child->getChildren());
     }
@@ -82,7 +82,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('default');
+        $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('custom second sibling label');
         $this->assertInstanceOf(ItemInterface::class, $child);
     }
@@ -105,7 +105,7 @@ class KnpMenuProviderTest extends BaseUnit
         ];
 
         $provider = $this->getProvider();
-        $rootItem = $provider->get('default');
+        $rootItem = $provider->get('zero-gravity');
 
         foreach ($expectedItemUris as $childName => $uri) {
             $child = $rootItem->getChild($childName);
@@ -134,7 +134,7 @@ class KnpMenuProviderTest extends BaseUnit
             if (!$argument instanceof BeforeBuildMenu) {
                 return false;
             }
-            if ('default' !== $argument->getMenuName()) {
+            if ('zero-gravity' !== $argument->getMenuName()) {
                 return false;
             }
             if ('root' !== $argument->getRootItem()->getName()) {
@@ -243,7 +243,7 @@ class KnpMenuProviderTest extends BaseUnit
         ;
 
         $provider = $this->getProvider($dispatcher);
-        $provider->get('default');
+        $provider->get('zero-gravity');
     }
 
     /**
@@ -254,7 +254,7 @@ class KnpMenuProviderTest extends BaseUnit
         $dispatcher = new EventDispatcher();
 
         $provider = $this->getProvider($dispatcher);
-        $provider->get('default');
+        $provider->get('zero-gravity');
     }
 
     protected function getRepository(): ContentRepository
