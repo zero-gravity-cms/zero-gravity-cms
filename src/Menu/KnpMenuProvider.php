@@ -9,8 +9,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\InvalidMenuNameException;
+use ZeroGravity\Cms\Menu\Event\AfterAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\AfterAddItem;
 use ZeroGravity\Cms\Menu\Event\AfterBuildMenu;
+use ZeroGravity\Cms\Menu\Event\BeforeAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\BeforeAddItem;
 use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 
@@ -121,14 +123,23 @@ class KnpMenuProvider implements MenuProviderInterface
             return;
         }
 
+        $pageItemSettings = $page->getExtraValue('menu_item_options', []);
         $itemOptions = array_merge(
+            $defaultOptions,
             [
                 'route' => $page->getPath()->toString(),
+                'label' => $page->getMenuLabel(),
             ],
-            $page->getExtraValue('menu_item_options', []),
-            $defaultOptions
+            $pageItemSettings
         );
-        $item = $this->factory->createItem($page->getMenuLabel(), $itemOptions);
+        $itemOptions['extras'] = array_merge(
+            isset($defaultOptions['extras']) ? $defaultOptions['extras'] : [],
+            [
+                'page_slug' => $page->getSlug(),
+            ],
+            isset($pageItemSettings['extras']) ? $pageItemSettings['extras'] : []
+        );
+        $item = $this->factory->createItem($page->getName(), $itemOptions);
 
         $this->eventDispatcher->dispatch(
             BeforeAddItem::BEFORE_ADD_ITEM,
@@ -136,9 +147,17 @@ class KnpMenuProvider implements MenuProviderInterface
         );
 
         $parent->addChild($item);
-        foreach ($page->getChildren() as $child) {
-            $this->addPageItem($child, $item, $menuName, $defaultOptions);
+        $this->eventDispatcher->dispatch(
+            BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM,
+            new BeforeAddChildrenToItem($menuName, $item)
+        );
+        foreach ($page->getChildren() as $childPage) {
+            $this->addPageItem($childPage, $item, $menuName, $defaultOptions);
         }
+        $this->eventDispatcher->dispatch(
+            AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM,
+            new AfterAddChildrenToItem($menuName, $item)
+        );
 
         $this->eventDispatcher->dispatch(
             AfterAddItem::AFTER_ADD_ITEM,

@@ -580,7 +580,7 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(3, $finder);
 
         $finder = $this->getFinder()
-            ->setting('menu_id', 'default')
+            ->setting('menu_id', 'zero-gravity')
         ;
         $this->assertCount(12, $finder);
     }
