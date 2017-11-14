@@ -123,14 +123,23 @@ class KnpMenuProvider implements MenuProviderInterface
             return;
         }
 
+        $pageItemSettings = $page->getExtraValue('menu_item_options', []);
         $itemOptions = array_merge(
+            $defaultOptions,
             [
                 'route' => $page->getPath()->toString(),
+                'label' => $page->getMenuLabel(),
             ],
-            $page->getExtraValue('menu_item_options', []),
-            $defaultOptions
+            $pageItemSettings
         );
-        $item = $this->factory->createItem($page->getMenuLabel(), $itemOptions);
+        $itemOptions['extras'] = array_merge(
+            isset($defaultOptions['extras']) ? $defaultOptions['extras'] : [],
+            [
+                'page_slug' => $page->getSlug(),
+            ],
+            isset($pageItemSettings['extras']) ? $pageItemSettings['extras'] : []
+        );
+        $item = $this->factory->createItem($page->getName(), $itemOptions);
 
         $this->eventDispatcher->dispatch(
             BeforeAddItem::BEFORE_ADD_ITEM,

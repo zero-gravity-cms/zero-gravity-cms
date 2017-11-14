@@ -1,1 +1,5 @@
 menu_label: custom second sibling label
+extra:
+    menu_item_options:
+        extras:
+            custom_extra: custom_value
