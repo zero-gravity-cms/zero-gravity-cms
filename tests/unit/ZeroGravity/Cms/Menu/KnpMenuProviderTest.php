@@ -17,8 +17,10 @@ use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Exception\InvalidMenuNameException;
 use ZeroGravity\Cms\Filesystem\FilesystemParser;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
+use ZeroGravity\Cms\Menu\Event\AfterAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\AfterAddItem;
 use ZeroGravity\Cms\Menu\Event\AfterBuildMenu;
+use ZeroGravity\Cms\Menu\Event\BeforeAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\BeforeAddItem;
 use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 use ZeroGravity\Cms\Menu\KnpMenuProvider;
@@ -172,6 +174,47 @@ class KnpMenuProviderTest extends BaseUnit
             ->method('dispatch')
             ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->callback($beforeAddHomeItemCallback))
         ;
+
+        $beforeAddHomeChildrenCallback = function ($argument) {
+            if (!$argument instanceof BeforeAddChildrenToItem) {
+                return false;
+            }
+            if ('root' !== $argument->getRootItem()->getName()) {
+                return false;
+            }
+            if ('Home' !== $argument->getItem()->getName()) {
+                return false;
+            }
+
+            return true;
+        };
+
+        // first item's children pre-event
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->callback($beforeAddHomeChildrenCallback))
+        ;
+
+        $afterAddHomeChildrenCallback = function ($argument) {
+            if (!$argument instanceof AfterAddChildrenToItem) {
+                return false;
+            }
+            if ('root' !== $argument->getRootItem()->getName()) {
+                return false;
+            }
+            if ('Home' !== $argument->getItem()->getName()) {
+                return false;
+            }
+
+            return true;
+        };
+
+        // first item's children post-event
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->callback($afterAddHomeChildrenCallback))
+        ;
+
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
             ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
@@ -182,11 +225,23 @@ class KnpMenuProviderTest extends BaseUnit
             ->method('dispatch')
             ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
         ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+        ;
 
         // second item first child
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
             ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
         ;
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
@@ -217,10 +272,39 @@ class KnpMenuProviderTest extends BaseUnit
         ;
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
+            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
             ->with(AfterAddItem::AFTER_ADD_ITEM, $this->callback($afterAddSecondSubChildItemCallback))
         ;
 
+        $afterAddSecondItemChildrenCallback = function ($argument) {
+            if (!$argument instanceof AfterAddChildrenToItem) {
+                return false;
+            }
+            if ('root' !== $argument->getRootItem()->getName()) {
+                return false;
+            }
+            if ('First Sibling' !== $argument->getItem()->getName()) {
+                return false;
+            }
+            if (2 !== count($argument->getItem()->getChildren())) {
+                return false;
+            }
+
+            return true;
+        };
+
         // second item finished
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->callback($afterAddSecondItemChildrenCallback))
+        ;
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
             ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
@@ -230,6 +314,14 @@ class KnpMenuProviderTest extends BaseUnit
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
             ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+        ;
+        $dispatcher->expects($this->at($run++))
+            ->method('dispatch')
+            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
         ;
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
