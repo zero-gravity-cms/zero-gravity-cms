@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Menu\Voter;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Voter\VoterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use ZeroGravity\Cms\Content\Page;
 
 class PageRouteVoter implements VoterInterface
@@ -14,12 +15,9 @@ class PageRouteVoter implements VoterInterface
      */
     private $request;
 
-    /**
-     * @param Request|null $request
-     */
-    public function setRequest(Request $request = null)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**

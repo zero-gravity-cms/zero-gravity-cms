@@ -4,6 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Menu\Voter;
 
 use Knp\Menu\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Menu\Voter\PageRouteVoter;
@@ -23,7 +24,7 @@ class PageRouteVoterTest extends BaseUnit
             ->method('getExtra')
         ;
 
-        $voter = new PageRouteVoter();
+        $voter = new PageRouteVoter(new RequestStack());
 
         $this->assertNull($voter->matchItem($item));
     }
@@ -38,9 +39,9 @@ class PageRouteVoterTest extends BaseUnit
             ->method('getExtra')
         ;
 
-        $voter = new PageRouteVoter();
-        $request = new Request();
-        $voter->setRequest($request);
+        $stack = new RequestStack();
+        $stack->push(new Request());
+        $voter = new PageRouteVoter($stack);
 
         $this->assertNull($voter->matchItem($item));
     }
@@ -59,9 +60,10 @@ class PageRouteVoterTest extends BaseUnit
 
         $request = new Request();
         $request->attributes->set('page', $page);
+        $stack = new RequestStack();
+        $stack->push($request);
 
-        $voter = new PageRouteVoter();
-        $voter->setRequest($request);
+        $voter = new PageRouteVoter($stack);
 
         $this->assertNull($voter->matchItem($item));
     }
@@ -82,9 +84,10 @@ class PageRouteVoterTest extends BaseUnit
 
         $request = new Request();
         $request->attributes->set('page', $page);
+        $stack = new RequestStack();
+        $stack->push($request);
 
-        $voter = new PageRouteVoter();
-        $voter->setRequest($request);
+        $voter = new PageRouteVoter($stack);
 
         $this->expectException(\InvalidArgumentException::class);
         $voter->matchItem($item);
@@ -106,9 +109,10 @@ class PageRouteVoterTest extends BaseUnit
 
         $request = new Request();
         $request->attributes->set('page', $page);
+        $stack = new RequestStack();
+        $stack->push($request);
 
-        $voter = new PageRouteVoter();
-        $voter->setRequest($request);
+        $voter = new PageRouteVoter($stack);
 
         $this->assertTrue($voter->matchItem($item));
     }
@@ -132,9 +136,10 @@ class PageRouteVoterTest extends BaseUnit
 
         $request = new Request();
         $request->attributes->set('page', $page);
+        $stack = new RequestStack();
+        $stack->push($request);
 
-        $voter = new PageRouteVoter();
-        $voter->setRequest($request);
+        $voter = new PageRouteVoter($stack);
 
         $this->assertTrue($voter->matchItem($item));
     }
@@ -158,9 +163,10 @@ class PageRouteVoterTest extends BaseUnit
 
         $request = new Request();
         $request->attributes->set('page', $page);
+        $stack = new RequestStack();
+        $stack->push($request);
 
-        $voter = new PageRouteVoter();
-        $voter->setRequest($request);
+        $voter = new PageRouteVoter($stack);
 
         $this->assertNull($voter->matchItem($item));
     }
