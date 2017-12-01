@@ -2,7 +2,6 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
-use Symfony\Component\Finder\Iterator\FilterIterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
@@ -11,7 +10,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class TaxonomiesFilterIterator extends FilterIterator
+class TaxonomiesFilterIterator extends \FilterIterator
 {
     /**
      * @var TaxonomyTester[]

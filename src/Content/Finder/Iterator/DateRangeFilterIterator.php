@@ -3,7 +3,6 @@
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use Symfony\Component\Finder\Comparator\DateComparator;
-use Symfony\Component\Finder\Iterator\FilterIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -11,7 +10,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class DateRangeFilterIterator extends FilterIterator
+class DateRangeFilterIterator extends \FilterIterator
 {
     private $comparators = array();
 

@@ -3,7 +3,6 @@
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use Symfony\Component\Finder\Iterator\FilterIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -11,7 +10,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class FileCountFilterIterator extends FilterIterator
+class FileCountFilterIterator extends \FilterIterator
 {
     const MODE_FILES = 'files';
     const MODE_IMAGES = 'images';

@@ -2,7 +2,6 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
-use Symfony\Component\Finder\Iterator\FilterIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -10,7 +9,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class SettingFilterIterator extends FilterIterator
+class SettingFilterIterator extends \FilterIterator
 {
     /**
      * @var array
