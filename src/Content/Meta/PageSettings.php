@@ -100,6 +100,7 @@ class PageSettings
             'template' => null,
             'title' => null,
             'taxonomy' => [],
+            'content_type' => 'page',
         ]);
     }
 
@@ -115,6 +116,7 @@ class PageSettings
         $resolver->setAllowedTypes('modular', 'bool');
         $resolver->setAllowedTypes('module', 'bool');
         $resolver->setAllowedTypes('title', ['null', 'string']);
+        $resolver->setAllowedTypes('content_type', 'string');
 
         $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
         $resolver->setAllowedTypes('publish_date', $dateTypes);

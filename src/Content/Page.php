@@ -251,6 +251,14 @@ class Page
     }
 
     /**
+     * @return string
+     */
+    public function getContentType(): string
+    {
+        return $this->getSetting('content_type');
+    }
+
+    /**
      * Get all defined taxonomy keys and values.
      *
      * @return array

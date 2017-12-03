@@ -46,6 +46,8 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notExtras = [];
     private $settings = [];
     private $notSettings = [];
+    private $contentTypes = [];
+    private $notContentTypes = [];
     private $filters = [];
     private $sort;
     private $iterators = [];
@@ -527,6 +529,44 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Adds rules that pages must match.
+     *
+     * You can use patterns (delimited with / sign), globs or simple strings.
+     *
+     * $finder->contentType('foo type')
+     * $finder->contentType('foo *')
+     * $finder->contentType('/foo [a-z]{1,4}/')
+     *
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
+     *
+     * @return $this
+     *
+     * @see ContentTypeFilterIterator
+     */
+    public function contentType($pattern)
+    {
+        $this->contentTypes[] = $pattern;
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages must not match.
+     *
+     * @param string $pattern A pattern (a regexp, a glob, or a string)
+     *
+     * @return $this
+     *
+     * @see ContentTypeFilterIterator
+     */
+    public function notContentType($pattern)
+    {
+        $this->notContentTypes[] = $pattern;
+
+        return $this;
+    }
+
+    /**
      * Adds tests that page contents must match.
      * This will be matched against the raw (HTML or markdown) content.
      *
@@ -953,6 +993,10 @@ class PageFinder implements \IteratorAggregate, \Countable
 
         if (!empty($this->contains) || !empty($this->notContains)) {
             $iterator = new Iterator\ContentFilterIterator($iterator, $this->contains, $this->notContains);
+        }
+
+        if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
+            $iterator = new Iterator\ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
         }
 
         if (!empty($this->dates)) {

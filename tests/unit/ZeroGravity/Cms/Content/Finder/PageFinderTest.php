@@ -88,6 +88,8 @@ class PageFinderTest extends BaseUnit
             ['notExtra', ''],
             ['setting', ''],
             ['notSetting', ''],
+            ['contentType', ''],
+            ['notContentType', ''],
         ];
     }
 
@@ -276,6 +278,36 @@ class PageFinderTest extends BaseUnit
             ->title('/.*Chil.*/i')
         ;
         $this->assertCount(6, $finder, 'Regex comparison');
+    }
+
+    /**
+     * @test
+     */
+    public function pagesCanBeFilteredByContentType()
+    {
+        $finder = $this->getFinder()
+            ->contentType('page')
+        ;
+        $this->assertCount(10, $finder, 'String comparison');
+        $finder = $this->getFinder()
+            ->notContentType('page')
+        ;
+        $this->assertCount(2, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->contentType('custom-child')
+        ;
+        $this->assertCount(2, $finder, 'String comparison, custom contentType');
+
+        $finder = $this->getFinder()
+            ->contentType('custom*')
+        ;
+        $this->assertCount(2, $finder, 'Glob comparison');
+
+        $finder = $this->getFinder()
+            ->contentType('/.*tom-ch.*/i')
+        ;
+        $this->assertCount(2, $finder, 'Regex comparison');
     }
 
     /**

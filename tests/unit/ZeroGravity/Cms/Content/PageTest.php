@@ -205,6 +205,7 @@ class PageTest extends BaseUnit
             'unpublish_date' => null,
             'extra' => [],
             'taxonomy' => [],
+            'content_type' => 'page',
         ];
         $this->assertEquals($expectedSettings, $page->getSettings());
     }
@@ -420,6 +421,29 @@ class PageTest extends BaseUnit
         $this->assertSame(['foo', 'bar'], $page->getTags());
         $this->assertSame(['baz'], $page->getCategories());
         $this->assertSame(['David', 'Julian'], $page->getAuthors());
+    }
+
+    /**
+     * @test
+     */
+    public function contentTypeDefaultsToPage()
+    {
+        $page = new Page('page', [
+        ]);
+
+        $this->assertSame('page', $page->getContentType());
+    }
+
+    /**
+     * @test
+     */
+    public function contentTypeCanBeSet()
+    {
+        $page = new Page('page', [
+            'content_type' => 'custom-type',
+        ]);
+
+        $this->assertSame('custom-type', $page->getContentType());
     }
 
     /**
