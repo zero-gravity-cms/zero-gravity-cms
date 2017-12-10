@@ -388,6 +388,12 @@ class PageTest extends BaseUnit
             'tag' => ['foo', 'bar'],
             'category' => ['baz'],
         ], $page->getTaxonomies());
+
+        $page = new Page('page', [
+            'taxonomy' => null,
+        ]);
+
+        $this->assertSame([], $page->getTaxonomies());
     }
 
     /**

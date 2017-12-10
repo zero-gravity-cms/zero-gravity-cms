@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Codeception\Util\Stub;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -103,6 +104,35 @@ class ContentRepositoryTest extends BaseUnit
         $repo2 = new ContentRepository($emptyParser, $cache, true);
 
         $this->assertEquals([], $repo2->getAllPages());
+    }
+
+    /**
+     * @test
+     */
+    public function pagesAreLoadedIfCacheThrowsException()
+    {
+        $page1 = $this->createSimplePage('page1');
+        $page2 = $this->createSimplePage('page2');
+        $page3 = $this->createSimplePage('page3', $page2);
+
+        $parser = Stub::makeEmpty(StructureParser::class, [
+            'parse' => [
+                $page1,
+                $page2,
+            ],
+        ]);
+
+        $cache = $this->getMockBuilder(ArrayCache::class)
+            ->setMethods(['has'])
+            ->getMock()
+        ;
+        $cache->expects($this->once())
+            ->method('has')
+            ->willThrowException(new InvalidArgumentException())
+        ;
+
+        $repo = new ContentRepository($parser, $cache, false);
+        $repo->getAllPages();
     }
 
     /**
