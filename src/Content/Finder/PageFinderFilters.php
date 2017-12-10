@@ -5,7 +5,7 @@ namespace ZeroGravity\Cms\Content\Finder;
 interface PageFinderFilters
 {
     /**
-     * @return array
+     * @return callable[]|PageFinderFilter[]
      */
     public function getFilters(): array;
 }

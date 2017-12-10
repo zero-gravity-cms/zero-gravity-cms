@@ -5,3 +5,5 @@ taxonomy:
     category:
         - category1
         - category2
+extra:
+    my_custom_date: 1449769188

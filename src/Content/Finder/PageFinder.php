@@ -6,6 +6,7 @@ use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 use Webmozart\Assert\Assert;
+use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
@@ -281,12 +282,15 @@ class PageFinder implements \IteratorAggregate, \Countable
      *
      * @param string $name
      * @param mixed  $value
+     * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
      *
      * @return $this
+     *
+     * @see ExtraFilterIterator
      */
-    public function extra($name, $value)
+    public function extra($name, $value, $comparator = ExtraFilterIterator::COMPARATOR_STRING)
     {
-        $this->extras[] = [$name, $value];
+        $this->extras[] = [$name, $value, $comparator];
 
         return $this;
     }
@@ -298,12 +302,15 @@ class PageFinder implements \IteratorAggregate, \Countable
      *
      * @param string $name
      * @param mixed  $value
+     * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
      *
      * @return $this
+     *
+     * @see ExtraFilterIterator
      */
-    public function notExtra($name, $value)
+    public function notExtra($name, $value, $comparator = ExtraFilterIterator::COMPARATOR_STRING)
     {
-        $this->notExtras[] = [$name, $value];
+        $this->notExtras[] = [$name, $value, $comparator];
 
         return $this;
     }
