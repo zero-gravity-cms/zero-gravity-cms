@@ -5,6 +5,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
+use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\FilesystemParser;
@@ -588,12 +589,56 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->extra('custom', 'custom_value')
         ;
-        $this->assertCount(2, $finder);
+        $this->assertCount(2, $finder, 'String comparison');
 
         $finder = $this->getFinder()
             ->notExtra('custom', 'custom_value')
         ;
-        $this->assertCount(10, $finder);
+        $this->assertCount(10, $finder, 'String comparison, negated');
+
+        $finder = $this->getFinder()
+            ->extra('custom', '> aaa')
+        ;
+        $this->assertCount(3, $finder, 'String comparison, comparator');
+
+        $finder = $this->getFinder()
+            ->extra('my_custom_date', '> 2016-01-01')
+        ;
+        $this->assertCount(4, $finder, 'String comparison of date value, comparator');
+
+        $finder = $this->getFinder()
+            ->extra('my_custom_date', '> 2016-01-01', ExtraFilterIterator::COMPARATOR_DATE)
+        ;
+        $this->assertCount(2, $finder, 'Date comparison of date value');
+
+        $finder = $this->getFinder()
+            ->extra('my_custom_date', '> 1449769188', ExtraFilterIterator::COMPARATOR_NUMERIC)
+        ;
+        $this->assertCount(1, $finder, 'Numeric comparison of date value');
+    }
+
+    /**
+     * @test
+     */
+    public function stringComparatorThrowsExceptionForInvalidPattern()
+    {
+        $finder = $this->getFinder()
+            ->extra('custom', '')
+        ;
+        $this->expectException(\InvalidArgumentException::class);
+        $finder->count();
+    }
+
+    /**
+     * @test
+     */
+    public function extraFilterThrowsExceptionForInvalidComparator()
+    {
+        $finder = $this->getFinder()
+            ->extra('custom', 'somevalue', 'this-is-not-a-comparator')
+        ;
+        $this->expectException(\InvalidArgumentException::class);
+        $finder->count();
     }
 
     /**
