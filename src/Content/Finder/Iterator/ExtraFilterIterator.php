@@ -52,28 +52,28 @@ class ExtraFilterIterator extends \FilterIterator
     {
         $page = $this->current();
         foreach ($this->extras as $extraSet) {
-            $key = $extraSet[0];
-            $target = $extraSet[1];
-            $comparator = $this->getComparator($extraSet[2], $target);
-            $value = $this->getExtraValue($page, $key, $extraSet[2]);
-
-            if (!$comparator->test($value)) {
+            if (!$this->compareExtra($extraSet, $page)) {
                 return false;
             }
         }
 
         foreach ($this->notExtras as $extraSet) {
-            $key = $extraSet[0];
-            $target = $extraSet[1];
-            $comparator = $this->getComparator($extraSet[2], $target);
-            $value = $this->getExtraValue($page, $key, $extraSet[2]);
-
-            if ($comparator->test($value)) {
+            if ($this->compareExtra($extraSet, $page)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private function compareExtra(array $extraSet, Page $page): bool
+    {
+        $key = $extraSet[0];
+        $target = $extraSet[1];
+        $comparator = $this->getComparator($extraSet[2], $target);
+        $value = $this->getExtraValue($page, $key, $extraSet[2]);
+
+        return $comparator->test($value);
     }
 
     private function getExtraValue(Page $page, $key, $type)
