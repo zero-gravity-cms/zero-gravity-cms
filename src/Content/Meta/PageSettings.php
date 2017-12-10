@@ -111,7 +111,7 @@ class PageSettings
     {
         $resolver->setAllowedTypes('extra', 'array');
         $resolver->setAllowedTypes('file_aliases', 'array');
-        $resolver->setAllowedTypes('taxonomy', 'array');
+        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
         $resolver->setAllowedTypes('visible', 'bool');
         $resolver->setAllowedTypes('modular', 'bool');
         $resolver->setAllowedTypes('module', 'bool');

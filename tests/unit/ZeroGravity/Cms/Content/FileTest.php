@@ -4,6 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Content\Meta\Metadata;
 
 class FileTest extends BaseUnit
 {
@@ -12,7 +13,7 @@ class FileTest extends BaseUnit
      */
     public function fileHasVariousGetters()
     {
-        $metadata = new \ZeroGravity\Cms\Content\Meta\Metadata([
+        $metadata = new Metadata([
             'alt_text' => 'Sample alt text',
         ]);
 
@@ -27,6 +28,9 @@ class FileTest extends BaseUnit
         $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
         $this->assertSame('jpg', $file->getExtension());
         $this->assertSame('/filesystem/path/foo/bar/baz/photo.jpg', $file->getFilesystemPathname());
+
+        $file = new File('/foo/bar/baz/photo', '/filesystem/path/', $metadata, 'image');
+        $this->assertSame('photo', $file->getDefaultBasename());
     }
 
     /**
@@ -36,5 +40,14 @@ class FileTest extends BaseUnit
     {
         $file = new File('foo/bar/baz/photo.jpg', '', new \ZeroGravity\Cms\Content\Meta\Metadata([]), 'image');
         $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
+    }
+
+    /**
+     * @test
+     */
+    public function toStringReturnsPathname()
+    {
+        $file = new File('/foo/bar/baz/photo.jpg', '/filesystem/path/', new Metadata([]), 'image');
+        $this->assertSame('/foo/bar/baz/photo.jpg', (string) $file);
     }
 }

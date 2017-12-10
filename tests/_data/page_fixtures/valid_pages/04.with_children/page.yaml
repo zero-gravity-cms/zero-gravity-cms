@@ -6,3 +6,4 @@ taxonomy:
         - category2
 extra:
     custom: custom_value
+    my_custom_date: '2017-01-01 12:10:00'

@@ -10,3 +10,5 @@ taxonomy:
         - john
 extra:
     custom: another_custom_value
+    # parsed as timestamp
+    my_custom_date: 2017-01-01 12:10:00
