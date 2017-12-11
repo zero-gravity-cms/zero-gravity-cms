@@ -1,0 +1,18 @@
+--TEST--
+'zg_filter' filter
+--TEMPLATE--
+{% for child in zg_current_page().children|zg_filter('sort-path-desc') %}
+current: {{ child.filesystemPath }}
+{% endfor %}
+
+{% for child in zg_page('/yaml_and_twig').children|zg_filter('filter-custom-children') %}
+another page: {{ child.filesystemPath }}
+{% endfor %}
+--DATA--
+return array()
+--EXPECT--
+current: /04.with_children/_child2
+current: /04.with_children/_child1
+
+another page: /06.yaml_and_twig/01.child1
+another page: /06.yaml_and_twig/02.child2

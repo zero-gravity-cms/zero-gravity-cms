@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Test;
 
+use Helper\Unit;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
@@ -15,7 +16,15 @@ trait FixtureDirTrait
      */
     protected function getPageFixtureDir(): string
     {
-        return $this->getModule('\Helper\Unit')->getPageFixtureDir();
+        return $this->getUnitHelperModule()->getPageFixtureDir();
+    }
+
+    /**
+     * @return Unit
+     */
+    protected function getUnitHelperModule()
+    {
+        return $this->getModule('\Helper\Unit');
     }
 
     /**

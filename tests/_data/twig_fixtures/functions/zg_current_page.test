@@ -1,0 +1,8 @@
+--TEST--
+'zg_current_page' function
+--TEMPLATE--
+{{ zg_current_page().getFilesystemPath() }}
+--DATA--
+return array()
+--EXPECT--
+/04.with_children

@@ -1,0 +1,11 @@
+--TEST--
+'zg_filter' function
+--TEMPLATE--
+{% for child in zg_filter('filter-custom-children') %}
+{{ child.filesystemPath }}
+{% endfor %}
+--DATA--
+return array()
+--EXPECT--
+/06.yaml_and_twig/01.child1
+/06.yaml_and_twig/02.child2

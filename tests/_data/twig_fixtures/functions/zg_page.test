@@ -1,0 +1,12 @@
+--TEST--
+'zg_page' function
+--TEMPLATE--
+{{ zg_page('/with_children/_child1').getFilesystemPath() }}
+{{ zg_page('./_child1').getFilesystemPath() }}
+{% if zg_page('/does-not-exist') is null %}does not exist{% else %}exists{% endif %}
+--DATA--
+return array()
+--EXPECT--
+/04.with_children/_child1
+/04.with_children/_child1
+does not exist
