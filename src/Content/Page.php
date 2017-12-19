@@ -318,6 +318,16 @@ class Page
     }
 
     /**
+     * Get default setting values for child pages.
+     *
+     * @return array
+     */
+    public function getChildDefaults(): array
+    {
+        return $this->getSetting('child_defaults');
+    }
+
+    /**
      * @return array
      */
     public function getExtra(): array

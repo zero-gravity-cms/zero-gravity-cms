@@ -209,6 +209,7 @@ class PageTest extends BaseUnit
             'extra' => [],
             'taxonomy' => [],
             'content_type' => 'page',
+            'child_defaults' => [],
         ];
         $this->assertEquals($expectedSettings, $page->getSettings());
     }

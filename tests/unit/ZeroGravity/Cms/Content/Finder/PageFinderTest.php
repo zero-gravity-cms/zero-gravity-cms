@@ -586,17 +586,17 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->extra('custom', 'custom_value')
         ;
-        $this->assertCount(2, $finder, 'String comparison');
+        $this->assertCount(3, $finder, 'String comparison');
 
         $finder = $this->getFinder()
             ->notExtra('custom', 'custom_value')
         ;
-        $this->assertCount(10, $finder, 'String comparison, negated');
+        $this->assertCount(9, $finder, 'String comparison, negated');
 
         $finder = $this->getFinder()
             ->extra('custom', '> aaa')
         ;
-        $this->assertCount(3, $finder, 'String comparison, comparator');
+        $this->assertCount(4, $finder, 'String comparison, comparator');
 
         $finder = $this->getFinder()
             ->extra('my_custom_date', '> 2016-01-01')
