@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Psr\Log\NullLogger;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\FilesystemException;
@@ -16,7 +17,7 @@ class FilesystemParserTest extends BaseUnit
     {
         $path = $this->getPageFixtureDir().'/invalid_path';
         $fileFactory = $this->getDefaultFileFactory();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
 
         $this->expectException(FilesystemException::class);
         $parser->parse();
@@ -29,7 +30,7 @@ class FilesystemParserTest extends BaseUnit
     {
         $path = $this->getValidPagesDir();
         $fileFactory = $this->getDefaultFileFactory();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
 
         $pages = $parser->parse();
         $this->assertContainsOnlyInstancesOf(Page::class, $pages);

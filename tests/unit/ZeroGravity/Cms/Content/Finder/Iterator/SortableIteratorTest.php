@@ -8,7 +8,6 @@ use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\Iterator\SortableIterator;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
 
 /**
  * @group sort
@@ -22,9 +21,7 @@ class SortableIteratorTest extends BaseUnit
 
     public function _before()
     {
-        $fileFactory = $this->getDefaultFileFactory();
-        $path = $this->getValidPagesDir();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = $this->getValidPagesFilesystemParser();
         $repository = new ContentRepository($parser, new ArrayCache(), false);
 
         $this->finderPrototype = $repository->getPageFinder();
@@ -65,7 +62,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_only' => '01.yaml_only',
             '/yaml_and_twig/child2' => '02.child2',
             '/markdown_only' => '02.markdown_only',
-            '/yaml_and_markdown' => '03.yaml_and_markdown',
+            '/yaml_and_markdown_and_twig' => '03.yaml_and_markdown_and_twig',
             '/with_children' => '04.with_children',
             '/twig_only' => '05.twig_only',
             '/yaml_and_twig' => '06.yaml_and_twig',
@@ -83,7 +80,7 @@ class SortableIteratorTest extends BaseUnit
             '/no_sorting_prefix' => 'no_sorting_prefix',
             '/twig_only' => 'twig_only',
             '/with_children' => 'with_children',
-            '/yaml_and_markdown' => 'yaml_and_markdown',
+            '/yaml_and_markdown_and_twig' => 'yaml_and_markdown_and_twig',
             '/yaml_and_twig' => 'yaml_and_twig',
             '/yaml_only' => 'yaml_only',
         ];
@@ -98,7 +95,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_only' => 'testtitle',
             '/twig_only' => 'Twig Only',
             '/with_children' => 'With Children',
-            '/yaml_and_markdown' => 'Yaml And Markdown',
+            '/yaml_and_markdown_and_twig' => 'Yaml And Markdown',
             '/yaml_and_twig' => 'Yaml And Twig',
         ];
         $pagesSortedByDate = [
@@ -112,7 +109,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig/child1' => null,
             '/yaml_and_twig/child2' => null,
             '/not_published/child1' => '2016-10-01 00:00:00.000000',
-            '/yaml_and_markdown' => '2016-10-01 00:00:00.000000',
+            '/yaml_and_markdown_and_twig' => '2016-10-01 00:00:00.000000',
             '/yaml_only' => '2017-01-01 00:00:00.000000',
         ];
         $pagesSortedByPublishDate = [
@@ -120,7 +117,7 @@ class SortableIteratorTest extends BaseUnit
             '/no_sorting_prefix' => null,
             '/twig_only' => null,
             '/with_children' => null,
-            '/yaml_and_markdown' => null,
+            '/yaml_and_markdown_and_twig' => null,
             '/yaml_and_twig' => null,
             '/yaml_only' => null,
             '/not_published/child1' => '2016-01-01 00:00:00.000000',
@@ -137,7 +134,7 @@ class SortableIteratorTest extends BaseUnit
             '/with_children' => '/with_children',
             '/with_children/_child1' => '/with_children/_child1',
             '/with_children/_child2' => '/with_children/_child2',
-            '/yaml_and_markdown' => '/yaml_and_markdown',
+            '/yaml_and_markdown_and_twig' => '/yaml_and_markdown_and_twig',
             '/yaml_and_twig' => '/yaml_and_twig',
             '/yaml_and_twig/child1' => '/yaml_and_twig/child1',
             '/yaml_and_twig/child2' => '/yaml_and_twig/child2',
@@ -146,7 +143,7 @@ class SortableIteratorTest extends BaseUnit
         $pagesSortedByFilesystemPath = [
             '/yaml_only' => '/01.yaml_only',
             '/markdown_only' => '/02.markdown_only',
-            '/yaml_and_markdown' => '/03.yaml_and_markdown',
+            '/yaml_and_markdown_and_twig' => '/03.yaml_and_markdown_and_twig',
             '/with_children' => '/04.with_children',
             '/with_children/_child1' => '/04.with_children/_child1',
             '/with_children/_child2' => '/04.with_children/_child2',
@@ -167,7 +164,7 @@ class SortableIteratorTest extends BaseUnit
             '/no_sorting_prefix' => 'No Sorting Prefix',
             '/twig_only' => 'Twig Only',
             '/with_children' => 'With Children',
-            '/yaml_and_markdown' => 'Yaml And Markdown',
+            '/yaml_and_markdown_and_twig' => 'Yaml And Markdown',
             '/yaml_and_twig' => 'Yaml And Twig',
             '/yaml_only' => 'testtitle',
         ];

@@ -7,11 +7,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use Tests\Unit\ZeroGravity\Cms\Test\TwigExtensionTestTrait;
+use Twig_Loader_Filesystem;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
 use ZeroGravity\Cms\Routing\RouterPageSelector;
 use ZeroGravity\Cms\Twig\Extension\ZeroGravityExtension;
 
@@ -24,9 +24,7 @@ class ZeroGravityExtensionTest extends BaseUnit
 
     public function getExtensions()
     {
-        $fileFactory = $this->getDefaultFileFactory();
-        $path = $this->getValidPagesDir();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = $this->getValidPagesFilesystemParser();
         $repository = new ContentRepository($parser, new ArrayCache(), false);
 
         $requestStack = new RequestStack();
@@ -68,5 +66,18 @@ class ZeroGravityExtensionTest extends BaseUnit
     protected function getFixturesDir()
     {
         return __DIR__.'/../../../../../_data/twig_fixtures';
+    }
+
+    /**
+     * @return Twig_LoaderInterface[]
+     */
+    protected function getTwigLoaders()
+    {
+        $filesystemLoader = new Twig_Loader_Filesystem();
+        $filesystemLoader->addPath($this->getValidPagesDir(), 'ZeroGravity');
+
+        return [
+            $filesystemLoader,
+        ];
     }
 }

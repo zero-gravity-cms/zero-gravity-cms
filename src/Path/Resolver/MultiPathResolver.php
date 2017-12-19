@@ -5,7 +5,7 @@ namespace ZeroGravity\Cms\Path\Resolver;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
-interface PathResolver
+interface MultiPathResolver extends SinglePathResolver
 {
     /**
      * Resolve the given path or glob pattern and find the matching files.
@@ -16,16 +16,6 @@ interface PathResolver
      * @return File[]
      */
     public function find(Path $path, Path $parentPath = null): array;
-
-    /**
-     * Resolve the given file name and path.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return null|File
-     */
-    public function get(Path $path, Path $parentPath = null): ? File;
 
     /**
      * Find a single matching file.

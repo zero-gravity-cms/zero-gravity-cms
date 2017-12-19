@@ -162,7 +162,8 @@ class PageTest extends BaseUnit
             'title' => 'Page title',
             'visible' => true,
             'modular' => true,
-            'template' => 'main.html.twig',
+            'layout_template' => 'main.html.twig',
+            'content_template' => 'render_with_h1.html.twig',
             'controller' => 'CustomBundle:Custom:action',
             'menu_id' => 'custom_id',
             'menu_label' => 'custom label',
@@ -174,7 +175,8 @@ class PageTest extends BaseUnit
         $this->assertSame('Page title', $page->getTitle());
         $this->assertTrue($page->isVisible());
         $this->assertTrue($page->isModular());
-        $this->assertSame('main.html.twig', $page->getTemplate());
+        $this->assertSame('main.html.twig', $page->getLayoutTemplate());
+        $this->assertSame('render_with_h1.html.twig', $page->getContentTemplate());
         $this->assertSame('CustomBundle:Custom:action', $page->getController());
         $this->assertSame('custom_id', $page->getMenuId());
         $this->assertSame('custom label', $page->getMenuLabel());
@@ -194,7 +196,8 @@ class PageTest extends BaseUnit
             'visible' => false,
             'modular' => false,
             'module' => false,
-            'template' => null,
+            'layout_template' => null,
+            'content_template' => null,
             'controller' => null,
             'menu_id' => 'zero-gravity',
             'menu_label' => null,

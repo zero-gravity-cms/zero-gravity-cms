@@ -6,6 +6,7 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\Integration\Symfony\RoutingExtension;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
+use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -383,7 +384,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $path = $this->getPageFixtureDir().'/sample_menu_pages';
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
 
         return new ContentRepository($parser, new ArrayCache(), false);
     }

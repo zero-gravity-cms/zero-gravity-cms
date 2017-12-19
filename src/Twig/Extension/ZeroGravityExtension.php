@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Twig\Extension;
 
+use Twig_Environment;
 use Twig_Extension;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
@@ -39,6 +40,21 @@ class ZeroGravityExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFilter('zg_filter', [$this, 'filterPages']),
+            new Twig_SimpleFilter(
+                'zg_render_content',
+                [$this, 'renderPageContent'],
+                [
+                    'is_safe' => ['html'],
+                ]
+            ),
+            new Twig_SimpleFilter(
+                'zg_render',
+                [$this, 'renderPage'],
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true,
+                ]
+            ),
         ];
     }
 
@@ -48,6 +64,21 @@ class ZeroGravityExtension extends Twig_Extension
             new Twig_SimpleFunction('zg_page', [$this, 'getPage']),
             new Twig_SimpleFunction('zg_current_page', [$this, 'getCurrentPage']),
             new Twig_SimpleFunction('zg_filter', [$this, 'filterAllPages']),
+            new Twig_SimpleFunction(
+                'zg_render_content',
+                [$this, 'renderPageContent'],
+                [
+                    'is_safe' => ['html'],
+                ]
+            ),
+            new Twig_SimpleFunction(
+                'zg_render',
+                [$this, 'renderPage'],
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true,
+                ]
+            ),
         ];
     }
 
@@ -102,5 +133,37 @@ class ZeroGravityExtension extends Twig_Extension
         $pageFinder = $this->contentRepository->getPageFinder();
 
         return $this->filterPages($pageFinder, $filterName, $filterOptions);
+    }
+
+    /**
+     * @param Twig_Environment $environment
+     * @param Page             $page
+     * @param array            $context
+     *
+     * @return null|string
+     *
+     * @throws \Twig_Error_Loader
+     * @throws \Twig_Error_Runtime
+     * @throws \Twig_Error_Syntax
+     */
+    public function renderPage(Twig_Environment $environment, Page $page, array $context = [])
+    {
+        if (!empty($page->getContentTemplate())) {
+            $context['page'] = $page;
+
+            return $environment->render($page->getContentTemplate(), $context);
+        }
+
+        return $page->getContent();
+    }
+
+    /**
+     * @param Page $page
+     *
+     * @return null|string
+     */
+    public function renderPageContent(Page $page)
+    {
+        return $page->getContent();
     }
 }

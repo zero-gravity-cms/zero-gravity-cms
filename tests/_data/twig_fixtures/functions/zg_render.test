@@ -1,0 +1,12 @@
+--TEST--
+'zg_render' function
+--TEMPLATE--
+{{ zg_render(zg_page('/markdown_only')) }}
+
+{{ zg_render(zg_page('/yaml_and_twig'), {'testvar': 'testvalue'}) }}
+--DATA--
+return array()
+--EXPECT--
+This is the content of page 02.
+
+Custom TWIG template testvalue

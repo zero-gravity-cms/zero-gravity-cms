@@ -32,6 +32,12 @@ class YamlMetadataLoader implements MetadataLoader
             $data = [];
         }
 
+        if (!is_array($data)) {
+            $data = [
+                'title' => $data,
+            ];
+        }
+
         return new Metadata($data);
     }
 }

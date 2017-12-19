@@ -2,47 +2,54 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Media;
 
-use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
-use ZeroGravity\Cms\Content\ContentRepository;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
+use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Media\MediaRepository;
 
 /**
- * @tag current
+ * @group media
  */
 class MediaRepositoryTest extends BaseUnit
 {
     /**
-     * @var ContentRepository
-     */
-    protected $repository;
-
-    protected function _before()
-    {
-        $this->prepareRepository();
-    }
-
-    /**
      * @test
      * @dataProvider provideValidMediaPaths
+     *
+     * @param $pathString
      */
-    public function mediaCanBeLoaded($path)
+    public function validPathReturnsFile($pathString)
     {
+        $mediaRepository = new MediaRepository($this->getValidPagesResolver());
+
+        $this->assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
     }
 
     public function provideValidMediaPaths()
     {
         return [
-            ['01.yaml_only/1.png'],
+            ['01.yaml_only/file1.png'],
+            ['01.yaml_only/file2.png'],
         ];
     }
 
-    protected function prepareRepository()
+    /**
+     * @test
+     * @dataProvider provideInvalidMediaPaths
+     *
+     * @param $pathString
+     */
+    public function invalidPathReturnsNull($pathString)
     {
-        $fileFactory = $this->getDefaultFileFactory();
-        $path = $this->getValidPagesDir();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
-        $this->repository = new ContentRepository($parser, new ArrayCache(), false);
+        $this->assertNull($mediaRepository->getFile($pathString));
+    }
+
+    public function provideInvalidMediaPaths()
+    {
+        return [
+            ['01.yaml_only/file1.png.meta.yaml'],
+            ['01.yaml_only/file4.png'],
+        ];
     }
 }

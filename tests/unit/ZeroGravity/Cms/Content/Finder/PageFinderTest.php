@@ -8,7 +8,6 @@ use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
 
 /**
  * @group finder
@@ -22,9 +21,7 @@ class PageFinderTest extends BaseUnit
 
     public function _before()
     {
-        $fileFactory = $this->getDefaultFileFactory();
-        $path = $this->getValidPagesDir();
-        $parser = new FilesystemParser($fileFactory, $path, false, []);
+        $parser = $this->getValidPagesFilesystemParser();
         $repository = new ContentRepository($parser, new ArrayCache(), false);
 
         $this->finderPrototype = $repository->getPageFinder();

@@ -32,17 +32,6 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
 
     /**
      * @param SplFileInfo $directory
-     * @param array       $files
-     *
-     * @return StructureException
-     */
-    public static function moreThanOneTwigFile(SplFileInfo $directory, array $files)
-    {
-        return static::moreThanOneFileOfType($directory, $files, 'twig');
-    }
-
-    /**
-     * @param SplFileInfo $directory
      * @param File        $yamlFile
      * @param File        $markdownFile
      *
@@ -54,30 +43,10 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
         File $markdownFile
     ) {
         return new static(sprintf(
-            'ParsedDirectory %s contains a YAML and a markdown file, but the basenames do not match: %s vs %s',
+            'Directory %s contains a YAML and a markdown file, but the basenames do not match: %s vs %s',
             $directory->getRealPath(),
             $yamlFile->getFilename(),
             $markdownFile->getFilename()
-        ));
-    }
-
-    /**
-     * @param SplFileInfo $directory
-     * @param File        $yamlFile
-     * @param File        $twigFile
-     *
-     * @return StructureException
-     */
-    public static function yamlAndTwigFilesMismatch(
-        SplFileInfo $directory,
-        File $yamlFile,
-        File $twigFile
-    ) {
-        return new static(sprintf(
-            'ParsedDirectory %s contains a YAML and a twig file, but the basenames do not match: %s vs %s',
-            $directory->getRealPath(),
-            $yamlFile->getFilename(),
-            $twigFile->getFilename()
         ));
     }
 

@@ -3,9 +3,12 @@
 namespace Tests\Unit\ZeroGravity\Cms\Test;
 
 use Helper\Unit;
+use Psr\Log\NullLogger;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
+use ZeroGravity\Cms\Filesystem\FilesystemParser;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
+use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 
 trait FixtureDirTrait
 {
@@ -45,5 +48,24 @@ trait FixtureDirTrait
     public function getDefaultFileFactory(): FileFactory
     {
         return new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->getValidPagesDir());
+    }
+
+    /**
+     * @return FilesystemParser
+     */
+    protected function getValidPagesFilesystemParser()
+    {
+        $fileFactory = $this->getDefaultFileFactory();
+        $path = $this->getValidPagesDir();
+
+        return new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
+    }
+
+    /**
+     * @return FilesystemResolver
+     */
+    protected function getValidPagesResolver()
+    {
+        return new FilesystemResolver($this->getDefaultFileFactory());
     }
 }

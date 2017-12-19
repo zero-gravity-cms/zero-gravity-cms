@@ -1,0 +1,11 @@
+--TEST--
+'zg_render_content' filter
+--TEMPLATE--
+{{ zg_page('/markdown_only')|zg_render_content }}
+
+{{ zg_page('/yaml_and_twig')|zg_render_content }}
+--DATA--
+return array()
+--EXPECT--
+This is the content of page 02.
+

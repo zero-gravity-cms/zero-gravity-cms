@@ -2,38 +2,38 @@
 
 namespace ZeroGravity\Cms\Media;
 
-use ZeroGravity\Cms\Content\ContentRepository;
-use ZeroGravity\Cms\Path\Resolver\PathResolver;
+use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Path\Path;
+use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
 class MediaRepository
 {
     /**
-     * @var ContentRepository
-     */
-    private $contentRepository;
-
-    /**
-     * @var string
-     */
-    private $path;
-
-    /**
-     * @var PathResolver
+     * @var SinglePathResolver
      */
     private $pathResolver;
 
-    public function __construct(ContentRepository $contentRepository, string $basePath, PathResolver $pathResolver)
+    public function __construct(SinglePathResolver $pathResolver)
     {
-        $this->contentRepository = $contentRepository;
-        $this->path = $basePath;
         $this->pathResolver = $pathResolver;
     }
 
-    public function getFile($relativePath)
+    /**
+     * @param string|Path $relativePath
+     *
+     * @return null|File
+     */
+    public function getFile($relativePath): ? File
     {
-        $file = $this->pathResolver->get($relativePath);
-        if (null === $file) {
-            return null;
+        if (!$relativePath instanceof Path) {
+            $relativePath = new Path((string) $relativePath);
         }
+
+        $file = $this->pathResolver->get($relativePath);
+        if (null !== $file) {
+            return $file;
+        }
+
+        return null;
     }
 }

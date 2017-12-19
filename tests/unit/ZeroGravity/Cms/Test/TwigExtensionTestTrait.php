@@ -13,6 +13,8 @@ use Twig_ExtensionInterface;
 use Twig_Filter;
 use Twig_Function;
 use Twig_Loader_Array;
+use Twig_Loader_Chain;
+use Twig_LoaderInterface;
 use Twig_RuntimeLoaderInterface;
 use Twig_Test;
 
@@ -64,6 +66,14 @@ trait TwigExtensionTestTrait
      * @return Twig_Test[]
      */
     protected function getTwigTests()
+    {
+        return array();
+    }
+
+    /**
+     * @return Twig_LoaderInterface[]
+     */
+    protected function getTwigLoaders()
     {
         return array();
     }
@@ -149,7 +159,11 @@ trait TwigExtensionTestTrait
             }
         }
 
-        $loader = new Twig_Loader_Array($templates);
+        $loader = new Twig_Loader_Chain();
+        foreach ($this->getTwigLoaders() as $customLoader) {
+            $loader->addLoader($customLoader);
+        }
+        $loader->addLoader(new Twig_Loader_Array($templates));
 
         foreach ($outputs as $i => $match) {
             $config = array_merge(array(

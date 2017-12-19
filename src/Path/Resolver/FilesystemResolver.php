@@ -10,8 +10,10 @@ use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\PathElement;
 
-class FilesystemResolver extends AbstractResolver
+class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 {
+    use MultiPathFindOneTrait;
+
     /**
      * @var string
      */
@@ -53,6 +55,7 @@ class FilesystemResolver extends AbstractResolver
         $path->normalize($parentPath);
 
         $finder = Finder::create()
+            ->notName('*.meta.yaml')
             ->sortByName()
             ->files()
         ;
@@ -113,6 +116,9 @@ class FilesystemResolver extends AbstractResolver
         $fullPath->normalize();
 
         $trimmedPath = ltrim($fullPath->toString(), '/');
+        if ('.meta.yaml' === substr($trimmedPath, -10)) {
+            return null;
+        }
         $testPath = $this->buildBaseDir().'/'.$trimmedPath;
         if ($this->filesystem->exists($testPath) && is_file($testPath)) {
             return $this->fileFactory->createFile('/'.$trimmedPath);

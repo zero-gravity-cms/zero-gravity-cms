@@ -376,13 +376,23 @@ class Page
     }
 
     /**
-     * Get custom template name to use for this page.
+     * Get custom template to embed this page in.
      *
      * @return string|null
      */
-    public function getTemplate(): ? string
+    public function getLayoutTemplate(): ? string
     {
-        return (string) $this->getSetting('template');
+        return $this->getSetting('layout_template');
+    }
+
+    /**
+     * Get custom template for rendering the page content.
+     *
+     * @return string|null
+     */
+    public function getContentTemplate(): ? string
+    {
+        return $this->getSetting('content_template');
     }
 
     /**

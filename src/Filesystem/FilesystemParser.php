@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\Page;
@@ -31,23 +32,31 @@ class FilesystemParser implements StructureParser
     private $defaultPageSettings;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * FilesystemParser constructor.
      *
-     * @param FileFactory $fileFactory
-     * @param string      $path
-     * @param bool        $convertMarkdown
-     * @param array       $defaultPageSettings
+     * @param FileFactory     $fileFactory
+     * @param string          $path
+     * @param bool            $convertMarkdown
+     * @param array           $defaultPageSettings
+     * @param LoggerInterface $logger
      */
     public function __construct(
         FileFactory $fileFactory,
         string $path,
         bool $convertMarkdown,
-        array $defaultPageSettings
+        array $defaultPageSettings,
+        LoggerInterface $logger
     ) {
         $this->fileFactory = $fileFactory;
         $this->path = $path;
         $this->convertMarkdown = $convertMarkdown;
         $this->defaultPageSettings = $defaultPageSettings;
+        $this->logger = $logger;
     }
 
     /**
@@ -58,9 +67,12 @@ class FilesystemParser implements StructureParser
     public function parse()
     {
         if (!is_dir($this->path)) {
+            $this->logger->error('Cannot parse filesystem: page content directory {path} does not exist', ['path' => $this->path]);
             throw FilesystemException::contentDirectoryDoesNotExist($this->path);
         }
-        $directory = new ParsedDirectory(new SplFileInfo($this->path), $this->fileFactory);
+
+        $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
+        $directory = new Directory(new SplFileInfo($this->path), $this->fileFactory, $this->logger);
 
         $pages = [];
         foreach ($directory->getDirectories() as $subDir) {

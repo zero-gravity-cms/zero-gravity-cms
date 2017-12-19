@@ -24,22 +24,6 @@ class CombinedResolver extends AbstractResolver
     }
 
     /**
-     * Resolve the given path or glob pattern and find the matching files.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return File[]
-     */
-    public function find(Path $path, Path $parentPath = null): array
-    {
-        return array_merge(
-            $this->filesystemResolver->find($path, $parentPath),
-            $this->pageResolver->find($path, $parentPath)
-        );
-    }
-
-    /**
      * Resolve the given file name and path.
      *
      * @param Path      $path

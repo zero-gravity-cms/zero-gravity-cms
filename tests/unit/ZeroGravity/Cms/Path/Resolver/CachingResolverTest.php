@@ -8,8 +8,12 @@ use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\CachingResolver;
-use ZeroGravity\Cms\Path\Resolver\PathResolver;
+use ZeroGravity\Cms\Path\Resolver\MultiPathResolver;
+use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
+/**
+ * @group resolver
+ */
 class CachingResolverTest extends BaseUnit
 {
     /**
@@ -40,7 +44,7 @@ class CachingResolverTest extends BaseUnit
 
         $resolver = new CachingResolver(
             $this->getCache(),
-            $this->getWrappedRepository($calledMethod, $callback),
+            $this->getWrappedResolver($calledMethod, $callback),
             new Slugify()
         );
 
@@ -73,9 +77,9 @@ class CachingResolverTest extends BaseUnit
     public function provideMethods()
     {
         return [
-            ['get', 'file'],
-            ['find', []],
-            ['findOne', 'file', 'get'],
+            'get' => ['get', 'file'],
+            'find' => ['find', []],
+            'findOne' => ['findOne', 'file', 'get'],
         ];
     }
 
@@ -83,15 +87,31 @@ class CachingResolverTest extends BaseUnit
      * @param string   $method
      * @param callable $callback
      *
-     * @return PathResolver
+     * @return MultiPathResolver
      */
-    private function getWrappedRepository($method, callable $callback)
+    private function getWrappedResolver($method, callable $callback)
     {
-        $repo = Stub::makeEmpty(PathResolver::class, [
+        $resolver = Stub::makeEmpty(MultiPathResolver::class, [
             $method => $callback,
         ]);
 
-        return $repo;
+        return $resolver;
+    }
+
+    /**
+     * @test
+     */
+    public function findReturnsEmptyArrayIfWrappedResolverIsSinglePathResolver()
+    {
+        $wrappedResolver = Stub::makeEmpty(SinglePathResolver::class, []);
+        $resolver = new CachingResolver(
+            $this->getCache(),
+            $wrappedResolver,
+            new Slugify()
+        );
+
+        $result = $resolver->find(new Path('a'), new Path('b'));
+        $this->assertSame([], $result);
     }
 
     /**

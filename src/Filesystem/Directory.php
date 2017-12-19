@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Filesystem;
 
 use Mni\FrontYAML\Parser as FrontYAMLParser;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
@@ -13,7 +14,7 @@ use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\StructureException;
 
-class ParsedDirectory
+class Directory
 {
     const CONFIG_TYPE_YAML = 'yaml';
     const CONFIG_TYPE_FRONTMATTER = 'frontmatter';
@@ -38,22 +39,41 @@ class ParsedDirectory
     /**
      * @var File[]
      */
-    private $files = [];
+    private $files;
 
     /**
-     * @var ParsedDirectory[]
+     * @var Directory[]
      */
-    private $directories = [];
+    private $directories;
 
-    public function __construct(SplFileInfo $directoryInfo, FileFactory $fileFactory, string $parentPath = null)
-    {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @param SplFileInfo     $directoryInfo
+     * @param FileFactory     $fileFactory
+     * @param LoggerInterface $logger
+     * @param string|null     $parentPath
+     */
+    public function __construct(
+        SplFileInfo $directoryInfo,
+        FileFactory $fileFactory,
+        LoggerInterface $logger,
+        string $parentPath = null
+    ) {
         $this->directoryInfo = $directoryInfo;
         $this->fileFactory = $fileFactory;
         $this->parentPath = $parentPath;
-
-        $this->init();
+        $this->logger = $logger;
     }
 
+    /**
+     * Get directory path relative to parsing base path.
+     *
+     * @return string
+     */
     public function getPath(): string
     {
         if (null === $this->parentPath) {
@@ -64,8 +84,15 @@ class ParsedDirectory
         return $this->parentPath.'/'.$this->getName();
     }
 
-    private function init()
+    /**
+     * Parse this directory for files.
+     */
+    private function parseFiles()
     {
+        if (null !== $this->files) {
+            return;
+        }
+
         $fileFinder = Finder::create()
             ->files()
             ->depth(0)
@@ -75,10 +102,22 @@ class ParsedDirectory
             ->sortByName()
             ->in($this->directoryInfo->getRealPath())
         ;
+
+        $this->files = [];
         foreach ($fileFinder as $fileInfo) {
             /* @var $fileInfo FinderSplFileInfo */
             $filePath = $this->getPath().'/'.$fileInfo->getRelativePathname();
             $this->files[$fileInfo->getFilename()] = $this->fileFactory->createFile($filePath);
+        }
+    }
+
+    /**
+     * Parse this directory for sub directories.
+     */
+    private function parseDirectories()
+    {
+        if (null !== $this->directories) {
+            return;
         }
 
         $subDirectoryFinder = Finder::create()
@@ -89,11 +128,14 @@ class ParsedDirectory
             ->sortByName()
             ->in($this->directoryInfo->getRealPath())
         ;
+
+        $this->directories = [];
         foreach ($subDirectoryFinder as $directoryInfo) {
             /* @var $directoryInfo FinderSplFileInfo */
             $this->directories[$directoryInfo->getFilename()] = new self(
                 $directoryInfo,
                 $this->fileFactory,
+                $this->logger,
                 $this->getPath()
             );
         }
@@ -106,16 +148,20 @@ class ParsedDirectory
      */
     public function getFiles(): array
     {
+        $this->parseFiles();
+
         return $this->files;
     }
 
     /**
      * Sub directories indexed by directory name.
      *
-     * @return ParsedDirectory[]
+     * @return Directory[]
      */
     public function getDirectories(): array
     {
+        $this->parseDirectories();
+
         return $this->directories;
     }
 
@@ -174,13 +220,21 @@ class ParsedDirectory
         }
 
         $content = $this->fetchPageContent($groupedFiles, $convertMarkdown);
+        $settings = $this->fetchPageSettings($groupedFiles);
+        if (isset($groupedFiles['default_twig']) && !isset($settings['content_template'])) {
+            $parentPath = $parentPage ? $parentPage->getFilesystemPath() : '';
+            $settings['content_template'] = sprintf('@ZeroGravity%s%s',
+                $parentPath,
+                $groupedFiles['default_twig']->getPathname()
+            );
+        }
         $settings = array_merge([
                 'slug' => $this->getSlug(),
                 'visible' => $this->hasSortingPrefix() && !$this->hasUnderscorePrefix(),
                 'module' => $this->hasUnderscorePrefix(),
             ],
             $defaultPageSettings,
-            $this->fetchPageSettings($groupedFiles)
+            $settings
         );
 
         $page = new Page($this->getName(), $settings, $parentPage);
@@ -248,7 +302,7 @@ class ParsedDirectory
      */
     private function getFilesByType(string $type)
     {
-        return array_filter($this->files, function (File $file) use ($type) {
+        return array_filter($this->getFiles(), function (File $file) use ($type) {
             return $file->getType() === $type;
         });
     }
@@ -256,7 +310,7 @@ class ParsedDirectory
     /**
      * Get files contained in this directory, grouped by type.
      *
-     * @return array
+     * @return File[]
      */
     private function groupAndValidateFiles(): array
     {
@@ -269,9 +323,6 @@ class ParsedDirectory
         }
         if (count($markdownFiles) > 1) {
             throw StructureException::moreThanOneMarkdownFile($this->directoryInfo, $markdownFiles);
-        }
-        if (count($twigFiles) > 1) {
-            throw StructureException::moreThanOneTwigFile($this->directoryInfo, $twigFiles);
         }
 
         $files = [];
@@ -296,21 +347,18 @@ class ParsedDirectory
                 }
             }
         }
+        if (count($twigFiles) > 0) {
+            $files['twig'] = $twigFiles;
+        }
         if (1 == count($twigFiles)) {
-            $files['twig'] = current($twigFiles);
-            $files['base'] = $files['twig']->getBasename('.html.'.$files['twig']->getExtension());
+            $twigFile = current($twigFiles);
+            $twigBase = $twigFile->getBasename('.html.'.$twigFile->getExtension());
 
-            if (isset($files['yaml'])) {
-                $twigBase = $files['twig']->getBasename('.html.'.$files['twig']->getExtension());
-                $yamlBase = $files['yaml']->getDefaultBasename();
-
-                if ($yamlBase !== $twigBase) {
-                    throw StructureException::yamlAndTwigFilesMismatch(
-                        $this->directoryInfo,
-                        $files['yaml'],
-                        $files['twig']
-                    );
-                }
+            if (isset($files['yaml']) && $files['yaml']->getDefaultBasename() === $twigBase) {
+                $files['default_twig'] = $twigFile;
+            }
+            if (isset($files['markdown']) && $files['markdown']->getDefaultBasename() === $twigBase) {
+                $files['default_twig'] = $twigFile;
             }
         }
 

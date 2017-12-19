@@ -7,15 +7,17 @@ use Psr\SimpleCache\CacheInterface;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
-class CachingResolver extends AbstractResolver
+class CachingResolver extends AbstractResolver implements MultiPathResolver
 {
+    use MultiPathFindOneTrait;
+
     /**
      * @var CacheInterface
      */
     protected $cache;
 
     /**
-     * @var PathResolver
+     * @var SinglePathResolver
      */
     protected $wrappedResolver;
 
@@ -25,11 +27,11 @@ class CachingResolver extends AbstractResolver
     protected $slugify;
 
     /**
-     * @param CacheInterface   $cache
-     * @param PathResolver     $wrappedResolver
-     * @param SlugifyInterface $slugify
+     * @param CacheInterface     $cache
+     * @param SinglePathResolver $wrappedResolver
+     * @param SlugifyInterface   $slugify
      */
-    public function __construct(CacheInterface $cache, PathResolver $wrappedResolver, SlugifyInterface $slugify)
+    public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
     {
         $this->cache = $cache;
         $this->wrappedResolver = $wrappedResolver;
@@ -48,6 +50,9 @@ class CachingResolver extends AbstractResolver
      */
     public function find(Path $path, Path $parentPath = null): array
     {
+        if (!$this->wrappedResolver instanceof MultiPathResolver) {
+            return [];
+        }
         $key = $this->generateCacheKey('find', $path, $parentPath);
         if ($this->cache->has($key)) {
             return $this->cache->get($key);

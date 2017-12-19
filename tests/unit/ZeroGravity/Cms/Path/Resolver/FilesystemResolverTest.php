@@ -7,13 +7,13 @@ use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Exception\ResolverException;
 use ZeroGravity\Cms\Exception\UnsafePathException;
 use ZeroGravity\Cms\Path\Path;
-use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 
 class FilesystemResolverTest extends BaseUnit
 {
     /**
      * @test
      * @dataProvider provideSingleValidFiles
+     * @group resolver
      *
      * @param string    $file
      * @param Path|null $inPath
@@ -117,6 +117,7 @@ class FilesystemResolverTest extends BaseUnit
             ['foo'],
             ['root_file1'],
             ['01.yaml_only/'],
+            ['01.yaml_only/file1.png.meta.yaml'],
             ['01.yaml_only'],
             ['04.with_children/_child1/'],
         ];
@@ -369,13 +370,5 @@ class FilesystemResolverTest extends BaseUnit
             '/04.with_children/03.empty/sub/dir/child_file8.png',
             $resolved->getPathname()
         );
-    }
-
-    /**
-     * @return FilesystemResolver
-     */
-    private function getValidPagesResolver()
-    {
-        return new FilesystemResolver($this->getDefaultFileFactory());
     }
 }

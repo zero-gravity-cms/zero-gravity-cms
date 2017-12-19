@@ -2,12 +2,13 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Psr\Log\NullLogger;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\StructureException;
-use ZeroGravity\Cms\Filesystem\ParsedDirectory;
+use ZeroGravity\Cms\Filesystem\Directory;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 
 class DirectoryTest extends BaseUnit
@@ -30,10 +31,8 @@ class DirectoryTest extends BaseUnit
     {
         return [
             ['invalid_pages/2_markdown_files'],
-            ['invalid_pages/2_twig_files'],
             ['invalid_pages/2_yaml_files'],
             ['invalid_pages/basenames_dont_match__markdown'],
-            ['invalid_pages/basenames_dont_match__twig'],
         ];
     }
 
@@ -67,7 +66,7 @@ class DirectoryTest extends BaseUnit
         return [
             ['01.yaml_only'],
             ['02.markdown_only'],
-            ['03.yaml_and_markdown'],
+            ['03.yaml_and_markdown_and_twig'],
             ['04.with_children'],
             ['05.twig_only'],
             ['06.yaml_and_twig'],
@@ -120,14 +119,43 @@ class DirectoryTest extends BaseUnit
     }
 
     /**
+     * @test
+     */
+    public function defaultTemplateIsSetIfSingleTwigFileWithBasenameIsPresent()
+    {
+        $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
+        $parentPage = null;
+        $page = $dir->createPage(false, [], $parentPage);
+        $this->assertEquals('@ZeroGravity/name.html.twig', $page->getContentTemplate());
+
+        $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/06.yaml_and_twig');
+        $parentPage = new Page('06.yaml_and_twig');
+        $page = $dir->createPage(false, [], $parentPage);
+        $this->assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
+    }
+
+    /**
+     * @test
+     */
+    public function pagesAreEqualIfParsedMultipleTimes()
+    {
+        $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
+        $page1 = $dir->createPage(false, [], null);
+        $page2 = $dir->createPage(false, [], null);
+
+        $this->assertEquals($page1, $page2);
+    }
+
+    /**
      * @param string $path
      *
-     * @return ParsedDirectory
+     * @return Directory
      */
     private function createParsedDirectoryFromPath(string $path)
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
+        $directory = new Directory(new \SplFileInfo($path), $fileFactory, new NullLogger());
 
-        return new ParsedDirectory(new \SplFileInfo($path), $fileFactory);
+        return $directory;
     }
 }
