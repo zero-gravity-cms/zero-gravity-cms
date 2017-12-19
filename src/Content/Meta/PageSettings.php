@@ -102,6 +102,7 @@ class PageSettings
             'title' => null,
             'taxonomy' => [],
             'content_type' => 'page',
+            'child_defaults' => [],
         ]);
     }
 
@@ -111,6 +112,7 @@ class PageSettings
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
         $resolver->setAllowedTypes('extra', 'array');
+        $resolver->setAllowedTypes('child_defaults', 'array');
         $resolver->setAllowedTypes('file_aliases', 'array');
         $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
         $resolver->setAllowedTypes('visible', 'bool');
@@ -132,6 +134,16 @@ class PageSettings
      */
     private function configureNormalizers(OptionsResolver $resolver): void
     {
+        $this->normalizeDates($resolver);
+        $this->normalizeTitle($resolver);
+        $this->normalizeTaxonomy($resolver);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function normalizeDates(OptionsResolver $resolver): void
+    {
         $normalizeDateTime = function (Options $options, $value) {
             if (null === $value) {
                 return $value;
@@ -146,7 +158,16 @@ class PageSettings
 
             return new DateTimeImmutable((string) $value);
         };
+        $resolver->setNormalizer('date', $normalizeDateTime);
+        $resolver->setNormalizer('publish_date', $normalizeDateTime);
+        $resolver->setNormalizer('unpublish_date', $normalizeDateTime);
+    }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function normalizeTitle(OptionsResolver $resolver): void
+    {
         $normalizeTitle = function (Options $options, $value) {
             if (null !== $value) {
                 return (string) $value;
@@ -158,7 +179,14 @@ class PageSettings
 
             return trim(ucwords(str_replace(['-', '_'], ' ', $name)));
         };
+        $resolver->setNormalizer('title', $normalizeTitle);
+    }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function normalizeTaxonomy(OptionsResolver $resolver): void
+    {
         $normalizeTaxonomy = function (Options $options, $value) {
             if (null === $value) {
                 return [];
@@ -170,11 +198,6 @@ class PageSettings
 
             return $taxonomies;
         };
-
-        $resolver->setNormalizer('date', $normalizeDateTime);
-        $resolver->setNormalizer('publish_date', $normalizeDateTime);
-        $resolver->setNormalizer('unpublish_date', $normalizeDateTime);
-        $resolver->setNormalizer('title', $normalizeTitle);
         $resolver->setNormalizer('taxonomy', $normalizeTaxonomy);
     }
 }

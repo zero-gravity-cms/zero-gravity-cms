@@ -214,31 +214,14 @@ class Directory
     public function createPage(bool $convertMarkdown, array $defaultPageSettings, Page $parentPage = null)
     {
         $groupedFiles = $this->groupAndValidateFiles();
-
         if (0 === count($groupedFiles)) {
             return null;
         }
 
-        $content = $this->fetchPageContent($groupedFiles, $convertMarkdown);
-        $settings = $this->fetchPageSettings($groupedFiles);
-        if (isset($groupedFiles['default_twig']) && !isset($settings['content_template'])) {
-            $parentPath = $parentPage ? $parentPage->getFilesystemPath() : '';
-            $settings['content_template'] = sprintf('@ZeroGravity%s%s',
-                $parentPath,
-                $groupedFiles['default_twig']->getPathname()
-            );
-        }
-        $settings = array_merge([
-                'slug' => $this->getSlug(),
-                'visible' => $this->hasSortingPrefix() && !$this->hasUnderscorePrefix(),
-                'module' => $this->hasUnderscorePrefix(),
-            ],
-            $defaultPageSettings,
-            $settings
-        );
+        $settings = $this->buildPageSettings($groupedFiles, $defaultPageSettings, $parentPage);
 
         $page = new Page($this->getName(), $settings, $parentPage);
-        $page->setContent($content);
+        $page->setContent($this->fetchPageContent($groupedFiles, $convertMarkdown));
 
         $files = $this->getFiles();
         foreach ($this->getDirectories() as $directory) {
@@ -252,6 +235,37 @@ class Directory
         $page->setFiles($files);
 
         return $page;
+    }
+
+    /**
+     * @param array $groupedFiles
+     * @param array $defaultPageSettings
+     * @param Page  $parentPage
+     *
+     * @return array
+     */
+    private function buildPageSettings(array $groupedFiles, array $defaultPageSettings, Page $parentPage = null): array
+    {
+        $settings = $this->fetchPageSettings($groupedFiles);
+        if (isset($groupedFiles['default_twig']) && !isset($settings['content_template'])) {
+            $parentPath = $parentPage ? $parentPage->getFilesystemPath() : '';
+            $settings['content_template'] = sprintf('@ZeroGravity%s%s',
+                $parentPath,
+                $groupedFiles['default_twig']->getPathname()
+            );
+        }
+
+        $settings = $this->mergeSettings([
+                'slug' => $this->getSlug(),
+                'visible' => $this->hasSortingPrefix() && !$this->hasUnderscorePrefix(),
+                'module' => $this->hasUnderscorePrefix(),
+            ],
+            $defaultPageSettings,
+            $parentPage ? $parentPage->getChildDefaults() : [],
+            $settings
+        );
+
+        return $settings;
     }
 
     /**
@@ -354,11 +368,10 @@ class Directory
             $twigFile = current($twigFiles);
             $twigBase = $twigFile->getBasename('.html.'.$twigFile->getExtension());
 
-            if (isset($files['yaml']) && $files['yaml']->getDefaultBasename() === $twigBase) {
-                $files['default_twig'] = $twigFile;
-            }
-            if (isset($files['markdown']) && $files['markdown']->getDefaultBasename() === $twigBase) {
-                $files['default_twig'] = $twigFile;
+            foreach (['yaml', 'markdown'] as $checkBase) {
+                if (isset($files[$checkBase]) && $files[$checkBase]->getDefaultBasename() === $twigBase) {
+                    $files['default_twig'] = $twigFile;
+                }
             }
         }
 
@@ -379,5 +392,21 @@ class Directory
     private function hasUnderscorePrefix(): bool
     {
         return (bool) preg_match(self::MODULAR_PREFIX_PATTERN, $this->getName());
+    }
+
+    private function mergeSettings(): array
+    {
+        $settings = [];
+        foreach (func_get_args() as $array) {
+            foreach ($array as $key => $value) {
+                if (isset($settings[$key]) && is_array($settings[$key]) && is_array($value)) {
+                    $settings[$key] = $this->mergeSettings($settings[$key], $value);
+                } else {
+                    $settings[$key] = $value;
+                }
+            }
+        }
+
+        return $settings;
     }
 }

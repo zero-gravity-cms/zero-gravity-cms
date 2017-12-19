@@ -147,6 +147,26 @@ class DirectoryTest extends BaseUnit
     }
 
     /**
+     * @test
+     */
+    public function parentsChildDefaultsAreAppliedToChildPagesAndMerged()
+    {
+        $parentPage = new Page('page', [
+            'child_defaults' => [
+                'extra' => [
+                    'some key' => 'some value',
+                ],
+            ],
+        ]);
+
+        $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
+        $page = $dir->createPage(false, [], $parentPage);
+
+        $this->assertEquals('some value', $page->getExtraValue('some key'));
+        $this->assertEquals('another_custom_value', $page->getExtraValue('custom'));
+    }
+
+    /**
      * @param string $path
      *
      * @return Directory
