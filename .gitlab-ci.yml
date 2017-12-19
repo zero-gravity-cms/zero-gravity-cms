@@ -2,7 +2,6 @@ image: c33s/php:7.1
 
 stages:
     - test
-    - check
 
 variables:
     COMPOSER_ALLOW_SUPERUSER:       '1'
@@ -45,7 +44,7 @@ test:
 # \____|_| |_|\___|\___|_|\_\
 ####################################################################################################
 check:
-    stage: check
+    stage: test
     script:
         - robo init
         - ls -lsa $CI_PROJECT_DIR/.ci
