@@ -51,6 +51,8 @@ class PageFinder implements \IteratorAggregate, \Countable
     private $notContentTypes = [];
     private $filters = [];
     private $sort;
+    private $limit;
+    private $offset;
     private $iterators = [];
 
     /**
@@ -853,6 +855,34 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Set a finder limit.
+     *
+     * @param int|null $limit
+     *
+     * @return $this
+     */
+    public function limit(int $limit = null)
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    /**
+     * Set a finder offset.
+     *
+     * @param int|null $offset
+     *
+     * @return $this
+     */
+    public function offset(int $offset = null)
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
+    /**
      * Appends an existing set of pages to the finder.
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
@@ -1057,6 +1087,10 @@ class PageFinder implements \IteratorAggregate, \Countable
         if (null !== $this->sort) {
             $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
+        }
+
+        if (null !== $this->limit || null !== $this->offset) {
+            $iterator = new Iterator\LimitAndOffsetIterator($iterator, $this->limit, $this->offset);
         }
 
         return $iterator;
