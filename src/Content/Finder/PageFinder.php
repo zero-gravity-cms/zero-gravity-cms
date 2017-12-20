@@ -841,6 +841,20 @@ class PageFinder implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sorts pages by extra value.
+     *
+     * @return $this
+     *
+     * @see SortableIterator
+     */
+    public function sortByExtraValue($name)
+    {
+        $this->sort = [Iterator\SortableIterator::SORT_BY_EXTRA_VALUE, $name];
+
+        return $this;
+    }
+
+    /**
      * @param Page[] $pages
      *
      * @return $this
