@@ -10,7 +10,7 @@ build:
                     SYMFONY_DEPRECATIONS_HELPER: weak
                     TIMEZONE: Europe/Vienna
     tests:
-        override:
+        before:
             -
                 command: 'php robo.phar test --no-interaction'
                 coverage:
