@@ -40,6 +40,10 @@ class SortableIteratorTest extends BaseUnit
         if (is_string($method)) {
             $sortMethod = 'sortBy'.ucfirst($method);
             $finder->$sortMethod();
+        } elseif (is_array($method)) {
+            list($method, $parameter) = $method;
+            $sortMethod = 'sortBy'.ucfirst($method);
+            $finder->$sortMethod($parameter);
         } elseif (is_callable($method)) {
             $finder->sort($method);
         }
@@ -168,6 +172,20 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => 'Yaml And Twig',
             '/yaml_only' => 'testtitle',
         ];
+        $pagesSortedByExtraValue = [
+            '/markdown_only' => '',
+            '/no_sorting_prefix' => '',
+            '/not_published/child1' => '',
+            '/twig_only' => '',
+            '/with_children/_child1' => '',
+            '/with_children/_child2' => '',
+            '/yaml_and_twig/child1' => '',
+            '/yaml_and_twig/child2' => '',
+            '/yaml_and_markdown_and_twig' => '1449769188',
+            '/yaml_only' => '1483272600',
+            '/with_children' => '2017-01-01 12:10:00',
+            '/yaml_and_twig' => 'invalid date value',
+        ];
 
         $customFunction = function (Page $a, Page $b) {
             return strcmp($a->getTitle(), $b->getTitle());
@@ -181,6 +199,7 @@ class SortableIteratorTest extends BaseUnit
             SortableIterator::SORT_BY_PUBLISH_DATE => [SortableIterator::SORT_BY_PUBLISH_DATE, $pagesSortedByPublishDate],
             SortableIterator::SORT_BY_PATH => [SortableIterator::SORT_BY_PATH, $pagesSortedByPath],
             SortableIterator::SORT_BY_FILESYSTEM_PATH => [SortableIterator::SORT_BY_FILESYSTEM_PATH, $pagesSortedByFilesystemPath],
+            SortableIterator::SORT_BY_EXTRA_VALUE => [[SortableIterator::SORT_BY_EXTRA_VALUE, 'my_custom_date'], $pagesSortedByExtraValue],
             'custom callback' => [$customFunction, $pagesSortedByCustomFunction],
         ];
     }

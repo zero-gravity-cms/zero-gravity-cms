@@ -16,6 +16,7 @@ class SortableIterator implements \IteratorAggregate
     const SORT_BY_PUBLISH_DATE = 'publishDate';
     const SORT_BY_PATH = 'path';
     const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
+    const SORT_BY_EXTRA_VALUE = 'extraValue';
 
     private $iterator;
     private $sort;
@@ -34,51 +35,27 @@ class SortableIterator implements \IteratorAggregate
 
             return;
         }
+        $parameter = null;
+        if (is_array($sort) && 2 == count($sort)) {
+            list($sort, $parameter) = $sort;
+        }
 
         switch ($sort) {
             case self::SORT_BY_NAME:
             case self::SORT_BY_SLUG:
             case self::SORT_BY_TITLE:
-                $getter = 'get'.ucfirst($sort);
-                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
-                    $valueA = $pageA->$getter();
-                    $valueB = $pageB->$getter();
-                    if (mb_strtolower($valueA) === mb_strtolower($valueB)) {
-                        return strcasecmp($pageA->getPath(), $pageB->getPath());
-                    }
-
-                    return strcasecmp($valueA, $valueB);
-                };
+            case self::SORT_BY_EXTRA_VALUE:
+                $this->sortByGetterOrPath('get'.ucfirst($sort), $parameter);
                 break;
 
             case self::SORT_BY_DATE:
             case self::SORT_BY_PUBLISH_DATE:
-                $getter = 'get'.ucfirst($sort);
-                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
-                    $valueA = $pageA->$getter();
-                    $valueB = $pageB->$getter();
-                    if (null !== $valueA && null === $valueB) {
-                        return 1;
-                    }
-                    if (null === $valueA && null !== $valueB) {
-                        return -1;
-                    }
-                    if ((null === $valueA && null === $valueB)
-                        || ($valueA->format('U') === $valueB->format('U'))
-                    ) {
-                        return strcasecmp($pageA->getPath(), $pageB->getPath());
-                    }
-
-                    return $valueA->format('U') - $valueB->format('U');
-                };
+                $this->sortByDateOrPath('get'.ucfirst($sort));
                 break;
 
             case self::SORT_BY_PATH:
             case self::SORT_BY_FILESYSTEM_PATH:
-                $getter = 'get'.ucfirst($sort);
-                $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
-                    return strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
-                };
+                $this->sortByGetter('get'.ucfirst($sort));
                 break;
 
             default:
@@ -92,5 +69,56 @@ class SortableIterator implements \IteratorAggregate
         uasort($array, $this->sort);
 
         return new \ArrayIterator($array);
+    }
+
+    /**
+     * @param string $getter
+     * @param mixed  $parameter
+     */
+    private function sortByGetterOrPath(string $getter, $parameter = null): void
+    {
+        $this->sort = function (Page $pageA, Page $pageB) use ($getter, $parameter) {
+            $valueA = $pageA->$getter($parameter);
+            $valueB = $pageB->$getter($parameter);
+            if (mb_strtolower($valueA) === mb_strtolower($valueB)) {
+                return strcasecmp($pageA->getPath(), $pageB->getPath());
+            }
+
+            return strcasecmp($valueA, $valueB);
+        };
+    }
+
+    /**
+     * @param $getter
+     */
+    private function sortByDateOrPath($getter): void
+    {
+        $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+            $valueA = $pageA->$getter();
+            $valueB = $pageB->$getter();
+            if (null !== $valueA && null === $valueB) {
+                return 1;
+            }
+            if (null === $valueA && null !== $valueB) {
+                return -1;
+            }
+            if ((null === $valueA && null === $valueB)
+                || ($valueA->format('U') === $valueB->format('U'))
+            ) {
+                return strcasecmp($pageA->getPath(), $pageB->getPath());
+            }
+
+            return $valueA->format('U') - $valueB->format('U');
+        };
+    }
+
+    /**
+     * @param $getter
+     */
+    private function sortByGetter($getter): void
+    {
+        $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+            return strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
+        };
     }
 }
