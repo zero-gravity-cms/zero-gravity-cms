@@ -662,6 +662,33 @@ class PageFinderTest extends BaseUnit
     /**
      * @test
      */
+    public function pageResultsCanBeLimited()
+    {
+        $finder = $this->getFinder()
+            ->limit(5)
+        ;
+        $this->assertCount(5, $finder);
+
+        $finder = $this->getFinder()
+            ->limit(50)
+        ;
+        $this->assertCount(12, $finder);
+    }
+
+    /**
+     * @test
+     */
+    public function pageResultsCanBeOffset()
+    {
+        $finder = $this->getFinder()
+            ->offset(5)
+        ;
+        $this->assertCount(7, $finder);
+    }
+
+    /**
+     * @test
+     */
     public function findersCanBeAppended()
     {
         $finder = $this->getFinder();
