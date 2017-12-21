@@ -55,6 +55,56 @@ class Directory
         $this->directoryInfo = $directoryInfo;
         $this->fileFactory = $fileFactory;
         $this->parentPath = $parentPath;
+        $this->parseFiles();
+        $this->parseDirectories();
+    }
+
+    /**
+     * Parse this directory for files.
+     */
+    private function parseFiles()
+    {
+        $fileFinder = Finder::create()
+            ->files()
+            ->depth(0)
+            ->ignoreVCS(true)
+            ->ignoreDotFiles(false)
+            ->notName('*.meta.yaml')
+            ->sortByName()
+            ->in($this->directoryInfo->getRealPath())
+        ;
+
+        $this->files = [];
+        foreach ($fileFinder as $fileInfo) {
+            /* @var $fileInfo FinderSplFileInfo */
+            $filePath = $this->getPath().'/'.$fileInfo->getRelativePathname();
+            $this->files[$fileInfo->getFilename()] = $this->fileFactory->createFile($filePath);
+        }
+    }
+
+    /**
+     * Parse this directory for sub directories.
+     */
+    private function parseDirectories()
+    {
+        $subDirectoryFinder = Finder::create()
+            ->directories()
+            ->depth(0)
+            ->ignoreVCS(true)
+            ->ignoreDotFiles(false)
+            ->sortByName()
+            ->in($this->directoryInfo->getRealPath())
+        ;
+
+        $this->directories = [];
+        foreach ($subDirectoryFinder as $directoryInfo) {
+            /* @var $directoryInfo FinderSplFileInfo */
+            $this->directories[$directoryInfo->getFilename()] = new self(
+                $directoryInfo,
+                $this->fileFactory,
+                $this->getPath()
+            );
+        }
     }
 
     /**
@@ -255,70 +305,12 @@ class Directory
     }
 
     /**
-     * Parse this directory for files.
-     */
-    private function parseFiles()
-    {
-        if (null !== $this->files) {
-            return;
-        }
-
-        $fileFinder = Finder::create()
-            ->files()
-            ->depth(0)
-            ->ignoreVCS(true)
-            ->ignoreDotFiles(false)
-            ->notName('*.meta.yaml')
-            ->sortByName()
-            ->in($this->directoryInfo->getRealPath())
-        ;
-
-        $this->files = [];
-        foreach ($fileFinder as $fileInfo) {
-            /* @var $fileInfo FinderSplFileInfo */
-            $filePath = $this->getPath().'/'.$fileInfo->getRelativePathname();
-            $this->files[$fileInfo->getFilename()] = $this->fileFactory->createFile($filePath);
-        }
-    }
-
-    /**
-     * Parse this directory for sub directories.
-     */
-    private function parseDirectories()
-    {
-        if (null !== $this->directories) {
-            return;
-        }
-
-        $subDirectoryFinder = Finder::create()
-            ->directories()
-            ->depth(0)
-            ->ignoreVCS(true)
-            ->ignoreDotFiles(false)
-            ->sortByName()
-            ->in($this->directoryInfo->getRealPath())
-        ;
-
-        $this->directories = [];
-        foreach ($subDirectoryFinder as $directoryInfo) {
-            /* @var $directoryInfo FinderSplFileInfo */
-            $this->directories[$directoryInfo->getFilename()] = new self(
-                $directoryInfo,
-                $this->fileFactory,
-                $this->getPath()
-            );
-        }
-    }
-
-    /**
      * File objects indexed by filename.
      *
      * @return File[]
      */
     public function getFiles(): array
     {
-        $this->parseFiles();
-
         return $this->files;
     }
 
@@ -329,8 +321,6 @@ class Directory
      */
     public function getDirectories(): array
     {
-        $this->parseDirectories();
-
         return $this->directories;
     }
 

@@ -279,14 +279,29 @@ trait PageSettingsTrait
      */
     public function isCurrentDateWithinPublishDates(): bool
     {
-        $now = time();
-        if (null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > $now) {
+        if ($this->publishDateIsInFuture()) {
             return false;
         }
-        if (null !== $this->getUnpublishDate() && $now > $this->getUnpublishDate()->format('U')) {
+        if ($this->unpublishDateIsInPast()) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    private function publishDateIsInFuture(): bool
+    {
+        return null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > time();
+    }
+
+    /**
+     * @return bool
+     */
+    private function unpublishDateIsInPast(): bool
+    {
+        return null !== $this->getUnpublishDate() && time() > $this->getUnpublishDate()->format('U');
     }
 }
