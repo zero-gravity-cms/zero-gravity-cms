@@ -270,6 +270,15 @@ trait PageSettingsTrait
         if (!$this->getSetting('publish')) {
             return false;
         }
+
+        return $this->isCurrentDateWithinPublishDates();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCurrentDateWithinPublishDates(): bool
+    {
         $now = time();
         if (null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > $now) {
             return false;
