@@ -2,12 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
-use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
-use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\File;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\CombinedResolver;
 use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
@@ -69,11 +65,7 @@ class CombinedResolverTest extends BaseUnit
      */
     private function getPageResolver()
     {
-        $fileFactory = $this->getDefaultFileFactory();
-        $basePath = $fileFactory->getBasePath();
-        $parser = new FilesystemParser($fileFactory, $basePath, false, [], new NullLogger());
-        $pageRepository = new ContentRepository($parser, new ArrayCache(), false);
-        $resolver = new PageResolver($pageRepository, $basePath, $fileFactory);
+        $resolver = new PageResolver($this->getDefaultContentRepository());
 
         return $resolver;
     }

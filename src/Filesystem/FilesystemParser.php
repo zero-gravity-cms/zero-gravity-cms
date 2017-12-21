@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Filesystem;
 
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\StructureParser;
@@ -37,26 +38,34 @@ class FilesystemParser implements StructureParser
     private $logger;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * FilesystemParser constructor.
      *
-     * @param FileFactory     $fileFactory
-     * @param string          $path
-     * @param bool            $convertMarkdown
-     * @param array           $defaultPageSettings
-     * @param LoggerInterface $logger
+     * @param FileFactory              $fileFactory
+     * @param string                   $path
+     * @param bool                     $convertMarkdown
+     * @param array                    $defaultPageSettings
+     * @param LoggerInterface          $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         FileFactory $fileFactory,
         string $path,
         bool $convertMarkdown,
         array $defaultPageSettings,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->fileFactory = $fileFactory;
         $this->path = $path;
         $this->convertMarkdown = $convertMarkdown;
         $this->defaultPageSettings = $defaultPageSettings;
         $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -66,17 +75,15 @@ class FilesystemParser implements StructureParser
      */
     public function parse()
     {
-        if (!is_dir($this->path)) {
-            $this->logger->error('Cannot parse filesystem: page content directory {path} does not exist', ['path' => $this->path]);
-            throw FilesystemException::contentDirectoryDoesNotExist($this->path);
-        }
+        $this->checkPath();
 
         $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
-        $directory = new Directory(new SplFileInfo($this->path), $this->fileFactory, $this->logger);
+        $directory = new Directory(new SplFileInfo($this->path), $this->fileFactory);
 
+        $pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
         $pages = [];
         foreach ($directory->getDirectories() as $subDir) {
-            $page = $subDir->createPage($this->convertMarkdown, $this->defaultPageSettings);
+            $page = $pageFactory->createPage($subDir, $this->convertMarkdown, $this->defaultPageSettings);
 
             if (null !== $page) {
                 $pages[$page->getPath()->toString()] = $page;
@@ -84,5 +91,18 @@ class FilesystemParser implements StructureParser
         }
 
         return $pages;
+    }
+
+    /**
+     * Throw an exception if the content path does not exist.
+     *
+     * @throws FilesystemException
+     */
+    private function checkPath()
+    {
+        if (!is_dir($this->path)) {
+            $this->logger->error('Cannot parse filesystem: page content directory {path} does not exist', ['path' => $this->path]);
+            throw FilesystemException::contentDirectoryDoesNotExist($this->path);
+        }
     }
 }

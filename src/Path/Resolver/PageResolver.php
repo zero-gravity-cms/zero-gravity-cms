@@ -4,7 +4,6 @@ namespace ZeroGravity\Cms\Path\Resolver;
 
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\File;
-use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Path\Path;
 
 class PageResolver extends AbstractResolver
@@ -15,25 +14,11 @@ class PageResolver extends AbstractResolver
     private $contentRepository;
 
     /**
-     * @var string
-     */
-    private $basePath;
-
-    /**
-     * @var FileFactory
-     */
-    private $fileFactory;
-
-    /**
      * @param ContentRepository $contentRepository
-     * @param string            $basePath
-     * @param FileFactory       $fileFactory
      */
-    public function __construct(ContentRepository $contentRepository, string $basePath, FileFactory $fileFactory)
+    public function __construct(ContentRepository $contentRepository)
     {
         $this->contentRepository = $contentRepository;
-        $this->basePath = $basePath;
-        $this->fileFactory = $fileFactory;
     }
 
     /**

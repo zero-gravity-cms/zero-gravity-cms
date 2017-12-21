@@ -4,6 +4,9 @@ namespace Tests\Unit\ZeroGravity\Cms\Test;
 
 use Helper\Unit;
 use Psr\Log\NullLogger;
+use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Filesystem\FilesystemParser;
@@ -58,7 +61,7 @@ trait FixtureDirTrait
         $fileFactory = $this->getDefaultFileFactory();
         $path = $this->getValidPagesDir();
 
-        return new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
+        return new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
     }
 
     /**
@@ -67,5 +70,17 @@ trait FixtureDirTrait
     protected function getValidPagesResolver()
     {
         return new FilesystemResolver($this->getDefaultFileFactory());
+    }
+
+    /**
+     * @return ContentRepository
+     */
+    protected function getDefaultContentRepository(): ContentRepository
+    {
+        $fileFactory = $this->getDefaultFileFactory();
+        $basePath = $fileFactory->getBasePath();
+        $parser = new FilesystemParser($fileFactory, $basePath, false, [], new NullLogger(), new EventDispatcher());
+
+        return new ContentRepository($parser, new ArrayCache(), false);
     }
 }

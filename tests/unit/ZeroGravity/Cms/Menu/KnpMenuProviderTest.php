@@ -384,7 +384,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $path = $this->getPageFixtureDir().'/sample_menu_pages';
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         return new ContentRepository($parser, new ArrayCache(), false);
     }

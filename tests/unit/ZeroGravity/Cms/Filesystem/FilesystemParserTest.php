@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
 use Psr\Log\NullLogger;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\FilesystemException;
@@ -17,7 +18,7 @@ class FilesystemParserTest extends BaseUnit
     {
         $path = $this->getPageFixtureDir().'/invalid_path';
         $fileFactory = $this->getDefaultFileFactory();
-        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         $this->expectException(FilesystemException::class);
         $parser->parse();
@@ -30,7 +31,7 @@ class FilesystemParserTest extends BaseUnit
     {
         $path = $this->getValidPagesDir();
         $fileFactory = $this->getDefaultFileFactory();
-        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger());
+        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         $pages = $parser->parse();
         $this->assertContainsOnlyInstancesOf(Page::class, $pages);
