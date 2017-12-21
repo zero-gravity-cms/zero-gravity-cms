@@ -127,6 +127,15 @@ class Directory
      */
     public function validateFiles()
     {
+        $this->validateFileCounts();
+        $this->validateBasenames();
+    }
+
+    /**
+     * Validate number of files of specific types in this directory.
+     */
+    private function validateFileCounts(): void
+    {
         $yamlFiles = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
         if (count($yamlFiles) > 1) {
             throw StructureException::moreThanOneYamlFile($this->directoryInfo, $yamlFiles);
@@ -135,7 +144,13 @@ class Directory
         if (count($markdownFiles) > 1) {
             throw StructureException::moreThanOneMarkdownFile($this->directoryInfo, $markdownFiles);
         }
+    }
 
+    /**
+     * Validate basenames of YAML and markdown files.
+     */
+    private function validateBasenames(): void
+    {
         if (!$this->yamlAndMarkdownBasenamesMatch()) {
             throw StructureException::yamlAndMarkdownFilesMismatch(
                 $this->directoryInfo,
