@@ -49,6 +49,7 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
      */
     public function find(Path $path, Path $parentPath = null): array
     {
+        /* @var $parentPath Path */
         $this->preparePaths($path, $parentPath);
 
         $finder = Finder::create()
@@ -64,7 +65,7 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
         }
         $finder->in($this->buildBaseDir($parentPath));
 
-        return $this->doFind($parentPath, $finder);
+        return $this->doFind($finder, $parentPath);
     }
 
     /**
@@ -88,12 +89,12 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
     }
 
     /**
-     * @param Path $parentPath
-     * @param      $finder
+     * @param Finder $finder
+     * @param Path   $parentPath
      *
      * @return array
      */
-    private function doFind(Path $parentPath, $finder): array
+    private function doFind(Finder $finder, Path $parentPath): array
     {
         $found = [];
         foreach ($finder as $file) {
