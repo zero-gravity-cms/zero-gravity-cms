@@ -123,7 +123,7 @@ class KnpMenuProvider implements MenuProviderInterface
             return;
         }
 
-        $pageItemSettings = $page->getExtraValue('menu_item_options', []);
+        $pageItemSettings = $page->getExtra('menu_item_options', []);
         $itemOptions = array_merge(
             $defaultOptions,
             [

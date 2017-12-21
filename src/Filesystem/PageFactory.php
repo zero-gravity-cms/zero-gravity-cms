@@ -60,6 +60,7 @@ class PageFactory
         }
         $settings = $this->buildPageSettings($defaultSettings, $directory, $parentPage);
 
+        /* @var $event BeforeCreatePage */
         $event = $this->eventDispatcher->dispatch(
             BeforeCreatePage::BEFORE_CREATE_PAGE,
             new BeforeCreatePage($directory, $settings, $parentPage)

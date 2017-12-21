@@ -160,8 +160,8 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
 
-        $this->assertEquals('some value', $page->getExtraValue('some key'));
-        $this->assertEquals('another_custom_value', $page->getExtraValue('custom'));
+        $this->assertEquals('some value', $page->getExtra('some key'));
+        $this->assertEquals('another_custom_value', $page->getExtra('custom'));
     }
 
     /**
@@ -233,7 +233,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, []);
 
-        $this->assertSame('very custom value', $page->getExtraValue('very_custom_key'));
+        $this->assertSame('very custom value', $page->getExtra('very_custom_key'));
     }
 
     /**

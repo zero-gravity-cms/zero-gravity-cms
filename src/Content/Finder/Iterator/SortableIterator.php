@@ -16,7 +16,7 @@ class SortableIterator implements \IteratorAggregate
     const SORT_BY_PUBLISH_DATE = 'publishDate';
     const SORT_BY_PATH = 'path';
     const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
-    const SORT_BY_EXTRA_VALUE = 'extraValue';
+    const SORT_BY_EXTRA_VALUE = 'extra';
 
     private $iterator;
     private $sort;

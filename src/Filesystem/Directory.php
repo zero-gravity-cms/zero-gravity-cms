@@ -136,16 +136,25 @@ class Directory
             throw StructureException::moreThanOneMarkdownFile($this->directoryInfo, $markdownFiles);
         }
 
-        if (
-            $this->hasYamlFile() && $this->hasMarkdownFile()
-            && ($this->getYamlFile()->getDefaultBasename() !== $this->getMarkdownFile()->getDefaultBasename())
-        ) {
+        if (!$this->yamlAndMarkdownBasenamesMatch()) {
             throw StructureException::yamlAndMarkdownFilesMismatch(
                 $this->directoryInfo,
                 $this->getYamlFile(),
                 $this->getMarkdownFile()
             );
         }
+    }
+
+    /**
+     * @return bool
+     */
+    private function yamlAndMarkdownBasenamesMatch(): bool
+    {
+        return
+            !$this->hasYamlFile() ||
+            !$this->hasMarkdownFile() ||
+            ($this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename())
+        ;
     }
 
     /**

@@ -2,14 +2,15 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Meta\PageFiles;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
 use ZeroGravity\Cms\Path\Path;
 
 class Page
 {
+    use PageSettingsTrait;
+
     const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
     const TAXONOMY_TAG = 'tag';
     const TAXONOMY_CATEGORY = 'category';
@@ -19,11 +20,6 @@ class Page
      * @var string
      */
     private $name;
-
-    /**
-     * @var PageSettings
-     */
-    private $settings;
 
     /**
      * @var string
@@ -65,8 +61,8 @@ class Page
     public function __construct(string $name, array $settings = [], Page $parent = null)
     {
         $this->name = $name;
-        $this->settings = new PageSettings($settings, $name);
         $this->parent = $parent;
+        $this->applySettings($settings, $name);
         $this->init();
     }
 
@@ -78,16 +74,6 @@ class Page
         if (null !== $this->parent) {
             $this->parent->addChild($this);
         }
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function getSetting(string $name)
-    {
-        return $this->settings->get($name);
     }
 
     /**
@@ -182,15 +168,6 @@ class Page
         return $this->path;
     }
 
-    private function buildPath(): void
-    {
-        if (null === $this->parent) {
-            $this->path = new Path('/'.$this->getSlug());
-        } else {
-            $this->path = new Path(rtrim($this->parent->getPath()->toString(), '/').'/'.$this->getSlug());
-        }
-    }
-
     /**
      * @return Page|null
      */
@@ -215,204 +192,12 @@ class Page
         return $this->filesystemPath;
     }
 
-    private function buildFilesystemPath(): void
-    {
-        if (null === $this->parent) {
-            $this->filesystemPath = new Path('/'.$this->getName());
-        } else {
-            $this->filesystemPath = new Path(
-                rtrim($this->parent->getFilesystemPath()->toString(), '/').'/'.$this->getName()
-            );
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle(): string
-    {
-        return (string) $this->getSetting('title');
-    }
-
     /**
      * @return string|null
      */
     public function getContent(): ? string
     {
         return $this->content;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSlug(): string
-    {
-        return (string) $this->getSetting('slug');
-    }
-
-    /**
-     * @return string
-     */
-    public function getContentType(): string
-    {
-        return $this->getSetting('content_type');
-    }
-
-    /**
-     * Get all defined taxonomy keys and values.
-     *
-     * @return array
-     */
-    public function getTaxonomies(): array
-    {
-        return $this->getSetting('taxonomy');
-    }
-
-    /**
-     * Get values for a single taxonomy key.
-     *
-     * @param string $name
-     *
-     * @return array
-     */
-    public function getTaxonomy($name): array
-    {
-        $taxonomy = $this->getSetting('taxonomy');
-        if (isset($taxonomy[$name])) {
-            return (array) $taxonomy[$name];
-        }
-
-        return [];
-    }
-
-    /**
-     * @return array
-     */
-    public function getTags(): array
-    {
-        return $this->getTaxonomy(self::TAXONOMY_TAG);
-    }
-
-    /**
-     * @return array
-     */
-    public function getCategories(): array
-    {
-        return $this->getTaxonomy(self::TAXONOMY_CATEGORY);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAuthors(): array
-    {
-        return $this->getTaxonomy(self::TAXONOMY_AUTHOR);
-    }
-
-    /**
-     * @return array
-     */
-    public function getSettings(): array
-    {
-        return $this->settings->toArray();
-    }
-
-    /**
-     * Get default setting values for child pages.
-     *
-     * @return array
-     */
-    public function getChildDefaults(): array
-    {
-        return $this->getSetting('child_defaults');
-    }
-
-    /**
-     * @return array
-     */
-    public function getExtra(): array
-    {
-        return (array) $this->getSetting('extra');
-    }
-
-    /**
-     * @return string
-     */
-    public function getMenuId(): string
-    {
-        return (string) $this->getSetting('menu_id');
-    }
-
-    /**
-     * @return string
-     */
-    public function getMenuLabel(): string
-    {
-        if (!empty($this->getSetting('menu_label'))) {
-            return (string) $this->getSetting('menu_label');
-        }
-
-        return $this->getTitle();
-    }
-
-    /**
-     * Page is listed in menus.
-     *
-     * @return bool
-     */
-    public function isVisible(): bool
-    {
-        return (bool) $this->getSetting('visible');
-    }
-
-    /**
-     * Page is considered a modular page, not a content page.
-     *
-     * @return bool
-     */
-    public function isModular(): bool
-    {
-        return (bool) $this->getSetting('modular');
-    }
-
-    /**
-     * Page is considered a modular snippet, not a standalone page.
-     *
-     * @return bool
-     */
-    public function isModule(): bool
-    {
-        return (bool) $this->getSetting('module');
-    }
-
-    /**
-     * Get custom template to embed this page in.
-     *
-     * @return string|null
-     */
-    public function getLayoutTemplate(): ? string
-    {
-        return $this->getSetting('layout_template');
-    }
-
-    /**
-     * Get custom template for rendering the page content.
-     *
-     * @return string|null
-     */
-    public function getContentTemplate(): ? string
-    {
-        return $this->getSetting('content_template');
-    }
-
-    /**
-     * Get custom controller name to use for this page.
-     *
-     * @return string|null
-     */
-    public function getController(): ? string
-    {
-        return (string) $this->getSetting('controller');
     }
 
     /**
@@ -439,68 +224,23 @@ class Page
         return count($this->children) > 0;
     }
 
-    /**
-     * Get optional date information of this page.
-     *
-     * @return DateTimeImmutable
-     */
-    public function getDate(): ? DateTimeImmutable
+    private function buildPath(): void
     {
-        return $this->getSetting('date');
+        if (null === $this->parent) {
+            $this->path = new Path('/'.$this->getSlug());
+        } else {
+            $this->path = new Path(rtrim($this->parent->getPath()->toString(), '/').'/'.$this->getSlug());
+        }
     }
 
-    /**
-     * Get optional publishing date of this page.
-     *
-     * @return DateTimeImmutable
-     */
-    public function getPublishDate(): ? DateTimeImmutable
+    private function buildFilesystemPath(): void
     {
-        return $this->getSetting('publish_date');
-    }
-
-    /**
-     * Get optional un-publishing date of this page.
-     *
-     * @return DateTimeImmutable
-     */
-    public function getUnpublishDate(): ? DateTimeImmutable
-    {
-        return $this->getSetting('unpublish_date');
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPublished(): bool
-    {
-        if (!$this->getSetting('publish')) {
-            return false;
+        if (null === $this->parent) {
+            $this->filesystemPath = new Path('/'.$this->getName());
+        } else {
+            $this->filesystemPath = new Path(
+                rtrim($this->parent->getFilesystemPath()->toString(), '/').'/'.$this->getName()
+            );
         }
-        $now = time();
-        if (null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > $now) {
-            return false;
-        }
-        if (null !== $this->getUnpublishDate() && $now > $this->getUnpublishDate()->format('U')) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param string     $name
-     * @param mixed|null $default
-     *
-     * @return mixed
-     */
-    public function getExtraValue(string $name, $default = null)
-    {
-        $extra = $this->getExtra();
-        if (array_key_exists($name, $extra)) {
-            return $extra[$name];
-        }
-
-        return $default;
     }
 }

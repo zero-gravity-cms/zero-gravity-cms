@@ -180,7 +180,7 @@ class PageTest extends BaseUnit
         $this->assertSame('CustomBundle:Custom:action', $page->getController());
         $this->assertSame('custom_id', $page->getMenuId());
         $this->assertSame('custom label', $page->getMenuLabel());
-        $this->assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtra());
+        $this->assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
     }
 
     /**
@@ -240,9 +240,9 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame('are not validated', $page->getExtraValue('fancy_extra_settings'));
-        $this->assertNull($page->getExtraValue('does_not_exist'));
-        $this->assertSame('default', $page->getExtraValue('does_not_exist', 'default'));
+        $this->assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
+        $this->assertNull($page->getExtra('does_not_exist'));
+        $this->assertSame('default', $page->getExtra('does_not_exist', 'default'));
     }
 
     /**

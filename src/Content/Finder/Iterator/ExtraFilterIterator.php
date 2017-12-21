@@ -78,7 +78,7 @@ class ExtraFilterIterator extends \FilterIterator
 
     private function getExtraValue(Page $page, $key, $type)
     {
-        $value = $page->getExtraValue($key);
+        $value = $page->getExtra($key);
         if (null === $value) {
             return $value;
         }
