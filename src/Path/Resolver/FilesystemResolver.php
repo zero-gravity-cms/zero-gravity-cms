@@ -49,16 +49,34 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
      */
     public function find(Path $path, Path $parentPath = null): array
     {
-        if (null === $parentPath) {
-            $parentPath = new Path('');
-        }
-        $path->normalize($parentPath);
+        $this->preparePaths($path, $parentPath);
 
         $finder = Finder::create()
             ->notName('*.meta.yaml')
             ->sortByName()
             ->files()
         ;
+
+        if (($path->isSingleElement() || $path->isGlob()) && !$path->isRegex()) {
+            $finder->name($path->toString());
+        } else {
+            $finder->path($path->toString());
+        }
+        $finder->in($this->buildBaseDir($parentPath));
+
+        return $this->doFind($parentPath, $finder);
+    }
+
+    /**
+     * @param Path $path
+     * @param Path $parentPath
+     */
+    private function preparePaths(Path &$path, Path &$parentPath = null): void
+    {
+        if (null === $parentPath) {
+            $parentPath = new Path('');
+        }
+        $path->normalize($parentPath);
 
         if ($path->isAbsolute() && !$path->isRegex()) {
             $path = $this->toRegexMatchStart($path);
@@ -67,14 +85,16 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
             // try moving pattern parts into inPath because globs don't work with paths
             $this->moveNonGlobsToParent($path, $parentPath);
         }
+    }
 
-        if (($path->isSingleElement() || $path->isGlob()) && !$path->isRegex()) {
-            $finder->name($path->toString());
-        } else {
-            $finder->path($path->toString());
-        }
-
-        $finder->in($this->buildBaseDir($parentPath));
+    /**
+     * @param Path $parentPath
+     * @param      $finder
+     *
+     * @return array
+     */
+    private function doFind(Path $parentPath, $finder): array
+    {
         $found = [];
         foreach ($finder as $file) {
             /* @var $file SplFileInfo */

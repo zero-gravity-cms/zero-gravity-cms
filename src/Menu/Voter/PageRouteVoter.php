@@ -15,6 +15,9 @@ class PageRouteVoter implements VoterInterface
      */
     private $request;
 
+    /**
+     * @param RequestStack $requestStack
+     */
     public function __construct(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -41,6 +44,18 @@ class PageRouteVoter implements VoterInterface
         }
 
         $routes = (array) $item->getExtra('routes', []);
+
+        return $this->matchRoutes($routes, $page->getPath()->toString());
+    }
+
+    /**
+     * @param array  $routes
+     * @param string $pagePath
+     *
+     * @return bool|null
+     */
+    private function matchRoutes(array $routes, string $pagePath)
+    {
         foreach ($routes as $route) {
             if (is_string($route)) {
                 $route = ['route' => $route];
@@ -49,7 +64,7 @@ class PageRouteVoter implements VoterInterface
                 throw new \InvalidArgumentException('Routes extra items must be strings or arrays with route key.');
             }
 
-            if ($page->getPath()->toString() === $route['route']) {
+            if ($pagePath === $route['route']) {
                 return true;
             }
         }

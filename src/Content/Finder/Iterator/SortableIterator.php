@@ -40,6 +40,17 @@ class SortableIterator implements \IteratorAggregate
             list($sort, $parameter) = $sort;
         }
 
+        $this->configureSortFunction($sort, $parameter);
+    }
+
+    /**
+     * @param $sort
+     * @param $parameter
+     *
+     * @throws \InvalidArgumentException
+     */
+    private function configureSortFunction(string $sort, string $parameter = null): void
+    {
         switch ($sort) {
             case self::SORT_BY_NAME:
             case self::SORT_BY_SLUG:
