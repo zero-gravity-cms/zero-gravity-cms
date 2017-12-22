@@ -41,15 +41,35 @@ class TaxonomyTester
         $pageValues = $page->getTaxonomy($this->name);
 
         if (PageFinder::TAXONOMY_OR === $this->mode) {
-            foreach ($this->values as $value) {
-                if (in_array($value, $pageValues)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return $this->testOr($pageValues);
         }
 
+        return $this->testAnd($pageValues);
+    }
+
+    /**
+     * @param $pageValues
+     *
+     * @return bool
+     */
+    private function testOr($pageValues): bool
+    {
+        foreach ($this->values as $value) {
+            if (in_array($value, $pageValues)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $pageValues
+     *
+     * @return bool
+     */
+    private function testAnd($pageValues): bool
+    {
         foreach ($this->values as $value) {
             if (!in_array($value, $pageValues)) {
                 return false;

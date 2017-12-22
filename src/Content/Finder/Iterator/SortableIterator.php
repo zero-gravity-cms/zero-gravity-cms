@@ -113,9 +113,7 @@ class SortableIterator implements \IteratorAggregate
             if (null === $valueA && null !== $valueB) {
                 return -1;
             }
-            if ((null === $valueA && null === $valueB)
-                || ($valueA->format('U') === $valueB->format('U'))
-            ) {
+            if ($valueA == $valueB) {
                 return strcasecmp($pageA->getPath(), $pageB->getPath());
             }
 

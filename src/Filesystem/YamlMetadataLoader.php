@@ -2,7 +2,6 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\Meta\Metadata;
@@ -21,8 +20,7 @@ class YamlMetadataLoader implements MetadataLoader
     public function loadMetadataForFile(string $pathname, string $basePath): Metadata
     {
         $metadataPath = sprintf('%s/%s.meta.yaml', rtrim($basePath, '/'), $pathname);
-        $fs = new Filesystem();
-        if (!$fs->exists($metadataPath) || is_dir($metadataPath)) {
+        if (!is_file($metadataPath)) {
             return new Metadata([]);
         }
 
