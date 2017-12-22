@@ -294,7 +294,14 @@ trait PageSettingsTrait
      */
     private function publishDateIsInFuture(): bool
     {
-        return null !== $this->getPublishDate() && $this->getPublishDate()->format('U') > time();
+        if (null === $this->getPublishDate()) {
+            return false;
+        }
+        if ($this->getPublishDate()->format('U') > time()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -302,6 +309,13 @@ trait PageSettingsTrait
      */
     private function unpublishDateIsInPast(): bool
     {
-        return null !== $this->getUnpublishDate() && time() > $this->getUnpublishDate()->format('U');
+        if (null === $this->getUnpublishDate()) {
+            return false;
+        }
+        if ($this->getUnpublishDate()->format('U') < time()) {
+            return true;
+        }
+
+        return false;
     }
 }
