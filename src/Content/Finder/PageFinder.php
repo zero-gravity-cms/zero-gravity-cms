@@ -8,7 +8,7 @@ use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
- * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some if its code.
+ * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some of its code.
  */
 class PageFinder implements \IteratorAggregate, \Countable
 {
