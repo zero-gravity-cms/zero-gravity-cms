@@ -19,7 +19,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function taxonomy($name, $values, $mode = self::TAXONOMY_AND)
+    public function taxonomy($name, $values, $mode = PageFinder::TAXONOMY_AND)
     {
         $this->taxonomies[] = new TaxonomyTester($name, (array) $values, $mode);
 
@@ -35,7 +35,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function notTaxonomy($name, $values, $mode = self::TAXONOMY_AND)
+    public function notTaxonomy($name, $values, $mode = PageFinder::TAXONOMY_AND)
     {
         $this->notTaxonomies[] = new TaxonomyTester($name, (array) $values, $mode);
 
@@ -50,7 +50,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function tag($values, $mode = self::TAXONOMY_AND)
+    public function tag($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->taxonomy(Page::TAXONOMY_TAG, $values, $mode);
     }
@@ -63,7 +63,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function notTag($values, $mode = self::TAXONOMY_AND)
+    public function notTag($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->notTaxonomy(Page::TAXONOMY_TAG, $values, $mode);
     }
@@ -76,7 +76,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function category($values, $mode = self::TAXONOMY_AND)
+    public function category($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->taxonomy(Page::TAXONOMY_CATEGORY, $values, $mode);
     }
@@ -89,7 +89,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function notCategory($values, $mode = self::TAXONOMY_AND)
+    public function notCategory($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->notTaxonomy(Page::TAXONOMY_CATEGORY, $values, $mode);
     }
@@ -102,7 +102,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function author($values, $mode = self::TAXONOMY_AND)
+    public function author($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->taxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
     }
@@ -115,7 +115,7 @@ trait PageFinderTaxonomyTrait
      *
      * @return $this
      */
-    public function notAuthor($values, $mode = self::TAXONOMY_AND)
+    public function notAuthor($values, $mode = PageFinder::TAXONOMY_AND)
     {
         return $this->notTaxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
     }

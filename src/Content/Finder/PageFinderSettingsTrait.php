@@ -271,10 +271,6 @@ trait PageFinderSettingsTrait
             $iterator = new Iterator\ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
         }
 
-        if (!empty($this->settings) || !empty($this->notSettings)) {
-            $iterator = new Iterator\SettingFilterIterator($iterator, $this->settings, $this->notSettings);
-        }
-
         return $iterator;
     }
 

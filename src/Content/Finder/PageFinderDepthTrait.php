@@ -45,21 +45,23 @@ trait PageFinderDepthTrait
         $maxDepth = PHP_INT_MAX;
 
         foreach ($this->depths as $comparator) {
+            $target = (int) $comparator->getTarget();
+
             switch ($comparator->getOperator()) {
                 case '>':
-                    $minDepth = (int) $comparator->getTarget() + 1;
+                    $minDepth = $target + 1;
                     break;
                 case '>=':
-                    $minDepth = $comparator->getTarget();
+                    $minDepth = $target;
                     break;
                 case '<':
-                    $maxDepth = (int) $comparator->getTarget() - 1;
+                    $maxDepth = $target - 1;
                     break;
                 case '<=':
-                    $maxDepth = $comparator->getTarget();
+                    $maxDepth = $target;
                     break;
                 default:
-                    $minDepth = $maxDepth = $comparator->getTarget();
+                    $minDepth = $maxDepth = $target;
             }
         }
 
