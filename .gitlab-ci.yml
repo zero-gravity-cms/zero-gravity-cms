@@ -28,7 +28,7 @@ before_script:
 test:
     stage: test
     script:
-        - robo ci:self-update
+        - rm -rf $CI_PROJECT_DIR/.ci
         - robo init
         - ls -lsa $CI_PROJECT_DIR/.ci
         - robo test
@@ -47,7 +47,7 @@ test:
 check:
     stage: test
     script:
-        - robo ci:self-update
+        - rm -rf $CI_PROJECT_DIR/.ci
         - robo init
         - ls -lsa $CI_PROJECT_DIR/.ci
         - robo check
