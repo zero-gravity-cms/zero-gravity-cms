@@ -139,7 +139,7 @@ class Path
      *
      * @param Path|null $parentPath
      */
-    public function normalize(Path $parentPath = null): void
+    public function normalize(self $parentPath = null): void
     {
         if ($this->isRegex()) {
             return;
@@ -311,7 +311,7 @@ class Path
      *
      * @return Path
      */
-    public function appendPath(Path $childPath): Path
+    public function appendPath(self $childPath): self
     {
         $path = clone $this;
         foreach ($childPath->getElements() as $element) {
@@ -358,7 +358,7 @@ class Path
      *
      * @return Path|null
      */
-    public function getFile(): ? Path
+    public function getFile(): ? self
     {
         if ($this->isDirectory() || !$this->hasElements()) {
             return null;

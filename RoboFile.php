@@ -50,9 +50,9 @@ class RoboFile extends \Robo\Tasks
     {
         $this->stopOnFail(true);
         $this->_prepareCiModules([
-            'codeception' => '2.3.6',
+            'codeception' => '2.3.7',
             'composer' => '@latest',
-            'php-cs-fixer' => 'v2.7.1',
+            'php-cs-fixer' => 'v2.9.0',
         ]);
     }
 

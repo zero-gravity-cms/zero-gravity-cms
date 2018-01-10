@@ -58,7 +58,7 @@ class Page
      * @param array  $settings
      * @param Page   $parent
      */
-    public function __construct(string $name, array $settings = [], Page $parent = null)
+    public function __construct(string $name, array $settings = [], self $parent = null)
     {
         $this->name = $name;
         $this->parent = $parent;
@@ -171,7 +171,7 @@ class Page
     /**
      * @return Page|null
      */
-    public function getParent(): ? Page
+    public function getParent(): ? self
     {
         return $this->parent;
     }
@@ -203,7 +203,7 @@ class Page
     /**
      * @param Page $childPage
      */
-    public function addChild(Page $childPage): void
+    public function addChild(self $childPage): void
     {
         $this->children[$childPage->getPath()->toString()] = $childPage;
     }
