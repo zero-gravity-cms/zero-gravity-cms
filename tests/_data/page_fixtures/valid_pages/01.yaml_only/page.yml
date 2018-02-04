@@ -1,5 +1,7 @@
 title: testtitle
 date: 2017-01-01
+file_aliases:
+child_defaults:
 taxonomy:
     tag:
         - tag1

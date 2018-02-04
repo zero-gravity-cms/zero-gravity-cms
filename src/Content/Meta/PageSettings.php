@@ -111,9 +111,9 @@ class PageSettings
      */
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
-        $resolver->setAllowedTypes('extra', 'array');
-        $resolver->setAllowedTypes('child_defaults', 'array');
-        $resolver->setAllowedTypes('file_aliases', 'array');
+        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $resolver->setAllowedTypes('child_defaults', ['null', 'array']);
+        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
         $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
         $resolver->setAllowedTypes('visible', 'bool');
         $resolver->setAllowedTypes('modular', 'bool');
@@ -137,6 +137,7 @@ class PageSettings
         $this->normalizeDates($resolver);
         $this->normalizeTitle($resolver);
         $this->normalizeTaxonomy($resolver);
+        $this->normalizeArrayValues($resolver);
     }
 
     /**
@@ -199,5 +200,22 @@ class PageSettings
             return $taxonomies;
         };
         $resolver->setNormalizer('taxonomy', $normalizeTaxonomy);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
+    private function normalizeArrayValues(OptionsResolver $resolver): void
+    {
+        $normalizeArray = function (Options $options, $value) {
+            if (null === $value) {
+                return [];
+            }
+
+            return $value;
+        };
+        $resolver->setNormalizer('extra', $normalizeArray);
+        $resolver->setNormalizer('child_defaults', $normalizeArray);
+        $resolver->setNormalizer('file_aliases', $normalizeArray);
     }
 }
