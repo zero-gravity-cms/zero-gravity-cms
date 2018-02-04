@@ -9,7 +9,7 @@ variables:
     SYMFONY_DEPRECATIONS_HELPER:    'weak'
     TIMEZONE:                       'Europe/Vienna'
 cache:
-    key: "$CI_BUILD_NAME/$CI_BUILD_REF_NAME"
+    key: "$CI_BUILD_NAME___$CI_BUILD_REF_NAME"
     paths:
         - "$COMPOSER_HOME"
         - "$CI_PROJECT_DIR/.ci"
