@@ -99,10 +99,11 @@ class PageFactory
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();
 
         if (null !== $defaultTemplate && !isset($settings['content_template'])) {
-            $parentPath = $parentPage ? $parentPage->getFilesystemPath() : '';
-            $settings['content_template'] = sprintf('@ZeroGravity%s%s',
+            $parentPath = isset($parentPage) ? rtrim($parentPage->getFilesystemPath(), '/') : '';
+            $settings['content_template'] = sprintf('@ZeroGravity%s/%s/%s',
                 $parentPath,
-                $defaultTemplate->getPathname()
+                $directory->getName(),
+                $defaultTemplate->getFilename()
             );
         }
 

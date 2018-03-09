@@ -121,10 +121,10 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
         $parentPage = null;
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
-        $this->assertEquals('@ZeroGravity/name.html.twig', $page->getContentTemplate());
+        $this->assertEquals('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/06.yaml_and_twig');
-        $parentPage = new Page('06.yaml_and_twig');
+        $parentPage = new Page('');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
         $this->assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
     }

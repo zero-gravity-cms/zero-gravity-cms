@@ -111,8 +111,38 @@ class RouteProvider implements RouteProviderInterface
         if (is_array($names)) {
             $pages = array_intersect_key($pages, array_flip($names));
         }
+        $routes = [];
+        foreach ($pages as $page) {
+            $routes = array_merge($routes, $this->extractPageRoutes($page));
+        }
 
-        return array_map([$this, 'createRouteFromPage'], $pages);
+        return $routes;
+    }
+
+    private function extractPageRoutes(Page $page): array
+    {
+        $routes = [
+            new Route($page->getPath()->toString(), [
+                'page' => $page,
+                '_controller' => $page->getController() ?: $this->defaultController,
+            ]),
+        ];
+        foreach ($page->getDocuments() as $name => $file) {
+            $routes[] = new Route($page->getPath()->toString().'/'.$name, [
+                'page' => $page,
+                '_controller' => $page->getController() ?: $this->defaultController,
+                'file' => $file,
+            ]);
+        }
+        foreach ($page->getImages() as $name => $file) {
+            $routes[] = new Route($page->getPath()->toString().'/'.$name, [
+                'page' => $page,
+                '_controller' => $page->getController() ?: $this->defaultController,
+                'file' => $file,
+            ]);
+        }
+
+        return $routes;
     }
 
     /**
