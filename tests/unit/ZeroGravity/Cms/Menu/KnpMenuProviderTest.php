@@ -16,7 +16,7 @@ use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Exception\InvalidMenuNameException;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
+use ZeroGravity\Cms\Filesystem\FilesystemMapper;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 use ZeroGravity\Cms\Menu\Event\AfterAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\AfterAddItem;
@@ -384,9 +384,9 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $path = $this->getPageFixtureDir().'/sample_menu_pages';
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $parser = new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
+        $mapper = new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
-        return new ContentRepository($parser, new ArrayCache(), false);
+        return new ContentRepository($mapper, new ArrayCache(), false);
     }
 
     protected function getProvider(EventDispatcherInterface $dispatcher = null): KnpMenuProvider

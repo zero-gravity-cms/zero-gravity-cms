@@ -92,6 +92,50 @@ class DirectoryTest extends BaseUnit
     }
 
     /**
+     * @test
+     * @dataProvider providePathsAndStrategies
+     *
+     * @param string $path
+     * @param string $expectedStrategy
+     */
+    public function contentStrategyIsDetectedCorrectly($path, $expectedStrategy)
+    {
+        $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().$path);
+
+        $this->assertSame($expectedStrategy, $dir->getContentStrategy());
+    }
+
+    public function providePathsAndStrategies()
+    {
+        return [
+            '01.yaml_only' => [
+                '/01.yaml_only',
+                Directory::CONTENT_STRATEGY_YAML_ONLY,
+            ],
+            '02.markdown_only' => [
+                '/02.markdown_only',
+                Directory::CONTENT_STRATEGY_MARKDOWN_ONLY,
+            ],
+            '03.yaml_and_markdown_and_twig' => [
+                '/03.yaml_and_markdown_and_twig',
+                Directory::CONTENT_STRATEGY_YAML_AND_MARKDOWN,
+            ],
+            '05.twig_only' => [
+                '/05.twig_only',
+                Directory::CONTENT_STRATEGY_TWIG_ONLY,
+            ],
+            '06.yaml_and_twig' => [
+                '/06.yaml_and_twig',
+                Directory::CONTENT_STRATEGY_YAML_ONLY,
+            ],
+            'images' => [
+                '/images',
+                Directory::CONTENT_STRATEGY_NONE,
+            ],
+        ];
+    }
+
+    /**
      * @param string $path
      *
      * @return Directory

@@ -186,37 +186,6 @@ class PageTest extends BaseUnit
     /**
      * @test
      */
-    public function settingsAreDefaultedAndCanBeFetched()
-    {
-        $page = new Page('page');
-
-        $expectedSettings = [
-            'slug' => 'page',
-            'title' => 'Page',
-            'visible' => false,
-            'modular' => false,
-            'module' => false,
-            'layout_template' => null,
-            'content_template' => null,
-            'controller' => null,
-            'menu_id' => 'zero-gravity',
-            'menu_label' => null,
-            'file_aliases' => [],
-            'date' => null,
-            'publish' => true,
-            'publish_date' => null,
-            'unpublish_date' => null,
-            'extra' => [],
-            'taxonomy' => [],
-            'content_type' => 'page',
-            'child_defaults' => [],
-        ];
-        $this->assertEquals($expectedSettings, $page->getSettings());
-    }
-
-    /**
-     * @test
-     */
     public function childrenCanBeAssignedAndFetched()
     {
         $parent = new Page('page');

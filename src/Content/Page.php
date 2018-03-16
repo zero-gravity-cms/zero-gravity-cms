@@ -7,7 +7,7 @@ use ZeroGravity\Cms\Content\Meta\PageFiles;
 use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
 use ZeroGravity\Cms\Path\Path;
 
-class Page
+class Page implements ReadablePage
 {
     use PageSettingsTrait;
 
@@ -19,7 +19,7 @@ class Page
     /**
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
@@ -82,6 +82,14 @@ class Page
     public function setContent(string $content = null): void
     {
         $this->content = $content;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContent(): ? string
+    {
+        return $this->content;
     }
 
     /**
@@ -171,7 +179,7 @@ class Page
     /**
      * @return Page|null
      */
-    public function getParent(): ? self
+    public function getParent(): ? ReadablePage
     {
         return $this->parent;
     }
@@ -190,14 +198,6 @@ class Page
     public function getFilesystemPath(): Path
     {
         return $this->filesystemPath;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getContent(): ? string
-    {
-        return $this->content;
     }
 
     /**

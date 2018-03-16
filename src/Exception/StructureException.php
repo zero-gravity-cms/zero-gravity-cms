@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Exception;
 use RuntimeException;
 use SplFileInfo;
 use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Content\PageDiff;
 
 class StructureException extends RuntimeException implements ZeroGravityException
 {
@@ -47,6 +48,20 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
             $directory->getRealPath(),
             $yamlFile->getFilename(),
             $markdownFile->getFilename()
+        ));
+    }
+
+    /**
+     * @param PageDiff $diff
+     *
+     * @return StructureException
+     */
+    public static function newPageNameAlreadyExists(PageDiff $diff)
+    {
+        return new static(sprintf(
+            'Cannot rename page "%s" to "%s" because a page with the same name already exists.',
+            $diff->getOld()->getName(),
+            $diff->getNewName()
         ));
     }
 

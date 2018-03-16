@@ -2,10 +2,8 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
-use Mni\FrontYAML\Parser as FrontYAMLParser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Event\AfterCreatePage;
 use ZeroGravity\Cms\Filesystem\Event\BeforeCreatePage;
@@ -51,7 +49,7 @@ class PageFactory
         Page $parentPage = null
     ) {
         $directory->validateFiles();
-        if (!$directory->hasContentFiles()) {
+        if (Directory::CONTENT_STRATEGY_NONE === $directory->getContentStrategy()) {
             return null;
         }
 
@@ -60,13 +58,13 @@ class PageFactory
         }
         $settings = $this->buildPageSettings($defaultSettings, $directory, $parentPage);
 
-        /* @var $event BeforeCreatePage */
-        $event = $this->eventDispatcher->dispatch(
+        /* @var $handledBeforeCreatePage BeforeCreatePage */
+        $handledBeforeCreatePage = $this->eventDispatcher->dispatch(
             BeforeCreatePage::BEFORE_CREATE_PAGE,
             new BeforeCreatePage($directory, $settings, $parentPage)
         );
-        $page = new Page($directory->getName(), $event->getSettings(), $parentPage);
-        $page->setContent($this->fetchPageContent($directory, $convertMarkdown));
+        $page = new Page($directory->getName(), $handledBeforeCreatePage->getSettings(), $parentPage);
+        $page->setContent($directory->fetchPageContent($convertMarkdown));
 
         $files = $directory->getFiles();
         foreach ($directory->getDirectories() as $subDirectory) {
@@ -95,7 +93,7 @@ class PageFactory
      */
     private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
     {
-        $settings = $this->fetchPageSettings($directory);
+        $settings = $directory->fetchPageSettings();
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();
 
         if (null !== $defaultTemplate && !isset($settings['content_template'])) {
@@ -120,41 +118,6 @@ class PageFactory
     }
 
     /**
-     * Fetch page settings from either YAML or markdown/frontmatter.
-     *
-     * @param Directory $directory
-     *
-     * @return array
-     */
-    private function fetchPageSettings(Directory $directory)
-    {
-        if ($directory->hasYamlFile()) {
-            $data = Yaml::parse(file_get_contents($directory->getYamlFile()->getFilesystemPathname()));
-
-            return is_array($data) ? $data : [];
-        } elseif ($directory->hasMarkdownFile()) {
-            return $this->getFrontYAMLDocument($directory, false)->getYAML() ?: [];
-        }
-
-        return [];
-    }
-
-    /**
-     * @param Directory $directory
-     * @param bool      $convertMarkdown
-     *
-     * @return null|string
-     */
-    private function fetchPageContent(Directory $directory, bool $convertMarkdown)
-    {
-        if ($directory->hasMarkdownFile()) {
-            return trim($this->getFrontYAMLDocument($directory, $convertMarkdown)->getContent());
-        }
-
-        return '';
-    }
-
-    /**
      * Merge 2 or more arrays, deep merging array values while replacing scalar values.
      *
      * @param array[] $params 1 or more arrays to merge
@@ -175,22 +138,5 @@ class PageFactory
         }
 
         return $settings;
-    }
-
-    /**
-     * @param Directory $directory
-     * @param bool      $convertMarkdown
-     *
-     * @return \Mni\FrontYAML\Document
-     */
-    private function getFrontYAMLDocument(Directory $directory, bool $convertMarkdown): \Mni\FrontYAML\Document
-    {
-        $parser = new FrontYAMLParser();
-        $document = $parser->parse(
-            file_get_contents($directory->getMarkdownFile()->getFilesystemPathname()),
-            $convertMarkdown
-        );
-
-        return $document;
     }
 }

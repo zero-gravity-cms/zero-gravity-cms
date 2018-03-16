@@ -14,7 +14,7 @@ trait PageSettingsTrait
     /**
      * @var PageSettings
      */
-    private $settings;
+    protected $settings;
 
     /**
      * @param array  $settings

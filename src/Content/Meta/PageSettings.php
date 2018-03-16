@@ -64,6 +64,7 @@ class PageSettings
         $this->configureOptions($resolver);
 
         $this->values = $resolver->resolve($values);
+        ksort($this->values);
     }
 
     /**

@@ -11,12 +11,12 @@ class ContentRepository
     const ALL_PAGES_CACHE_KEY = 'all_pages';
 
     /**
-     * @var Page[]
+     * @var ReadablePage[]
      */
     protected $pages;
 
     /**
-     * @var Page[]
+     * @var ReadablePage[]
      */
     protected $pagesByPath;
 
@@ -31,18 +31,18 @@ class ContentRepository
     private $skipCache;
 
     /**
-     * @var StructureParser
+     * @var StructureMapper
      */
     private $parser;
 
     /**
      * This is the main repository handling page loading and caching.
      *
-     * @param StructureParser $parser
+     * @param StructureMapper $parser
      * @param CacheInterface  $cache
      * @param bool            $skipCache
      */
-    public function __construct(StructureParser $parser, CacheInterface $cache, bool $skipCache)
+    public function __construct(StructureMapper $parser, CacheInterface $cache, bool $skipCache)
     {
         $this->parser = $parser;
         $this->cache = $cache;
@@ -60,7 +60,7 @@ class ContentRepository
     /**
      * Parse filesystem to get all page data.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     protected function loadFromParser()
     {
@@ -111,7 +111,7 @@ class ContentRepository
     }
 
     /**
-     * @param Page[] $pages
+     * @param ReadablePage[] $pages
      */
     protected function flattenPages(array $pages)
     {
@@ -120,7 +120,7 @@ class ContentRepository
     }
 
     /**
-     * @param Page[] $pages
+     * @param ReadablePage[] $pages
      */
     protected function doFlattenPages(array $pages)
     {
@@ -133,7 +133,7 @@ class ContentRepository
     /**
      * Get pages as nested tree.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     public function getPageTree()
     {
@@ -145,7 +145,7 @@ class ContentRepository
     /**
      * Get all pages as flattened array, indexed by full path.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     public function getAllPages()
     {
@@ -157,9 +157,9 @@ class ContentRepository
     /**
      * @param string $path
      *
-     * @return null|Page
+     * @return null|ReadablePage
      */
-    public function getPage(string $path)
+    public function getPage(string $path): ? ReadablePage
     {
         $this->fetchPages();
         if (isset($this->pagesByPath[$path])) {
@@ -175,5 +175,15 @@ class ContentRepository
     public function getPageFinder()
     {
         return PageFinder::create()->inPageList($this->getPageTree());
+    }
+
+    /**
+     * @param ReadablePage $page
+     *
+     * @return WritablePage
+     */
+    public function getWritablePageInstance(ReadablePage $page): WritablePage
+    {
+        return $this->parser->getWritablePageInstance($page);
     }
 }
