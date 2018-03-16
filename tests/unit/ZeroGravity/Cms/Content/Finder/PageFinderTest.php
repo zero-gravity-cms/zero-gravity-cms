@@ -21,8 +21,8 @@ class PageFinderTest extends BaseUnit
 
     public function _before()
     {
-        $parser = $this->getValidPagesFilesystemParser();
-        $repository = new ContentRepository($parser, new ArrayCache(), false);
+        $mapper = $this->getValidPagesFilesystemMapper();
+        $repository = new ContentRepository($mapper, new ArrayCache(), false);
 
         $this->finderPrototype = $repository->getPageFinder();
     }

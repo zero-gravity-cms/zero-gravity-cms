@@ -8,26 +8,27 @@ use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Content\StructureParser;
+use ZeroGravity\Cms\Content\PageDiff;
+use ZeroGravity\Cms\Content\StructureMapper;
 
 class ContentRepositoryTest extends BaseUnit
 {
     /**
      * @test
      */
-    public function pagesAreLoadedFromParser()
+    public function pagesAreLoadedFromMapper()
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
         $page3 = $this->createSimplePage('page3', $page2);
 
-        $parser = Stub::makeEmpty(StructureParser::class, [
+        $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
                 $page1,
                 $page2,
             ],
         ]);
-        $repo = new ContentRepository($parser, new ArrayCache(), false);
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
 
         $this->assertSame([
             $page1,
@@ -47,26 +48,90 @@ class ContentRepositoryTest extends BaseUnit
     /**
      * @test
      */
+    public function writablePageIsLoadedFromMapper()
+    {
+        $page1 = $this->createSimplePage('page1');
+
+        $mapper = $this->getMockBuilder(StructureMapper::class)
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
+            ->getMock()
+        ;
+        $mapper->expects($this->once())
+            ->method('getWritablePageInstance')
+        ;
+
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo->getWritablePageInstance($page1);
+    }
+
+    /**
+     * @test
+     */
+    public function newWritablePageIsLoadedFromMapper()
+    {
+        $page1 = $this->createSimplePage('page1');
+
+        $mapper = $this->getMockBuilder(StructureMapper::class)
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
+            ->getMock()
+        ;
+        $mapper->expects($this->once())
+            ->method('getNewWritablePage')
+            ->with($page1)
+        ;
+
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo->getNewWritablePage($page1);
+    }
+
+    /**
+     * @test
+     */
+    public function diffIsSavedThroughMapper()
+    {
+        $page1 = $this->createSimplePage('page1');
+
+        $mapper = $this->getMockBuilder(StructureMapper::class)
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
+            ->getMock()
+        ;
+
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $old = $repo->getWritablePageInstance($page1);
+        $new = clone $old;
+        $diff = new PageDiff($old, $new);
+
+        $mapper->expects($this->once())
+            ->method('saveChanges')
+            ->with($diff)
+        ;
+
+        $repo->saveChanges($diff);
+    }
+
+    /**
+     * @test
+     */
     public function pagesAreCachedBetweenInstances()
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
         $page3 = $this->createSimplePage('page3', $page2);
 
-        $parser = Stub::makeEmpty(StructureParser::class, [
+        $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
                 $page1,
                 $page2,
             ],
         ]);
         $cache = new ArrayCache();
-        $repo = new ContentRepository($parser, $cache, false);
+        $repo = new ContentRepository($mapper, $cache, false);
         $repo->getAllPages();
 
-        $emptyParser = Stub::makeEmpty(StructureParser::class, [
+        $emptyMapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [],
         ]);
-        $repo2 = new ContentRepository($emptyParser, $cache, false);
+        $repo2 = new ContentRepository($emptyMapper, $cache, false);
 
         $this->assertEquals([
             '/page1' => $page1,
@@ -74,7 +139,7 @@ class ContentRepositoryTest extends BaseUnit
             '/page2/page3' => $page3,
         ], $repo2->getAllPages(), 'The parser is never called if pages reside in the cache.');
 
-        $repo3 = new ContentRepository($emptyParser, $cache, false);
+        $repo3 = new ContentRepository($emptyMapper, $cache, false);
         $repo3->clearCache();
         $this->assertEquals([], $repo3->getAllPages(), 'After clearing the cache the empty result is loaded.');
     }
@@ -88,20 +153,20 @@ class ContentRepositoryTest extends BaseUnit
         $page2 = $this->createSimplePage('page2');
         $page3 = $this->createSimplePage('page3', $page2);
 
-        $parser = Stub::makeEmpty(StructureParser::class, [
+        $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
                 $page1,
                 $page2,
             ],
         ]);
         $cache = new ArrayCache();
-        $repo = new ContentRepository($parser, $cache, false);
+        $repo = new ContentRepository($mapper, $cache, false);
         $repo->getAllPages();
 
-        $emptyParser = Stub::makeEmpty(StructureParser::class, [
+        $emptyMapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [],
         ]);
-        $repo2 = new ContentRepository($emptyParser, $cache, true);
+        $repo2 = new ContentRepository($emptyMapper, $cache, true);
 
         $this->assertEquals([], $repo2->getAllPages());
     }
@@ -115,7 +180,7 @@ class ContentRepositoryTest extends BaseUnit
         $page2 = $this->createSimplePage('page2');
         $page3 = $this->createSimplePage('page3', $page2);
 
-        $parser = Stub::makeEmpty(StructureParser::class, [
+        $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
                 $page1,
                 $page2,
@@ -131,7 +196,7 @@ class ContentRepositoryTest extends BaseUnit
             ->willThrowException(new InvalidArgumentException())
         ;
 
-        $repo = new ContentRepository($parser, $cache, false);
+        $repo = new ContentRepository($mapper, $cache, false);
         $repo->getAllPages();
     }
 

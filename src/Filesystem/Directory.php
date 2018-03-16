@@ -2,13 +2,21 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
+use Mni\FrontYAML\Document;
+use Mni\FrontYAML\Parser as FrontYAMLParser;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
+use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Exception\StructureException;
+use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
+use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
 class Directory
 {
@@ -16,6 +24,31 @@ class Directory
     const CONFIG_TYPE_FRONTMATTER = 'frontmatter';
     const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
     const MODULAR_PREFIX_PATTERN = '/^_(.*)/';
+
+    /**
+     * This directory does not hold page content.
+     */
+    const CONTENT_STRATEGY_NONE = 'none';
+
+    /**
+     * Single YAML file only.
+     */
+    const CONTENT_STRATEGY_YAML_ONLY = 'yaml_only';
+
+    /**
+     * Single markdown file with optional frontmatter YAML config.
+     */
+    const CONTENT_STRATEGY_MARKDOWN_ONLY = 'markdown_only';
+
+    /**
+     * Only twig files.
+     */
+    const CONTENT_STRATEGY_TWIG_ONLY = 'twig_only';
+
+    /**
+     * YAML config file and markdown content file.
+     */
+    const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
 
     /**
      * @var SplFileInfo
@@ -43,6 +76,16 @@ class Directory
     private $directories;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @param SplFileInfo $directoryInfo
      * @param FileFactory $fileFactory
      * @param string|null $parentPath
@@ -50,10 +93,14 @@ class Directory
     public function __construct(
         SplFileInfo $directoryInfo,
         FileFactory $fileFactory,
+        LoggerInterface $logger,
+        EventDispatcherInterface $eventDispatcher,
         string $parentPath = null
     ) {
         $this->directoryInfo = $directoryInfo;
         $this->fileFactory = $fileFactory;
+        $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
         $this->parentPath = $parentPath;
         $this->parseFiles();
         $this->parseDirectories();
@@ -64,6 +111,7 @@ class Directory
      */
     private function parseFiles()
     {
+        $this->logger->debug("Scanning directory {$this->getPath()} for files");
         $fileFinder = Finder::create()
             ->files()
             ->depth(0)
@@ -87,6 +135,7 @@ class Directory
      */
     private function parseDirectories()
     {
+        $this->logger->debug("Scanning directory {$this->getPath()} for sub directories");
         $subDirectoryFinder = Finder::create()
             ->directories()
             ->depth(0)
@@ -102,6 +151,8 @@ class Directory
             $this->directories[$directoryInfo->getFilename()] = new self(
                 $directoryInfo,
                 $this->fileFactory,
+                $this->logger,
+                $this->eventDispatcher,
                 $this->getPath()
             );
         }
@@ -128,6 +179,14 @@ class Directory
     public function getName(): string
     {
         return $this->directoryInfo->getFilename();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilesystemPathname(): string
+    {
+        return $this->directoryInfo->getPathname();
     }
 
     /**
@@ -297,14 +356,6 @@ class Directory
     }
 
     /**
-     * @return bool
-     */
-    public function hasContentFiles(): bool
-    {
-        return $this->hasMarkdownFile() || $this->hasYamlFile() || count($this->getTwigFiles()) > 0;
-    }
-
-    /**
      * File objects indexed by filename.
      *
      * @return File[]
@@ -339,5 +390,227 @@ class Directory
         }
 
         return $files;
+    }
+
+    /**
+     * @param bool $convertMarkdown
+     *
+     * @return null|string
+     */
+    public function fetchPageContent(bool $convertMarkdown)
+    {
+        if ($this->hasMarkdownFile()) {
+            return trim($this->getFrontYAMLDocument($convertMarkdown)->getContent());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param bool $convertMarkdown
+     *
+     * @return Document
+     */
+    public function getFrontYAMLDocument(bool $convertMarkdown): Document
+    {
+        $parser = new FrontYAMLParser();
+        $document = $parser->parse(
+            file_get_contents($this->getMarkdownFile()->getFilesystemPathname()),
+            $convertMarkdown
+        );
+
+        return $document;
+    }
+
+    /**
+     * Fetch page settings from either YAML or markdown/frontmatter.
+     *
+     * @return array
+     */
+    public function fetchPageSettings()
+    {
+        if ($this->hasYamlFile()) {
+            $data = Yaml::parse(file_get_contents($this->getYamlFile()->getFilesystemPathname()));
+
+            return is_array($data) ? $data : [];
+        } elseif ($this->hasMarkdownFile()) {
+            return $this->getFrontYAMLDocument(false)->getYAML() ?: [];
+        }
+
+        return [];
+    }
+
+    /**
+     * Save the given raw content to the filesystem.
+     *
+     * @param string|null $newRawContent
+     */
+    public function saveContent(string $newRawContent = null): void
+    {
+        switch ($this->getContentStrategy()) {
+            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
+            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
+                $this->updateMarkdown($newRawContent);
+                break;
+
+            default:
+                $this->createMarkdown($newRawContent);
+        }
+    }
+
+    /**
+     * Save the given settings array to the filesystem.
+     *
+     * @param array $newSettings
+     */
+    public function saveSettings(array $newSettings): void
+    {
+        $newYaml = $this->dumpSettingsToYaml($newSettings);
+
+        switch ($this->getContentStrategy()) {
+            case self::CONTENT_STRATEGY_YAML_ONLY:
+            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
+            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
+                $this->updateYaml($newYaml);
+                break;
+
+            default:
+                $this->createYaml($newYaml);
+        }
+    }
+
+    /**
+     * Rename/move the directory to another path.
+     *
+     * @param string $newRealPath
+     */
+    public function renameOrMove(string $newRealPath): void
+    {
+        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to $newRealPath");
+        $fs = new Filesystem();
+        $fs->rename($this->getFilesystemPathname(), $newRealPath, false);
+
+        $this->directoryInfo = new SplFileInfo($newRealPath);
+        $this->parseFiles();
+        $this->parseDirectories();
+    }
+
+    /**
+     * Get the content strategy for this directory, one of the Directory::CONTENT_STRATEGY_* constants.
+     *
+     * @return string
+     */
+    public function getContentStrategy(): string
+    {
+        $hasMarkdown = $this->hasMarkdownFile();
+        $hasYaml = $this->hasYamlFile();
+        $hasTwig = count($this->getTwigFiles()) > 0;
+
+        if ($hasMarkdown && $hasYaml) {
+            return self::CONTENT_STRATEGY_YAML_AND_MARKDOWN;
+        }
+        if ($hasYaml) {
+            return self::CONTENT_STRATEGY_YAML_ONLY;
+        }
+        if ($hasMarkdown) {
+            return self::CONTENT_STRATEGY_MARKDOWN_ONLY;
+        }
+        if ($hasTwig) {
+            return self::CONTENT_STRATEGY_TWIG_ONLY;
+        }
+
+        return self::CONTENT_STRATEGY_NONE;
+    }
+
+    private function updateMarkdown($newRawContent)
+    {
+        $this->logger->debug("Updating markdown file in directory {$this->getPath()}");
+        $document = $this->getFrontYAMLDocument(false);
+        if (is_array($document->getYAML())) {
+            $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
+            $newRawContent = <<<FRONTMATTER
+---
+$yamlContent
+---
+$newRawContent
+FRONTMATTER;
+        }
+
+        $this->writeFile($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
+    }
+
+    private function createMarkdown($newRawContent)
+    {
+        $this->logger->debug("Creating new markdown file in directory {$this->getPath()}");
+        $path = sprintf('%s/%s.md',
+            $this->directoryInfo->getPathname(),
+            $this->getDefaultBasename()
+        );
+
+        $this->writeFile($path, $newRawContent);
+        $this->parseFiles();
+    }
+
+    private function updateYaml($newYaml)
+    {
+        $this->logger->debug("Updating YAML config in directory {$this->getPath()}");
+        if ($this->hasYamlFile()) {
+            $file = $this->getYamlFile();
+        } elseif ($this->hasMarkdownFile()) {
+            $file = $this->getMarkdownFile();
+            $document = $this->getFrontYAMLDocument(false);
+            $newYaml = <<<FRONTMATTER
+---
+$newYaml
+---
+{$document->getContent()}
+FRONTMATTER;
+        } else {
+            throw new \LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
+        }
+
+        $this->writeFile($file->getFilesystemPathname(), $newYaml);
+    }
+
+    private function createYaml($newYaml)
+    {
+        $this->logger->debug("Creating new YAML config in directory {$this->getPath()}");
+        $path = sprintf('%s/%s.yaml',
+            $this->directoryInfo->getPathname(),
+            $this->getDefaultBasename()
+        );
+
+        $this->writeFile($path, $newYaml);
+        $this->parseFiles();
+    }
+
+    /**
+     * @param array $settings
+     *
+     * @return string
+     */
+    private function dumpSettingsToYaml(array $settings): string
+    {
+        $yamlContent = Yaml::dump($settings, 4);
+
+        return $yamlContent;
+    }
+
+    private function writeFile(string $realPath, string $content)
+    {
+        /* @var $handledEvent BeforeFileWrite */
+        $handledEvent = $this->eventDispatcher->dispatch(
+            BeforeFileWrite::BEFORE_FILE_WRITE,
+            new BeforeFileWrite($realPath, $content, $this)
+        );
+        $content = $handledEvent->getContent();
+
+        $this->logger->info("Writing to file {$realPath} for directory {$this->getPath()}");
+        file_put_contents($realPath, $content);
+
+        $this->eventDispatcher->dispatch(
+            AfterFileWrite::AFTER_FILE_WRITE,
+            new AfterFileWrite($realPath, $content, $this)
+        );
     }
 }

@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Route;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Content\StructureParser;
+use ZeroGravity\Cms\Content\StructureMapper;
 use ZeroGravity\Cms\Routing\RouteProvider;
 
 class RouteProviderTest extends BaseUnit
@@ -93,7 +93,7 @@ class RouteProviderTest extends BaseUnit
         $page2 = $this->createSimplePage('page2');
         $page3 = $this->createSimplePage('page3', $page2);
 
-        $parser = Stub::makeEmpty(StructureParser::class, [
+        $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
                 $page1,
                 $page2,
@@ -101,7 +101,7 @@ class RouteProviderTest extends BaseUnit
         ]);
         $cache = new ArrayCache();
 
-        return new ContentRepository($parser, $cache, false);
+        return new ContentRepository($mapper, $cache, false);
     }
 
     /**

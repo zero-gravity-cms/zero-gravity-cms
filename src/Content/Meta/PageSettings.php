@@ -53,6 +53,25 @@ class PageSettings
     }
 
     /**
+     * Get all values that wouldn't have been set by default.
+     *
+     * @return array
+     */
+    public function getNonDefaultValues(): array
+    {
+        $defaults = (new self([], $this->pageName))->toArray();
+
+        $nonDefaults = [];
+        foreach ($this->toArray() as $key => $value) {
+            if (!array_key_exists($key, $defaults) || $defaults[$key] !== $value) {
+                $nonDefaults[$key] = $value;
+            }
+        }
+
+        return $nonDefaults;
+    }
+
+    /**
      * Resolve and validate page settings.
      * If everything was fine, assign them.
      *
@@ -64,6 +83,7 @@ class PageSettings
         $this->configureOptions($resolver);
 
         $this->values = $resolver->resolve($values);
+        ksort($this->values);
     }
 
     /**
