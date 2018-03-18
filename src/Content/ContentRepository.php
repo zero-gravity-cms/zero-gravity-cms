@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Content;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Exception\ZeroGravityException;
 
 class ContentRepository
 {
@@ -33,18 +34,18 @@ class ContentRepository
     /**
      * @var StructureMapper
      */
-    private $parser;
+    private $mapper;
 
     /**
      * This is the main repository handling page loading and caching.
      *
-     * @param StructureMapper $parser
+     * @param StructureMapper $mapper
      * @param CacheInterface  $cache
      * @param bool            $skipCache
      */
-    public function __construct(StructureMapper $parser, CacheInterface $cache, bool $skipCache)
+    public function __construct(StructureMapper $mapper, CacheInterface $cache, bool $skipCache)
     {
-        $this->parser = $parser;
+        $this->mapper = $mapper;
         $this->cache = $cache;
         $this->skipCache = $skipCache;
     }
@@ -64,7 +65,7 @@ class ContentRepository
      */
     protected function loadFromParser()
     {
-        $pages = $this->parser->parse();
+        $pages = $this->mapper->parse();
 
         return $pages;
     }
@@ -178,12 +179,38 @@ class ContentRepository
     }
 
     /**
+     * Get writable instance of an existing page.
+     *
      * @param ReadablePage $page
      *
      * @return WritablePage
      */
     public function getWritablePageInstance(ReadablePage $page): WritablePage
     {
-        return $this->parser->getWritablePageInstance($page);
+        return $this->mapper->getWritablePageInstance($page);
+    }
+
+    /**
+     * Get new writable page instance.
+     *
+     * @param ReadablePage|null $parentPage
+     *
+     * @return WritablePage
+     */
+    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
+    {
+        return $this->mapper->getNewWritablePage($parentPage);
+    }
+
+    /**
+     * Store changes of the given page diff.
+     *
+     * @param PageDiff $diff
+     *
+     * @throws ZeroGravityException
+     */
+    public function saveChanges(PageDiff $diff)
+    {
+        $this->mapper->saveChanges($diff);
     }
 }

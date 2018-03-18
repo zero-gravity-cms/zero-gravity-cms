@@ -19,6 +19,11 @@ interface StructureMapper
     public function getWritablePageInstance(ReadablePage $page): WritablePage;
 
     /**
+     * @return WritablePage
+     */
+    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage;
+
+    /**
      * Store changes of the given page diff.
      *
      * @param PageDiff $diff

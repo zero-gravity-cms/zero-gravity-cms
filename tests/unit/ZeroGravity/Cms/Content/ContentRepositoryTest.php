@@ -52,7 +52,7 @@ class ContentRepositoryTest extends BaseUnit
         $page1 = $this->createSimplePage('page1');
 
         $mapper = $this->getMockBuilder(StructureMapper::class)
-            ->setMethods(['parse', 'getWritablePageInstance', 'saveChanges'])
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
             ->getMock()
         ;
         $mapper->expects($this->once())

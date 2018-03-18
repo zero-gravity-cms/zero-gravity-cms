@@ -42,9 +42,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = new class('page') extends Page implements WritablePage {
             use BasicWritablePageTrait;
         };
-        $newPage = new class('page') extends Page implements WritablePage {
-            use BasicWritablePageTrait;
-        };
+        $newPage = clone $oldPage;
         $diff = new PageDiff($oldPage, $newPage);
 
         $mapper = $this->getTempValidPagesFilesystemMapper();
@@ -62,7 +60,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $page = $pages['/yaml_only'];
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setName('02.markdown_only');
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -82,7 +80,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setContentRaw('new **raw** content');
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -106,7 +104,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setContentRaw($oldPage->getContentRaw()."\n\nnew **raw** content");
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -131,7 +129,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(4, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setContentRaw('new **raw** content');
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -155,7 +153,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setContentRaw('new **raw** content');
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -179,7 +177,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
 
         $settings = $oldPage->getSettings();
         $settings['date'] = '2018-03-14 00:00:00+0000';
@@ -208,7 +206,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
 
         $settings = $oldPage->getSettings();
         $settings['date'] = '2018-03-14 00:00:00+0000';
@@ -237,7 +235,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $this->assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
 
         $settings = $oldPage->getSettings();
         $settings['date'] = '2018-03-14 00:00:00+0000';
@@ -265,7 +263,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $page = $pages['/with_children'];
 
         $oldPage = $mapper->getWritablePageInstance($page);
-        $newPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
         $newPage->setName('04.still_with_children');
 
         $diff = new PageDiff($oldPage, $newPage);
@@ -278,6 +276,86 @@ class FilesystemMapperWritingTest extends BaseUnit
 
         $page = $pages['/still_with_children'];
         $this->assertCount(2, $page->getChildren());
+    }
+
+    /**
+     * @test
+     */
+    public function pageCanBeMoved()
+    {
+        $mapper = $this->getTempValidPagesFilesystemMapper();
+        $pages = $mapper->parse();
+        $page = $pages['/with_children'];
+
+        $oldPage = $mapper->getWritablePageInstance($page);
+        $newPage = clone $oldPage;
+        $newPage->setName('04.still_with_children');
+
+        $diff = new PageDiff($oldPage, $newPage);
+
+        $mapper->saveChanges($diff);
+        $pages = $mapper->parse();
+
+        $this->assertArrayNotHasKey('/with_children', $pages);
+        $this->assertArrayHasKey('/still_with_children', $pages);
+
+        $page = $pages['/still_with_children'];
+        $this->assertCount(2, $page->getChildren());
+    }
+
+    /**
+     * @test
+     * @group new
+     */
+    public function newPageCanBeSavedInRootDir()
+    {
+        $mapper = $this->getTempValidPagesFilesystemMapper();
+
+        $oldPage = $mapper->getNewWritablePage();
+        $newPage = clone $oldPage;
+        $newPage->setName('08.totally_new');
+        $newPage->setSettings([
+            'title' => 'A totally new page!',
+            'slug' => 'totally_new',
+        ]);
+        $newPage->setContentRaw('totally **new** content!');
+
+        $diff = new PageDiff($oldPage, $newPage);
+
+        $mapper->saveChanges($diff);
+        $pages = $mapper->parse();
+        $this->assertArrayHasKey('/totally_new', $pages);
+        $page = $pages['/totally_new'];
+        $this->assertSame('A totally new page!', $page->getTitle());
+        $this->assertSame('<p>totally <strong>new</strong> content!</p>', $page->getContent());
+    }
+
+    /**
+     * @test
+     * @group new
+     */
+    public function newPageCanBeSavedInAnotherPageDir()
+    {
+        $mapper = $this->getTempValidPagesFilesystemMapper();
+        $pages = $mapper->parse();
+        $parent = $pages['/yaml_only'];
+
+        $oldPage = $mapper->getNewWritablePage($parent);
+        $newPage = clone $oldPage;
+        $newPage->setName('08.totally_new');
+        $newPage->setSettings([
+            'title' => 'A totally new page!',
+            'slug' => 'totally_new',
+        ]);
+        $newPage->setContentRaw('totally **new** content!');
+
+        $diff = new PageDiff($oldPage, $newPage);
+
+        $mapper->saveChanges($diff);
+        $pages = $mapper->parse();
+        $page = $pages['/yaml_only'];
+        $this->assertCount(1, $page->getChildren());
+        $this->assertArrayHasKey('/yaml_only/totally_new', $page->getChildren()->toArray());
     }
 
     /**

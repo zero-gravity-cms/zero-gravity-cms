@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
@@ -130,6 +131,16 @@ class FilesystemMapper implements StructureMapper
     }
 
     /**
+     * @param ReadablePage|null $parentPage
+     *
+     * @return WritableFilesystemPage
+     */
+    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
+    {
+        return new WritableFilesystemPage(new Page('', [], $parentPage));
+    }
+
+    /**
      * Store changes of the given page diff.
      *
      * @param PageDiff $diff
@@ -142,13 +153,19 @@ class FilesystemMapper implements StructureMapper
 
         /* @var $directory Directory */
         $directory = $diff->getNew()->getDirectory();
+        $isNew = false;
+        if (null === $directory) {
+            $isNew = true;
+            $directory = $this->createDirectoryForNewPage($diff);
+        }
+
         if ($diff->contentHasChanged()) {
             $directory->saveContent($diff->getNewContentRaw());
         }
         if ($diff->settingsHaveChanged()) {
             $directory->saveSettings($diff->getNewSettings());
         }
-        if ($diff->nameHasChanged()) {
+        if (!$isNew && $diff->nameHasChanged()) {
             $directory->changeName($diff->getNewName());
         }
     }
@@ -175,7 +192,13 @@ class FilesystemMapper implements StructureMapper
      */
     private function newNameAlreadyExists(PageDiff $diff): bool
     {
-        $parentPath = dirname($diff->getOld()->getDirectory()->getFilesystemPathname());
+        /* @var $newPage WritableFilesystemPage */
+        $newPage = $diff->getNew();
+        if (null !== $newPage->getParent()) {
+            $parentPath = $this->path.'/'.$newPage->getParent()->getFilesystemPath();
+        } else {
+            $parentPath = $this->path;
+        }
 
         return is_dir($parentPath.'/'.$diff->getNewName());
     }
@@ -190,5 +213,27 @@ class FilesystemMapper implements StructureMapper
         $this->logger->error($exception->getMessage());
 
         throw $exception;
+    }
+
+    /**
+     * @param PageDiff $diff
+     *
+     * @return Directory
+     */
+    private function createDirectoryForNewPage(PageDiff $diff): Directory
+    {
+        $newPage = $diff->getNew();
+        if (null !== $newPage->getParent()) {
+            $parentDir = $newPage->getParent()->getFilesystemPath();
+        } else {
+            $parentDir = '';
+        }
+        $path = $this->path.$parentDir.'/'.$diff->getNewName();
+
+        $fs = new Filesystem();
+        $fs->mkdir($path);
+        $directory = new Directory(new SplFileInfo($path), $this->fileFactory, $parentDir);
+
+        return $directory;
     }
 }
