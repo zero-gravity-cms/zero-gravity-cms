@@ -54,6 +54,6 @@ class PageDiffTest extends BaseUnit
         $newPage->setSettings($settings);
 
         $this->assertTrue($diff->settingsHaveChanged());
-        $this->assertSame($settings, $diff->getNewSettings());
+        $this->assertSame(['menu_id' => 'another-menu'], $diff->getNewNonDefaultSettings());
     }
 }

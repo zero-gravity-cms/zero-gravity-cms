@@ -67,9 +67,9 @@ class PageDiff
     /**
      * @return array
      */
-    public function getNewSettings(): array
+    public function getNewNonDefaultSettings(): array
     {
-        return $this->new->getSettings();
+        return $this->new->getNonDefaultSettings();
     }
 
     /**

@@ -4,10 +4,13 @@ namespace ZeroGravity\Cms\Content\Meta;
 
 use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * This trait contains all settings related methods (mostly getters) of the Page class.
  * This helps separating native properties from validated settings/options.
+ *
+ * @method ReadablePage getParent()
  */
 trait PageSettingsTrait
 {
@@ -116,6 +119,28 @@ trait PageSettingsTrait
     public function getSettings(): array
     {
         return $this->settings->toArray();
+    }
+
+    /**
+     * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
+     * the current parent page.
+     *
+     * @return array
+     */
+    public function getNonDefaultSettings(): array
+    {
+        $settings = $this->settings->getNonDefaultValues();
+        if (null === $this->getParent()) {
+            return $settings;
+        }
+
+        foreach ($this->getParent()->getChildDefaults() as $key => $defaultValue) {
+            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+                unset($settings[$key]);
+            }
+        }
+
+        return $settings;
     }
 
     /**

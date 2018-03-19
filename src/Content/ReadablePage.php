@@ -46,9 +46,19 @@ interface ReadablePage
     public function getFilesystemPath(): Path;
 
     /**
+     * Get all setting values.
+     *
      * @return array
      */
     public function getSettings(): array;
+
+    /**
+     * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
+     * the current parent page.
+     *
+     * @return array
+     */
+    public function getNonDefaultSettings(): array;
 
     /**
      * @return PageFinder

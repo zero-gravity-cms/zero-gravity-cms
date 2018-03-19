@@ -443,7 +443,6 @@ class Directory
      */
     public function saveSettings(array $newSettings): void
     {
-        // @TODO: extract default settings
         $newYaml = $this->dumpSettingsToYaml($newSettings);
 
         switch ($this->getContentStrategy()) {
@@ -513,7 +512,7 @@ $newRawContent
 FRONTMATTER;
         }
 
-        file_put_contents($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
+        $this->writeFile($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
     }
 
     private function createMarkdown($newRawContent)
@@ -523,7 +522,7 @@ FRONTMATTER;
             $this->getDefaultBasename()
         );
 
-        file_put_contents($path, $newRawContent);
+        $this->writeFile($path, $newRawContent);
         $this->parseFiles();
     }
 
@@ -544,7 +543,7 @@ FRONTMATTER;
             throw new \LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
         }
 
-        file_put_contents($file->getFilesystemPathname(), $newYaml);
+        $this->writeFile($file->getFilesystemPathname(), $newYaml);
     }
 
     private function createYaml($newYaml)
@@ -554,7 +553,7 @@ FRONTMATTER;
             $this->getDefaultBasename()
         );
 
-        file_put_contents($path, $newYaml);
+        $this->writeFile($path, $newYaml);
         $this->parseFiles();
     }
 
@@ -568,5 +567,10 @@ FRONTMATTER;
         $yamlContent = Yaml::dump($settings, 4);
 
         return $yamlContent;
+    }
+
+    private function writeFile(string $path, string $content)
+    {
+        file_put_contents($path, $content);
     }
 }

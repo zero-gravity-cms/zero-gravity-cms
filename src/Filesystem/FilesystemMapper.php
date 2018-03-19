@@ -163,7 +163,7 @@ class FilesystemMapper implements StructureMapper
             $directory->saveContent($diff->getNewContentRaw());
         }
         if ($diff->settingsHaveChanged()) {
-            $directory->saveSettings($diff->getNewSettings());
+            $directory->saveSettings($this->getNonDefaultSettingsForDiff($diff));
         }
         if (!$isNew && $diff->filesystemPathHasChanged()) {
             $directory->renameOrMove($this->path.$diff->getNewFilesystemPath());
@@ -222,5 +222,26 @@ class FilesystemMapper implements StructureMapper
         $directory = new Directory(new SplFileInfo($realPath), $this->fileFactory, $parentPath);
 
         return $directory;
+    }
+
+    /**
+     * @param PageDiff $diff
+     *
+     * @return array
+     */
+    private function getNonDefaultSettingsForDiff(PageDiff $diff): array
+    {
+        $settings = $diff->getNewNonDefaultSettings();
+        if (null !== $diff->getNew()->getParent()) {
+            return $settings;
+        }
+
+        foreach ($this->defaultPageSettings as $key => $defaultValue) {
+            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+                unset($settings[$key]);
+            }
+        }
+
+        return $settings;
     }
 }

@@ -53,4 +53,21 @@ class PageSettingsTest extends BaseUnit
         ];
         $this->assertEquals($expectedSettings, $settings->toArray());
     }
+
+    /**
+     * @test
+     */
+    public function settingsCanBeFetchedWithoutDefaultValues()
+    {
+        $settings = new PageSettings([
+            'slug' => 'not-page',
+            'menu_label' => 'custom label',
+        ], 'page');
+
+        $expectedSettings = [
+            'slug' => 'not-page',
+            'menu_label' => 'custom label',
+        ];
+        $this->assertEquals($expectedSettings, $settings->getNonDefaultValues());
+    }
 }
