@@ -8,6 +8,7 @@ use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Content\StructureMapper;
 
 class ContentRepositoryTest extends BaseUnit
@@ -61,6 +62,51 @@ class ContentRepositoryTest extends BaseUnit
 
         $repo = new ContentRepository($mapper, new ArrayCache(), false);
         $repo->getWritablePageInstance($page1);
+    }
+
+    /**
+     * @test
+     */
+    public function newWritablePageIsLoadedFromMapper()
+    {
+        $page1 = $this->createSimplePage('page1');
+
+        $mapper = $this->getMockBuilder(StructureMapper::class)
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
+            ->getMock()
+        ;
+        $mapper->expects($this->once())
+            ->method('getNewWritablePage')
+            ->with($page1)
+        ;
+
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo->getNewWritablePage($page1);
+    }
+
+    /**
+     * @test
+     */
+    public function diffIsSavedThroughMapper()
+    {
+        $page1 = $this->createSimplePage('page1');
+
+        $mapper = $this->getMockBuilder(StructureMapper::class)
+            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
+            ->getMock()
+        ;
+
+        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $old = $repo->getWritablePageInstance($page1);
+        $new = clone $old;
+        $diff = new PageDiff($old, $new);
+
+        $mapper->expects($this->once())
+            ->method('saveChanges')
+            ->with($diff)
+        ;
+
+        $repo->saveChanges($diff);
     }
 
     /**
