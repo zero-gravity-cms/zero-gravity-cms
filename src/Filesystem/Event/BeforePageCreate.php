@@ -6,9 +6,9 @@ use Symfony\Component\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
 
-class BeforeCreatePage extends Event
+class BeforePageCreate extends Event
 {
-    public const BEFORE_CREATE_PAGE = 'zerogravity.filesystem.before_create_page';
+    public const BEFORE_PAGE_CREATE = 'zerogravity.filesystem.before_page_create';
 
     /**
      * @var Directory

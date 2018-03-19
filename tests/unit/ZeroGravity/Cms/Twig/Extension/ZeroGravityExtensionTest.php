@@ -24,8 +24,8 @@ class ZeroGravityExtensionTest extends BaseUnit
 
     public function getExtensions()
     {
-        $parser = $this->getValidPagesFilesystemParser();
-        $repository = new ContentRepository($parser, new ArrayCache(), false);
+        $mapper = $this->getValidPagesFilesystemMapper();
+        $repository = new ContentRepository($mapper, new ArrayCache(), false);
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [

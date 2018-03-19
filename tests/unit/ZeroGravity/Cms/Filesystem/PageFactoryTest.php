@@ -9,8 +9,8 @@ use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
-use ZeroGravity\Cms\Filesystem\Event\AfterCreatePage;
-use ZeroGravity\Cms\Filesystem\Event\BeforeCreatePage;
+use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
+use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 use ZeroGravity\Cms\Filesystem\PageFactory;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 
@@ -173,7 +173,7 @@ class PageFactoryTest extends BaseUnit
         $run = 0;
 
         $beforeCreatePageCallback = function ($argument) {
-            if (!$argument instanceof BeforeCreatePage) {
+            if (!$argument instanceof BeforePageCreate) {
                 return false;
             }
             if ('01.yaml_only' !== $argument->getDirectory()->getName()) {
@@ -191,12 +191,12 @@ class PageFactoryTest extends BaseUnit
 
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
-            ->with(BeforeCreatePage::BEFORE_CREATE_PAGE, $this->callback($beforeCreatePageCallback))
+            ->with(BeforePageCreate::BEFORE_PAGE_CREATE, $this->callback($beforeCreatePageCallback))
             ->willReturnArgument(1)
         ;
 
         $afterCreatePageCallback = function ($argument) {
-            if (!$argument instanceof AfterCreatePage) {
+            if (!$argument instanceof AfterPageCreate) {
                 return false;
             }
             if ('testtitle' !== $argument->getPage()->getTitle()) {
@@ -208,7 +208,7 @@ class PageFactoryTest extends BaseUnit
 
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
-            ->with(AfterCreatePage::AFTER_CREATE_PAGE, $this->callback($afterCreatePageCallback))
+            ->with(AfterPageCreate::AFTER_PAGE_CREATE, $this->callback($afterCreatePageCallback))
             ->willReturnArgument(1)
         ;
 
@@ -223,7 +223,7 @@ class PageFactoryTest extends BaseUnit
     public function settingsCanBeModifiedDuringBeforeCreatePage()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(BeforeCreatePage::BEFORE_CREATE_PAGE, function (BeforeCreatePage $event) {
+        $dispatcher->addListener(BeforePageCreate::BEFORE_PAGE_CREATE, function (BeforePageCreate $event) {
             $settings = $event->getSettings();
             $settings['extra']['very_custom_key'] = 'very custom value';
             $event->setSettings($settings);
@@ -244,7 +244,7 @@ class PageFactoryTest extends BaseUnit
     private function createParsedDirectoryFromPath(string $path)
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $directory = new Directory(new \SplFileInfo($path), $fileFactory);
+        $directory = new Directory(new \SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher());
 
         return $directory;
     }

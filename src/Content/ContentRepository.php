@@ -5,18 +5,19 @@ namespace ZeroGravity\Cms\Content;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Exception\ZeroGravityException;
 
 class ContentRepository
 {
     const ALL_PAGES_CACHE_KEY = 'all_pages';
 
     /**
-     * @var Page[]
+     * @var ReadablePage[]
      */
     protected $pages;
 
     /**
-     * @var Page[]
+     * @var ReadablePage[]
      */
     protected $pagesByPath;
 
@@ -31,20 +32,20 @@ class ContentRepository
     private $skipCache;
 
     /**
-     * @var StructureParser
+     * @var StructureMapper
      */
-    private $parser;
+    private $mapper;
 
     /**
      * This is the main repository handling page loading and caching.
      *
-     * @param StructureParser $parser
+     * @param StructureMapper $mapper
      * @param CacheInterface  $cache
      * @param bool            $skipCache
      */
-    public function __construct(StructureParser $parser, CacheInterface $cache, bool $skipCache)
+    public function __construct(StructureMapper $mapper, CacheInterface $cache, bool $skipCache)
     {
-        $this->parser = $parser;
+        $this->mapper = $mapper;
         $this->cache = $cache;
         $this->skipCache = $skipCache;
     }
@@ -60,11 +61,11 @@ class ContentRepository
     /**
      * Parse filesystem to get all page data.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     protected function loadFromParser()
     {
-        $pages = $this->parser->parse();
+        $pages = $this->mapper->parse();
 
         return $pages;
     }
@@ -111,7 +112,7 @@ class ContentRepository
     }
 
     /**
-     * @param Page[] $pages
+     * @param ReadablePage[] $pages
      */
     protected function flattenPages(array $pages)
     {
@@ -120,7 +121,7 @@ class ContentRepository
     }
 
     /**
-     * @param Page[] $pages
+     * @param ReadablePage[] $pages
      */
     protected function doFlattenPages(array $pages)
     {
@@ -133,7 +134,7 @@ class ContentRepository
     /**
      * Get pages as nested tree.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     public function getPageTree()
     {
@@ -145,7 +146,7 @@ class ContentRepository
     /**
      * Get all pages as flattened array, indexed by full path.
      *
-     * @return Page[]
+     * @return ReadablePage[]
      */
     public function getAllPages()
     {
@@ -157,9 +158,9 @@ class ContentRepository
     /**
      * @param string $path
      *
-     * @return null|Page
+     * @return null|ReadablePage
      */
-    public function getPage(string $path)
+    public function getPage(string $path): ? ReadablePage
     {
         $this->fetchPages();
         if (isset($this->pagesByPath[$path])) {
@@ -175,5 +176,41 @@ class ContentRepository
     public function getPageFinder()
     {
         return PageFinder::create()->inPageList($this->getPageTree());
+    }
+
+    /**
+     * Get writable instance of an existing page.
+     *
+     * @param ReadablePage $page
+     *
+     * @return WritablePage
+     */
+    public function getWritablePageInstance(ReadablePage $page): WritablePage
+    {
+        return $this->mapper->getWritablePageInstance($page);
+    }
+
+    /**
+     * Get new writable page instance.
+     *
+     * @param ReadablePage|null $parentPage
+     *
+     * @return WritablePage
+     */
+    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
+    {
+        return $this->mapper->getNewWritablePage($parentPage);
+    }
+
+    /**
+     * Store changes of the given page diff.
+     *
+     * @param PageDiff $diff
+     *
+     * @throws ZeroGravityException
+     */
+    public function saveChanges(PageDiff $diff)
+    {
+        $this->mapper->saveChanges($diff);
     }
 }

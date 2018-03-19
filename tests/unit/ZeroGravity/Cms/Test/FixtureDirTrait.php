@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
-use ZeroGravity\Cms\Filesystem\FilesystemParser;
+use ZeroGravity\Cms\Filesystem\FilesystemMapper;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 
@@ -54,14 +54,14 @@ trait FixtureDirTrait
     }
 
     /**
-     * @return FilesystemParser
+     * @return FilesystemMapper
      */
-    protected function getValidPagesFilesystemParser()
+    protected function getValidPagesFilesystemMapper()
     {
         $fileFactory = $this->getDefaultFileFactory();
         $path = $this->getValidPagesDir();
 
-        return new FilesystemParser($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
+        return new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
     }
 
     /**
@@ -79,8 +79,8 @@ trait FixtureDirTrait
     {
         $fileFactory = $this->getDefaultFileFactory();
         $basePath = $fileFactory->getBasePath();
-        $parser = new FilesystemParser($fileFactory, $basePath, false, [], new NullLogger(), new EventDispatcher());
+        $mapper = new FilesystemMapper($fileFactory, $basePath, false, [], new NullLogger(), new EventDispatcher());
 
-        return new ContentRepository($parser, new ArrayCache(), false);
+        return new ContentRepository($mapper, new ArrayCache(), false);
     }
 }

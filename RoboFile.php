@@ -107,6 +107,15 @@ class RoboFile extends \Robo\Tasks
     public function test()
     {
         $this->_execPhp('php ./vendor/bin/codecept run --coverage-xml --coverage-html --coverage-text', true);
+        $this->outputCoverage();
+    }
+
+    /**
+     * Write plain coverage line used for gitlab CI detecting the coverage score.
+     */
+    private function outputCoverage(): void
+    {
+        $this->writeln(file(__DIR__.'/tests/_output/coverage.txt')[8]);
     }
 
     /**
