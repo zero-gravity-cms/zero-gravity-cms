@@ -61,7 +61,7 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
         return new static(sprintf(
             'Cannot rename page "%s" to "%s" because a page with the same name already exists.',
             $diff->getOld()->getName(),
-            $diff->getNewName()
+            $diff->getNewFilesystemPath()
         ));
     }
 

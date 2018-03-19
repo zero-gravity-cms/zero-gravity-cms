@@ -418,6 +418,11 @@ class Directory
         return [];
     }
 
+    /**
+     * Save the given raw content to the filesystem.
+     *
+     * @param string|null $newRawContent
+     */
     public function saveContent(string $newRawContent = null): void
     {
         switch ($this->getContentStrategy()) {
@@ -431,6 +436,11 @@ class Directory
         }
     }
 
+    /**
+     * Save the given settings array to the filesystem.
+     *
+     * @param array $newSettings
+     */
     public function saveSettings(array $newSettings): void
     {
         // @TODO: extract default settings
@@ -448,14 +458,17 @@ class Directory
         }
     }
 
-    public function changeName(string $newName): void
+    /**
+     * Rename/move the directory to another path.
+     *
+     * @param string $newRealPath
+     */
+    public function renameOrMove(string $newRealPath): void
     {
-        $newPath = dirname($this->directoryInfo->getPathname()).'/'.$newName;
-
         $fs = new Filesystem();
-        $fs->rename($this->directoryInfo->getPathname(), $newPath, false);
+        $fs->rename($this->directoryInfo->getPathname(), $newRealPath, false);
 
-        $this->directoryInfo = new SplFileInfo($newPath);
+        $this->directoryInfo = new SplFileInfo($newRealPath);
         $this->parseFiles();
         $this->parseDirectories();
     }
@@ -492,12 +505,12 @@ class Directory
         $document = $this->getFrontYAMLDocument(false);
         if (is_array($document->getYAML())) {
             $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
-            $newRawContent = <<<EOF
+            $newRawContent = <<<FRONTMATTER
 ---
 $yamlContent
 ---
 $newRawContent
-EOF;
+FRONTMATTER;
         }
 
         file_put_contents($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
@@ -521,12 +534,12 @@ EOF;
         } elseif ($this->hasMarkdownFile()) {
             $file = $this->getMarkdownFile();
             $document = $this->getFrontYAMLDocument(false);
-            $newYaml = <<<EOF
+            $newYaml = <<<FRONTMATTER
 ---
 $newYaml
 ---
 {$document->getContent()}
-EOF;
+FRONTMATTER;
         } else {
             throw new \LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
         }

@@ -20,7 +20,7 @@ trait PageSettingsTrait
      * @param array  $settings
      * @param string $name
      */
-    private function applySettings(array $settings, string $name)
+    private function initSettings(array $settings, string $name)
     {
         $this->settings = new PageSettings($settings, $name);
     }

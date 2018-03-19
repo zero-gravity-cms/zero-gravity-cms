@@ -12,6 +12,11 @@ interface WritablePage extends ReadablePage
     public function setName(string $name): void;
 
     /**
+     * @param ReadablePage|null $parent
+     */
+    public function setParent(ReadablePage $parent = null): void;
+
+    /**
      * Get raw (un-processed) markdown content.
      *
      * @return string|null

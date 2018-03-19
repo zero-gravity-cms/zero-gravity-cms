@@ -3,12 +3,12 @@
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;
-use ZeroGravity\Cms\Content\Meta\PageFiles;
 use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
 use ZeroGravity\Cms\Path\Path;
 
 class Page implements ReadablePage
 {
+    use PageFilesTrait;
     use PageSettingsTrait;
 
     const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
@@ -22,6 +22,11 @@ class Page implements ReadablePage
     protected $name;
 
     /**
+     * @var Page
+     */
+    private $parent;
+
+    /**
      * @var string
      */
     private $content;
@@ -30,16 +35,6 @@ class Page implements ReadablePage
      * @var Page[]
      */
     private $children = [];
-
-    /**
-     * @var Page
-     */
-    private $parent;
-
-    /**
-     * @var PageFiles
-     */
-    private $files;
 
     /**
      * @var Path
@@ -61,19 +56,37 @@ class Page implements ReadablePage
     public function __construct(string $name, array $settings = [], self $parent = null)
     {
         $this->name = $name;
-        $this->parent = $parent;
-        $this->applySettings($settings, $name);
+        $this->initSettings($settings, $name);
+        $this->initParent($parent);
         $this->init();
     }
 
-    private function init()
+    protected function init()
     {
+        $this->setFiles([]);
+    }
+
+    /**
+     * Set parent page and initialize all dependent values.
+     *
+     * @param ReadablePage|null $parent
+     */
+    protected function initParent(ReadablePage $parent = null): void
+    {
+        $this->parent = $parent;
         $this->buildFilesystemPath();
         $this->buildPath();
-        $this->setFiles([]);
         if (null !== $this->parent) {
             $this->parent->addChild($this);
         }
+    }
+
+    /**
+     * @return Page|null
+     */
+    public function getParent(): ? ReadablePage
+    {
+        return $this->parent;
     }
 
     /**
@@ -93,95 +106,11 @@ class Page implements ReadablePage
     }
 
     /**
-     * @param File[] $files
-     */
-    public function setFiles(array $files): void
-    {
-        $this->files = new PageFiles($files, $this->getSetting('file_aliases'));
-    }
-
-    /**
-     * @return File[]
-     */
-    public function getFiles(): array
-    {
-        return $this->files->toArray();
-    }
-
-    /**
-     * @param string $filename
-     *
-     * @return null|File
-     */
-    public function getFile(string $filename): ? File
-    {
-        return $this->files->get($filename);
-    }
-
-    /**
-     * Get names/aliases for all available image files.
-     *
-     * @return File[]
-     */
-    public function getImages(): array
-    {
-        return $this->files->getImages();
-    }
-
-    /**
-     * Get names/aliases and paths for all available document files.
-     *
-     * @return File[]
-     */
-    public function getDocuments(): array
-    {
-        return $this->files->getDocuments();
-    }
-
-    /**
-     * Get path to single markdown file if available.
-     *
-     * @return File|null
-     */
-    public function getMarkdownFile(): ? File
-    {
-        return $this->files->getMarkdownFile();
-    }
-
-    /**
-     * Get path to single YAML file if available.
-     *
-     * @return File|null
-     */
-    public function getYamlFile(): ? File
-    {
-        return $this->files->getYamlFile();
-    }
-
-    /**
-     * Get path to single Twig file if available.
-     *
-     * @return File|null
-     */
-    public function getTwigFile(): ? File
-    {
-        return $this->files->getTwigFile();
-    }
-
-    /**
      * @return Path
      */
     public function getPath(): Path
     {
         return $this->path;
-    }
-
-    /**
-     * @return Page|null
-     */
-    public function getParent(): ? ReadablePage
-    {
-        return $this->parent;
     }
 
     /**
@@ -224,7 +153,10 @@ class Page implements ReadablePage
         return count($this->children) > 0;
     }
 
-    private function buildPath(): void
+    /**
+     * Build the URL path. This needs to be triggered when the name, slug or parent is changed.
+     */
+    protected function buildPath(): void
     {
         if (null === $this->parent) {
             $this->path = new Path('/'.$this->getSlug());
@@ -233,7 +165,10 @@ class Page implements ReadablePage
         }
     }
 
-    private function buildFilesystemPath(): void
+    /**
+     * Build the URL path. This needs to be triggered when the name or parent is changed.
+     */
+    protected function buildFilesystemPath(): void
     {
         if (null === $this->parent) {
             $this->filesystemPath = new Path('/'.$this->getName());

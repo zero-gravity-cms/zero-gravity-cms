@@ -165,8 +165,8 @@ class FilesystemMapper implements StructureMapper
         if ($diff->settingsHaveChanged()) {
             $directory->saveSettings($diff->getNewSettings());
         }
-        if (!$isNew && $diff->nameHasChanged()) {
-            $directory->changeName($diff->getNewName());
+        if (!$isNew && $diff->filesystemPathHasChanged()) {
+            $directory->renameOrMove($this->path.$diff->getNewFilesystemPath());
         }
     }
 
@@ -180,7 +180,7 @@ class FilesystemMapper implements StructureMapper
         if (!$diff->containsInstancesOf(WritableFilesystemPage::class)) {
             $this->logAndThrow(FilesystemException::unsupportedWritablePageClass($diff));
         }
-        if ($diff->nameHasChanged() && $this->newNameAlreadyExists($diff)) {
+        if ($diff->filesystemPathHasChanged() && $this->newFilesystemPathAlreadyExists($diff)) {
             $this->logAndThrow(StructureException::newPageNameAlreadyExists($diff));
         }
     }
@@ -190,17 +190,9 @@ class FilesystemMapper implements StructureMapper
      *
      * @return bool
      */
-    private function newNameAlreadyExists(PageDiff $diff): bool
+    private function newFilesystemPathAlreadyExists(PageDiff $diff): bool
     {
-        /* @var $newPage WritableFilesystemPage */
-        $newPage = $diff->getNew();
-        if (null !== $newPage->getParent()) {
-            $parentPath = $this->path.'/'.$newPage->getParent()->getFilesystemPath();
-        } else {
-            $parentPath = $this->path;
-        }
-
-        return is_dir($parentPath.'/'.$diff->getNewName());
+        return is_dir($this->path.$diff->getNew()->getFilesystemPath()->toString());
     }
 
     /**
@@ -222,17 +214,12 @@ class FilesystemMapper implements StructureMapper
      */
     private function createDirectoryForNewPage(PageDiff $diff): Directory
     {
-        $newPage = $diff->getNew();
-        if (null !== $newPage->getParent()) {
-            $parentDir = $newPage->getParent()->getFilesystemPath();
-        } else {
-            $parentDir = '';
-        }
-        $path = $this->path.$parentDir.'/'.$diff->getNewName();
+        $realPath = $this->path.$diff->getNewFilesystemPath();
+        $parentPath = $diff->getNew()->getParent() ? $diff->getNew()->getParent()->getFilesystemPath() : '';
 
         $fs = new Filesystem();
-        $fs->mkdir($path);
-        $directory = new Directory(new SplFileInfo($path), $this->fileFactory, $parentDir);
+        $fs->mkdir($realPath);
+        $directory = new Directory(new SplFileInfo($realPath), $this->fileFactory, $parentPath);
 
         return $directory;
     }

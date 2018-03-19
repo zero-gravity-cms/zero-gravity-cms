@@ -19,6 +19,16 @@ trait BasicWritablePageTrait
     public function setName(string $name): void
     {
         $this->name = $name;
+        $this->buildPath();
+        $this->buildFilesystemPath();
+    }
+
+    /**
+     * @param ReadablePage|null $parent
+     */
+    public function setParent(ReadablePage $parent = null): void
+    {
+        $this->initParent($parent);
     }
 
     /**
@@ -49,5 +59,6 @@ trait BasicWritablePageTrait
     public function setSettings(array $settings): void
     {
         $this->settings = new PageSettings($settings, $this->getName());
+        $this->buildPath();
     }
 }

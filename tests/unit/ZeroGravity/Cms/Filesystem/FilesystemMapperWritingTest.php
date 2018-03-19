@@ -281,15 +281,17 @@ class FilesystemMapperWritingTest extends BaseUnit
     /**
      * @test
      */
-    public function pageCanBeMoved()
+    public function pageCanBeMovedToAnotherParent()
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/with_children'];
+        $newParent = $pages['/twig_only'];
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
-        $newPage->setName('04.still_with_children');
+        $newPage->setName('moved_but_still_with_children');
+        $newPage->setParent($newParent);
 
         $diff = new PageDiff($oldPage, $newPage);
 
@@ -297,9 +299,11 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
 
         $this->assertArrayNotHasKey('/with_children', $pages);
-        $this->assertArrayHasKey('/still_with_children', $pages);
 
-        $page = $pages['/still_with_children'];
+        $parent = $pages['/twig_only'];
+        $this->assertArrayHasKey('/twig_only/moved_but_still_with_children', $parent->getChildren()->toArray());
+
+        $page = $parent->getChildren()->toArray()['/twig_only/moved_but_still_with_children'];
         $this->assertCount(2, $page->getChildren());
     }
 

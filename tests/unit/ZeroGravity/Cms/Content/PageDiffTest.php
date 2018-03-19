@@ -27,15 +27,23 @@ class PageDiffTest extends BaseUnit
 
         $diff = new PageDiff($oldPage, $newPage);
 
-        $this->assertFalse($diff->nameHasChanged());
+        $this->assertFalse($diff->filesystemPathHasChanged());
         $this->assertFalse($diff->contentHasChanged());
         $this->assertFalse($diff->settingsHaveChanged());
 
         $this->assertSame($newPage, $diff->getNew());
 
         $newPage->setName('foo');
-        $this->assertTrue($diff->nameHasChanged());
-        $this->assertSame('foo', $diff->getNewName());
+        $this->assertTrue($diff->filesystemPathHasChanged());
+        $this->assertSame('/foo', $diff->getNewFilesystemPath());
+
+        $newPage->setName('page');
+        $this->assertFalse($diff->filesystemPathHasChanged());
+
+        $newParent = new Page('some-path');
+        $newPage->setParent($newParent);
+        $this->assertTrue($diff->filesystemPathHasChanged());
+        $this->assertSame('/some-path/page', $diff->getNewFilesystemPath());
 
         $newPage->setContentRaw('test');
         $this->assertTrue($diff->contentHasChanged());

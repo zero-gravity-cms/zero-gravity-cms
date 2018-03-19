@@ -43,17 +43,17 @@ class PageDiff
     /**
      * @return bool
      */
-    public function nameHasChanged(): bool
+    public function filesystemPathHasChanged(): bool
     {
-        return $this->old->getName() !== $this->new->getName();
+        return $this->old->getFilesystemPath()->toString() !== $this->new->getFilesystemPath()->toString();
     }
 
     /**
      * @return string
      */
-    public function getNewName(): string
+    public function getNewFilesystemPath(): string
     {
-        return $this->new->getName();
+        return $this->new->getFilesystemPath();
     }
 
     /**
