@@ -15,6 +15,9 @@ use ZeroGravity\Cms\Content\WritablePage;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
+use ZeroGravity\Cms\Filesystem\Event\AfterPageSave;
+use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
+use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
 class FilesystemMapper implements StructureMapper
 {
@@ -91,7 +94,7 @@ class FilesystemMapper implements StructureMapper
         $this->checkPath();
 
         $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
-        $directory = new Directory(new SplFileInfo($this->path), $this->fileFactory);
+        $directory = $this->createDirectory($this->path);
 
         $pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
         $pages = [];
@@ -149,7 +152,17 @@ class FilesystemMapper implements StructureMapper
      */
     public function saveChanges(PageDiff $diff): void
     {
+        $this->eventDispatcher->dispatch(
+            BeforePageSaveValidate::BEFORE_PAGE_SAVE_VALIDATE,
+            new BeforePageSaveValidate($diff)
+        );
+
         $this->validateDiff($diff);
+
+        $this->eventDispatcher->dispatch(
+            BeforePageSave::BEFORE_PAGE_SAVE,
+            new BeforePageSave($diff)
+        );
 
         /* @var $directory Directory */
         $directory = $diff->getNew()->getDirectory();
@@ -168,6 +181,11 @@ class FilesystemMapper implements StructureMapper
         if (!$isNew && $diff->filesystemPathHasChanged()) {
             $directory->renameOrMove($this->path.$diff->getNewFilesystemPath());
         }
+
+        $this->eventDispatcher->dispatch(
+            AfterPageSave::AFTER_PAGE_SAVE,
+            new AfterPageSave($diff)
+        );
     }
 
     /**
@@ -219,7 +237,7 @@ class FilesystemMapper implements StructureMapper
 
         $fs = new Filesystem();
         $fs->mkdir($realPath);
-        $directory = new Directory(new SplFileInfo($realPath), $this->fileFactory, $parentPath);
+        $directory = $this->createDirectory($realPath, $parentPath);
 
         return $directory;
     }
@@ -243,5 +261,24 @@ class FilesystemMapper implements StructureMapper
         }
 
         return $settings;
+    }
+
+    /**
+     * @param string      $path
+     * @param string|null $parentPath
+     *
+     * @return Directory
+     */
+    private function createDirectory(string $path, string $parentPath = null): Directory
+    {
+        $directory = new Directory(
+            new SplFileInfo($path),
+            $this->fileFactory,
+            $this->logger,
+            $this->eventDispatcher,
+            $parentPath
+        );
+
+        return $directory;
     }
 }

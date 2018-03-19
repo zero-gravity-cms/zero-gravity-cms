@@ -4,7 +4,9 @@ namespace ZeroGravity\Cms\Filesystem;
 
 use Mni\FrontYAML\Document;
 use Mni\FrontYAML\Parser as FrontYAMLParser;
+use Psr\Log\LoggerInterface;
 use SplFileInfo;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
@@ -13,6 +15,8 @@ use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Exception\StructureException;
+use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
+use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
 class Directory
 {
@@ -72,6 +76,16 @@ class Directory
     private $directories;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @param SplFileInfo $directoryInfo
      * @param FileFactory $fileFactory
      * @param string|null $parentPath
@@ -79,10 +93,14 @@ class Directory
     public function __construct(
         SplFileInfo $directoryInfo,
         FileFactory $fileFactory,
+        LoggerInterface $logger,
+        EventDispatcherInterface $eventDispatcher,
         string $parentPath = null
     ) {
         $this->directoryInfo = $directoryInfo;
         $this->fileFactory = $fileFactory;
+        $this->logger = $logger;
+        $this->eventDispatcher = $eventDispatcher;
         $this->parentPath = $parentPath;
         $this->parseFiles();
         $this->parseDirectories();
@@ -93,6 +111,7 @@ class Directory
      */
     private function parseFiles()
     {
+        $this->logger->debug("Scanning directory {$this->getPath()} for files");
         $fileFinder = Finder::create()
             ->files()
             ->depth(0)
@@ -116,6 +135,7 @@ class Directory
      */
     private function parseDirectories()
     {
+        $this->logger->debug("Scanning directory {$this->getPath()} for sub directories");
         $subDirectoryFinder = Finder::create()
             ->directories()
             ->depth(0)
@@ -131,6 +151,8 @@ class Directory
             $this->directories[$directoryInfo->getFilename()] = new self(
                 $directoryInfo,
                 $this->fileFactory,
+                $this->logger,
+                $this->eventDispatcher,
                 $this->getPath()
             );
         }
@@ -464,8 +486,9 @@ class Directory
      */
     public function renameOrMove(string $newRealPath): void
     {
+        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to $newRealPath");
         $fs = new Filesystem();
-        $fs->rename($this->directoryInfo->getPathname(), $newRealPath, false);
+        $fs->rename($this->getFilesystemPathname(), $newRealPath, false);
 
         $this->directoryInfo = new SplFileInfo($newRealPath);
         $this->parseFiles();
@@ -501,6 +524,7 @@ class Directory
 
     private function updateMarkdown($newRawContent)
     {
+        $this->logger->debug("Updating markdown file in directory {$this->getPath()}");
         $document = $this->getFrontYAMLDocument(false);
         if (is_array($document->getYAML())) {
             $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
@@ -517,6 +541,7 @@ FRONTMATTER;
 
     private function createMarkdown($newRawContent)
     {
+        $this->logger->debug("Creating new markdown file in directory {$this->getPath()}");
         $path = sprintf('%s/%s.md',
             $this->directoryInfo->getPathname(),
             $this->getDefaultBasename()
@@ -528,6 +553,7 @@ FRONTMATTER;
 
     private function updateYaml($newYaml)
     {
+        $this->logger->debug("Updating YAML config in directory {$this->getPath()}");
         if ($this->hasYamlFile()) {
             $file = $this->getYamlFile();
         } elseif ($this->hasMarkdownFile()) {
@@ -548,6 +574,7 @@ FRONTMATTER;
 
     private function createYaml($newYaml)
     {
+        $this->logger->debug("Creating new YAML config in directory {$this->getPath()}");
         $path = sprintf('%s/%s.yaml',
             $this->directoryInfo->getPathname(),
             $this->getDefaultBasename()
@@ -569,8 +596,21 @@ FRONTMATTER;
         return $yamlContent;
     }
 
-    private function writeFile(string $path, string $content)
+    private function writeFile(string $realPath, string $content)
     {
-        file_put_contents($path, $content);
+        /* @var $handledEvent BeforeFileWrite */
+        $handledEvent = $this->eventDispatcher->dispatch(
+            BeforeFileWrite::BEFORE_FILE_WRITE,
+            new BeforeFileWrite($realPath, $content, $this)
+        );
+        $content = $handledEvent->getContent();
+
+        $this->logger->info("Writing to file {$realPath} for directory {$this->getPath()}");
+        file_put_contents($realPath, $content);
+
+        $this->eventDispatcher->dispatch(
+            AfterFileWrite::AFTER_FILE_WRITE,
+            new AfterFileWrite($realPath, $content, $this)
+        );
     }
 }

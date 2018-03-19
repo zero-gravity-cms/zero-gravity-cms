@@ -5,8 +5,8 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\Page;
-use ZeroGravity\Cms\Filesystem\Event\AfterCreatePage;
-use ZeroGravity\Cms\Filesystem\Event\BeforeCreatePage;
+use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
+use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
 class PageFactory
 {
@@ -58,10 +58,10 @@ class PageFactory
         }
         $settings = $this->buildPageSettings($defaultSettings, $directory, $parentPage);
 
-        /* @var $handledBeforeCreatePage BeforeCreatePage */
+        /* @var $handledBeforeCreatePage BeforePageCreate */
         $handledBeforeCreatePage = $this->eventDispatcher->dispatch(
-            BeforeCreatePage::BEFORE_CREATE_PAGE,
-            new BeforeCreatePage($directory, $settings, $parentPage)
+            BeforePageCreate::BEFORE_PAGE_CREATE,
+            new BeforePageCreate($directory, $settings, $parentPage)
         );
         $page = new Page($directory->getName(), $handledBeforeCreatePage->getSettings(), $parentPage);
         $page->setContent($directory->fetchPageContent($convertMarkdown));
@@ -77,8 +77,8 @@ class PageFactory
         }
         $page->setFiles($files);
         $this->eventDispatcher->dispatch(
-            AfterCreatePage::AFTER_CREATE_PAGE,
-            new AfterCreatePage($page)
+            AfterPageCreate::AFTER_PAGE_CREATE,
+            new AfterPageCreate($page)
         );
 
         return $page;
