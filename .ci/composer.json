@@ -1,6 +1,6 @@
 {
     "require": {
-        "c33s-toolkit/robo-file": "^0.3.0",
+        "c33s-toolkit/robo-file": "^0.4.0",
         "yzalis/identicon": "^1.2"
     }
 }

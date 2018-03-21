@@ -104,25 +104,27 @@ class PageSettings
     private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'child_defaults' => [],
+            'content_template' => null,
+            'content_type' => 'page',
             'controller' => null,
+            'date' => null,
             'extra' => [],
             'file_aliases' => [],
-            'modular' => false,
-            'module' => false,
-            'visible' => false,
+            'layout_template' => null,
+            'locale' => null,
+            'locales' => [],
             'menu_id' => 'zero-gravity',
             'menu_label' => null,
-            'date' => null,
+            'modular' => false,
+            'module' => false,
             'publish' => true,
             'publish_date' => null,
-            'unpublish_date' => null,
             'slug' => $this->pageName,
-            'layout_template' => null,
-            'content_template' => null,
-            'title' => null,
             'taxonomy' => [],
-            'content_type' => 'page',
-            'child_defaults' => [],
+            'title' => null,
+            'unpublish_date' => null,
+            'visible' => false,
         ]);
     }
 
@@ -131,22 +133,24 @@ class PageSettings
      */
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
-        $resolver->setAllowedTypes('extra', ['null', 'array']);
         $resolver->setAllowedTypes('child_defaults', ['null', 'array']);
-        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
-        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
-        $resolver->setAllowedTypes('visible', 'bool');
-        $resolver->setAllowedTypes('modular', 'bool');
-        $resolver->setAllowedTypes('module', 'bool');
-        $resolver->setAllowedTypes('title', ['null', 'string']);
-        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_type', 'string');
+        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
+        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
+        $resolver->setAllowedTypes('locale', ['null', 'string']);
+        $resolver->setAllowedTypes('locales', 'array');
+        $resolver->setAllowedTypes('modular', 'bool');
+        $resolver->setAllowedTypes('module', 'bool');
+        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
+        $resolver->setAllowedTypes('title', ['null', 'string']);
+        $resolver->setAllowedTypes('visible', 'bool');
 
         $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
+        $resolver->setAllowedTypes('date', $dateTypes);
         $resolver->setAllowedTypes('publish_date', $dateTypes);
         $resolver->setAllowedTypes('unpublish_date', $dateTypes);
-        $resolver->setAllowedTypes('date', $dateTypes);
     }
 
     /**
@@ -234,8 +238,8 @@ class PageSettings
 
             return $value;
         };
-        $resolver->setNormalizer('extra', $normalizeArray);
         $resolver->setNormalizer('child_defaults', $normalizeArray);
+        $resolver->setNormalizer('extra', $normalizeArray);
         $resolver->setNormalizer('file_aliases', $normalizeArray);
     }
 }
