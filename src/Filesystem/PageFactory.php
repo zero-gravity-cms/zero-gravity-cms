@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
@@ -19,6 +20,11 @@ class PageFactory
      * @var LoggerInterface
      */
     private $logger;
+
+    /**
+     * @var Directory[]
+     */
+    private $directories = [];
 
     /**
      * @param LoggerInterface          $logger
@@ -80,6 +86,7 @@ class PageFactory
             AfterPageCreate::AFTER_PAGE_CREATE,
             new AfterPageCreate($page)
         );
+        $this->directories[$page->getPath()->toString()] = $directory;
 
         return $page;
     }
@@ -138,5 +145,21 @@ class PageFactory
         }
 
         return $settings;
+    }
+
+    /**
+     * Get the directory for a previously created page instance.
+     *
+     * @param Page $page
+     *
+     * @return Directory
+     */
+    public function getDirectory(Page $page): Directory
+    {
+        if (!isset($this->directories[$page->getPath()->toString()])) {
+            throw FilesystemException::cannotFindDirectoryForPage($page);
+        }
+
+        return $this->directories[$page->getPath()->toString()];
     }
 }

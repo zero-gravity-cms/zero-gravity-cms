@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Exception;
 
 use RuntimeException;
+use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
 
@@ -31,6 +32,19 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
             WritableFilesystemPage::class,
             get_class($diff->getOld()),
             get_class($diff->getNew())
+        ));
+    }
+
+    /**
+     * @param Page $page
+     *
+     * @return static
+     */
+    public static function cannotFindDirectoryForPage(Page $page)
+    {
+        return new static(sprintf(
+            'Cannot find directory for Page instance with path "%s".',
+            $page->getPath()->toString()
         ));
     }
 }

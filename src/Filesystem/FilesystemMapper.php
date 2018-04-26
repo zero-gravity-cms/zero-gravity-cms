@@ -52,9 +52,9 @@ class FilesystemMapper implements StructureMapper
     private $eventDispatcher;
 
     /**
-     * @var Directory[]
+     * @var PageFactory
      */
-    private $directories;
+    private $pageFactory;
 
     /**
      * FilesystemMapper constructor.
@@ -80,6 +80,8 @@ class FilesystemMapper implements StructureMapper
         $this->defaultPageSettings = $defaultPageSettings;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
+
+        $this->pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
     }
 
     /**
@@ -96,15 +98,12 @@ class FilesystemMapper implements StructureMapper
         $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
         $directory = $this->createDirectory($this->path);
 
-        $pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
         $pages = [];
-        $this->directories = [];
         foreach ($directory->getDirectories() as $subDir) {
-            $page = $pageFactory->createPage($subDir, $this->convertMarkdown, $this->defaultPageSettings);
+            $page = $this->pageFactory->createPage($subDir, $this->convertMarkdown, $this->defaultPageSettings);
 
             if (null !== $page) {
                 $pages[$page->getPath()->toString()] = $page;
-                $this->directories[$page->getPath()->toString()] = $subDir;
             }
         }
 
@@ -130,7 +129,7 @@ class FilesystemMapper implements StructureMapper
      */
     public function getWritablePageInstance(ReadablePage $page): WritablePage
     {
-        return new WritableFilesystemPage($page, $this->directories[$page->getPath()->toString()]);
+        return new WritableFilesystemPage($page, $this->pageFactory->getDirectory($page));
     }
 
     /**
