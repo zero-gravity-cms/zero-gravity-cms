@@ -10,6 +10,7 @@ use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 class ZeroGravityExtension extends Twig_Extension
@@ -40,6 +41,7 @@ class ZeroGravityExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFilter('zg_filter', [$this, 'filterPages']),
+            new Twig_SimpleFilter('zg_page_hash', [$this, 'getPageHash']),
             new Twig_SimpleFilter(
                 'zg_render_content',
                 [$this, 'renderPageContent'],
@@ -62,6 +64,7 @@ class ZeroGravityExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFunction('zg_page', [$this, 'getPage']),
+            new Twig_SimpleFunction('zg_page_hash', [$this, 'getPageHash']),
             new Twig_SimpleFunction('zg_current_page', [$this, 'getCurrentPage']),
             new Twig_SimpleFunction('zg_filter', [$this, 'filterAllPages']),
             new Twig_SimpleFunction(
@@ -120,6 +123,20 @@ class ZeroGravityExtension extends Twig_Extension
         $pageFinder = $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
 
         return $pageFinder;
+    }
+
+    /**
+     * @param ReadablePage $page
+     *
+     * @return string
+     */
+    public function getPageHash(ReadablePage $page = null): string
+    {
+        if (null === $page) {
+            return 'page_'.md5('');
+        }
+
+        return 'page_'.md5($page->getPath()->toString());
     }
 
     /**

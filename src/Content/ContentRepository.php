@@ -127,12 +127,12 @@ class ContentRepository
     {
         foreach ($pages as $page) {
             $this->pagesByPath[$page->getPath()->toString()] = $page;
-            $this->doFlattenPages($page->getChildren()->toArray());
+            $this->doFlattenPages($page->getChildren()->published(null)->toArray());
         }
     }
 
     /**
-     * Get pages as nested tree.
+     * Get pages as nested tree. This will include unpublished pages.
      *
      * @return ReadablePage[]
      */
@@ -144,7 +144,7 @@ class ContentRepository
     }
 
     /**
-     * Get all pages as flattened array, indexed by full path.
+     * Get all pages as flattened array, indexed by full path. This will include unpublished pages.
      *
      * @return ReadablePage[]
      */
@@ -171,6 +171,8 @@ class ContentRepository
     }
 
     /**
+     * Get a PageFinder instance covering the full page tree, excluding unpublished pages by default.
+     *
      * @return PageFinder
      */
     public function getPageFinder()

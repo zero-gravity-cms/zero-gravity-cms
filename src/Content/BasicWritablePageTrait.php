@@ -48,7 +48,7 @@ trait BasicWritablePageTrait
      */
     public function setContentRaw(string $contentRaw = null): void
     {
-        $this->contentRaw = $contentRaw;
+        $this->contentRaw = str_replace("\r\n", "\n", $contentRaw);
     }
 
     /**
