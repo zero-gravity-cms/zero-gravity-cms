@@ -9,6 +9,9 @@ use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 use ZeroGravity\Cms\Content\Page;
 
+/**
+ * @group page
+ */
 class PageTest extends BaseUnit
 {
     public function _before()
@@ -196,6 +199,39 @@ class PageTest extends BaseUnit
             '/page/child1' => $child1,
             '/page/child2' => $child2,
         ], $parent->getChildren()->toArray());
+    }
+
+    /**
+     * @test
+     */
+    public function childrenAreRestrictedToOneLevelByDefault()
+    {
+        $parent = new Page('page');
+        $child1 = new Page('child1', [], $parent);
+        $child2 = new Page('child2', [], $parent);
+        $child3 = new Page('child3', [], $child2);
+
+        $this->assertSame([
+            '/page/child1' => $child1,
+            '/page/child2' => $child2,
+        ], $parent->getChildren()->toArray());
+    }
+
+    /**
+     * @test
+     */
+    public function childrenFinderCanBeExtendedToDeeperLevel()
+    {
+        $parent = new Page('page');
+        $child1 = new Page('child1', [], $parent);
+        $child2 = new Page('child2', [], $parent);
+        $child3 = new Page('child3', [], $child2);
+
+        $this->assertSame([
+            '/page/child1' => $child1,
+            '/page/child2' => $child2,
+            '/page/child2/child3' => $child3,
+        ], $parent->getChildren()->depth('< 2')->toArray());
     }
 
     /**

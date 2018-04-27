@@ -142,7 +142,7 @@ class Page implements ReadablePage
      */
     public function getChildren(): PageFinder
     {
-        return PageFinder::create()->inPageList($this->children);
+        return PageFinder::create()->inPageList($this->children)->depth(0);
     }
 
     /**
