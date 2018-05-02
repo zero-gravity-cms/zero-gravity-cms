@@ -47,6 +47,16 @@ trait PageSettingsTrait
     }
 
     /**
+     * Check if this page has a custom slug that does not match its name.
+     *
+     * @return bool
+     */
+    public function hasCustomSlug(): bool
+    {
+        return array_key_exists('slug', $this->getNonDefaultSettings());
+    }
+
+    /**
      * @return string
      */
     public function getTitle(): string

@@ -83,6 +83,13 @@ interface ReadablePage
     public function getSlug(): string;
 
     /**
+     * Check if this page has a custom slug that does not match its name.
+     *
+     * @return bool
+     */
+    public function hasCustomSlug(): bool;
+
+    /**
      * @return string
      */
     public function getTitle(): string;
