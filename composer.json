@@ -10,7 +10,7 @@
     "require": {
         "symfony-cmf/routing-bundle": "^2.0",
         "liip/imagine-bundle": "^1.8.0|^2.0",
-        "symfony/finder": "^3.3",
+        "symfony/finder": "^v3.4.36",
         "php": ">=7.1",
         "mnapoli/front-yaml": "^1.5",
         "cocur/slugify": "^2.5|^3.0",
