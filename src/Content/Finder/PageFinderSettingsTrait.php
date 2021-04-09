@@ -50,7 +50,6 @@ trait PageFinderSettingsTrait
      * $finder->extra('my_extra', 'value')
      *
      * @param string $name
-     * @param mixed  $value
      * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
      *
      * @return $this
@@ -70,7 +69,6 @@ trait PageFinderSettingsTrait
      * $finder->notExtra('my_extra', 'value')
      *
      * @param string $name
-     * @param mixed  $value
      * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
      *
      * @return $this
@@ -90,7 +88,6 @@ trait PageFinderSettingsTrait
      * $finder->setting('my_setting', 'value')
      *
      * @param string $name
-     * @param mixed  $value
      *
      * @return $this
      */
@@ -107,7 +104,6 @@ trait PageFinderSettingsTrait
      * $finder->notSetting('my_setting', 'value')
      *
      * @param string $name
-     * @param mixed  $value
      *
      * @return $this
      */
@@ -232,11 +228,6 @@ trait PageFinderSettingsTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applySlugsIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->slugs) || !empty($this->notSlugs)) {
@@ -246,11 +237,6 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyTitlesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->titles) || !empty($this->notTitles)) {
@@ -260,11 +246,6 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyExtrasIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->extras) || !empty($this->notExtras)) {
@@ -274,11 +255,6 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applySettingsIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->settings) || !empty($this->notSettings)) {
@@ -288,11 +264,6 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyContentTypesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
@@ -302,11 +273,6 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyDatesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->dates)) {

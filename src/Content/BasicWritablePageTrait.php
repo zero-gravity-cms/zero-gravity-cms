@@ -13,8 +13,6 @@ trait BasicWritablePageTrait
 
     /**
      * Set page name.
-     *
-     * @param string $name
      */
     public function setName(string $name): void
     {
@@ -23,9 +21,6 @@ trait BasicWritablePageTrait
         $this->buildFilesystemPath();
     }
 
-    /**
-     * @param ReadablePage|null $parent
-     */
     public function setParent(ReadablePage $parent = null): void
     {
         $this->initParent($parent);
@@ -33,8 +28,6 @@ trait BasicWritablePageTrait
 
     /**
      * Get raw (un-processed) markdown content.
-     *
-     * @return string|null
      */
     public function getContentRaw(): ? string
     {
@@ -43,8 +36,6 @@ trait BasicWritablePageTrait
 
     /**
      * Set raw (un-processed) markdown content.
-     *
-     * @param string|null $contentRaw
      */
     public function setContentRaw(string $contentRaw = null): void
     {
@@ -53,8 +44,6 @@ trait BasicWritablePageTrait
 
     /**
      * Set page settings as plain array.
-     *
-     * @param array $settings
      */
     public function setSettings(array $settings): void
     {

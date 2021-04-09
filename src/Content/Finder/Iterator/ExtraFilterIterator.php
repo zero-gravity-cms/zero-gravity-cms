@@ -31,9 +31,7 @@ class ExtraFilterIterator extends \FilterIterator
     private $notExtras;
 
     /**
-     * @param \Iterator $iterator  The Iterator to filter
-     * @param array     $extras
-     * @param array     $notExtras
+     * @param \Iterator $iterator The Iterator to filter
      */
     public function __construct(\Iterator $iterator, array $extras, array $notExtras)
     {

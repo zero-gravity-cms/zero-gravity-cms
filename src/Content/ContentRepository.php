@@ -38,10 +38,6 @@ class ContentRepository
 
     /**
      * This is the main repository handling page loading and caching.
-     *
-     * @param StructureMapper $mapper
-     * @param CacheInterface  $cache
-     * @param bool            $skipCache
      */
     public function __construct(StructureMapper $mapper, CacheInterface $cache, bool $skipCache)
     {
@@ -84,8 +80,6 @@ class ContentRepository
 
     /**
      * Load pages from cache if applicable and actual cached pages exist.
-     *
-     * @return bool
      */
     protected function loadPagesFromCache(): bool
     {
@@ -155,11 +149,6 @@ class ContentRepository
         return $this->pagesByPath;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return null|ReadablePage
-     */
     public function getPage(string $path): ? ReadablePage
     {
         $this->fetchPages();
@@ -182,10 +171,6 @@ class ContentRepository
 
     /**
      * Get writable instance of an existing page.
-     *
-     * @param ReadablePage $page
-     *
-     * @return WritablePage
      */
     public function getWritablePageInstance(ReadablePage $page): WritablePage
     {
@@ -194,10 +179,6 @@ class ContentRepository
 
     /**
      * Get new writable page instance.
-     *
-     * @param ReadablePage|null $parentPage
-     *
-     * @return WritablePage
      */
     public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
     {
@@ -206,8 +187,6 @@ class ContentRepository
 
     /**
      * Store changes of the given page diff.
-     *
-     * @param PageDiff $diff
      *
      * @throws ZeroGravityException
      */

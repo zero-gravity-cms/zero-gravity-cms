@@ -6,8 +6,6 @@ use Knp\Menu\ItemInterface;
 
 class BeforeAddItem extends MenuEvent
 {
-    public const BEFORE_ADD_ITEM = 'zerogravity.before_add_item';
-
     /**
      * @var ItemInterface
      */
@@ -31,17 +29,11 @@ class BeforeAddItem extends MenuEvent
         $this->itemToBeAdded = $addedItem;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getParentItem(): ItemInterface
     {
         return $this->parentItem;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getItemToBeAdded(): ItemInterface
     {
         return $this->itemToBeAdded;

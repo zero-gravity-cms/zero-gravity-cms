@@ -11,9 +11,6 @@ final class FilterRegistry
      */
     private $filters;
 
-    /**
-     * @param PageFinderFilters $filters
-     */
     public function addFilters(PageFinderFilters $filters)
     {
         foreach ($filters->getFilters() as $filterName => $filter) {
@@ -39,21 +36,12 @@ final class FilterRegistry
 
     /**
      * @param $filter
-     *
-     * @return bool
      */
     private function isValidFilter($filter): bool
     {
         return is_callable($filter) || $filter instanceof PageFinderFilter;
     }
 
-    /**
-     * @param PageFinder $pageFinder
-     * @param string     $filterName
-     * @param array      $filterOptions
-     *
-     * @return PageFinder
-     */
     public function applyFilter(PageFinder $pageFinder, string $filterName, array $filterOptions): PageFinder
     {
         if (!isset($this->filters[$filterName])) {

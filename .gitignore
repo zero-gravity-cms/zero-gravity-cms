@@ -1,6 +1,6 @@
-/.ci/bin
-/.ci/cache
-/.ci/vendor
+/.robo/bin
+/.robo/cache
+/.robo/vendor
 /tests/_output
 /tests/_support/_generated
 /vendor/

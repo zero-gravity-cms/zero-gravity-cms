@@ -13,7 +13,7 @@ class FileFactoryTest extends BaseUnit
     /**
      * @test
      */
-    public function FilesystemResolverThrowsExceptionIfGivenBasePathIsInvalid()
+    public function filesystemResolverThrowsExceptionIfGivenBasePathIsInvalid()
     {
         $this->expectException(FilesystemException::class);
         new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->getPageFixtureDir().'/invalid_path');

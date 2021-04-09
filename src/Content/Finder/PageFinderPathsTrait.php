@@ -97,11 +97,6 @@ trait PageFinderPathsTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyPathsIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->paths) || !empty($this->notPaths)) {
@@ -111,11 +106,6 @@ trait PageFinderPathsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyFilesystemPathsIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->filesystemPaths) || !empty($this->notFilesystemPaths)) {

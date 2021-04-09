@@ -19,28 +19,16 @@ trait PageSettingsTrait
      */
     protected $settings;
 
-    /**
-     * @param array  $settings
-     * @param string $name
-     */
     private function initSettings(array $settings, string $name)
     {
         $this->settings = new PageSettings($settings, $name);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return mixed
-     */
     public function getSetting(string $name)
     {
         return $this->settings->get($name);
     }
 
-    /**
-     * @return string
-     */
     public function getSlug(): string
     {
         return (string) $this->getSetting('slug');
@@ -48,25 +36,17 @@ trait PageSettingsTrait
 
     /**
      * Check if this page has a custom slug that does not match its name.
-     *
-     * @return bool
      */
     public function hasCustomSlug(): bool
     {
         return array_key_exists('slug', $this->getNonDefaultSettings());
     }
 
-    /**
-     * @return string
-     */
     public function getTitle(): string
     {
         return (string) $this->getSetting('title');
     }
 
-    /**
-     * @return string
-     */
     public function getContentType(): string
     {
         return $this->getSetting('content_type');
@@ -74,8 +54,6 @@ trait PageSettingsTrait
 
     /**
      * Get all defined taxonomy keys and values.
-     *
-     * @return array
      */
     public function getTaxonomies(): array
     {
@@ -86,8 +64,6 @@ trait PageSettingsTrait
      * Get values for a single taxonomy key.
      *
      * @param string $name
-     *
-     * @return array
      */
     public function getTaxonomy($name): array
     {
@@ -99,33 +75,21 @@ trait PageSettingsTrait
         return [];
     }
 
-    /**
-     * @return array
-     */
     public function getTags(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_TAG);
     }
 
-    /**
-     * @return array
-     */
     public function getCategories(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_CATEGORY);
     }
 
-    /**
-     * @return array
-     */
     public function getAuthors(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_AUTHOR);
     }
 
-    /**
-     * @return array
-     */
     public function getSettings(): array
     {
         return $this->settings->toArray();
@@ -134,8 +98,6 @@ trait PageSettingsTrait
     /**
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
-     *
-     * @return array
      */
     public function getNonDefaultSettings(): array
     {
@@ -155,33 +117,22 @@ trait PageSettingsTrait
 
     /**
      * Get default setting values for child pages.
-     *
-     * @return array
      */
     public function getChildDefaults(): array
     {
         return $this->getSetting('child_defaults');
     }
 
-    /**
-     * @return array
-     */
     public function getExtraValues(): array
     {
         return (array) $this->getSetting('extra');
     }
 
-    /**
-     * @return string
-     */
     public function getMenuId(): string
     {
         return (string) $this->getSetting('menu_id');
     }
 
-    /**
-     * @return string
-     */
     public function getMenuLabel(): string
     {
         if (!empty($this->getSetting('menu_label'))) {
@@ -193,8 +144,6 @@ trait PageSettingsTrait
 
     /**
      * Page is listed in menus.
-     *
-     * @return bool
      */
     public function isVisible(): bool
     {
@@ -203,8 +152,6 @@ trait PageSettingsTrait
 
     /**
      * Page is considered a modular page, not a content page.
-     *
-     * @return bool
      */
     public function isModular(): bool
     {
@@ -213,8 +160,6 @@ trait PageSettingsTrait
 
     /**
      * Page is considered a modular snippet, not a standalone page.
-     *
-     * @return bool
      */
     public function isModule(): bool
     {
@@ -223,8 +168,6 @@ trait PageSettingsTrait
 
     /**
      * Get custom template to embed this page in.
-     *
-     * @return string|null
      */
     public function getLayoutTemplate(): ? string
     {
@@ -233,8 +176,6 @@ trait PageSettingsTrait
 
     /**
      * Get custom template for rendering the page content.
-     *
-     * @return string|null
      */
     public function getContentTemplate(): ? string
     {
@@ -243,8 +184,6 @@ trait PageSettingsTrait
 
     /**
      * Get custom controller name to use for this page.
-     *
-     * @return string|null
      */
     public function getController(): ? string
     {
@@ -252,10 +191,7 @@ trait PageSettingsTrait
     }
 
     /**
-     * @param string     $name
      * @param mixed|null $default
-     *
-     * @return mixed
      */
     public function getExtra(string $name, $default = null)
     {
@@ -297,9 +233,6 @@ trait PageSettingsTrait
         return $this->getSetting('unpublish_date');
     }
 
-    /**
-     * @return bool
-     */
     public function isPublished(): bool
     {
         if (!$this->getSetting('publish')) {
@@ -309,9 +242,6 @@ trait PageSettingsTrait
         return $this->isCurrentDateWithinPublishDates();
     }
 
-    /**
-     * @return bool
-     */
     public function isCurrentDateWithinPublishDates(): bool
     {
         if ($this->publishDateIsInFuture()) {
@@ -324,9 +254,6 @@ trait PageSettingsTrait
         return true;
     }
 
-    /**
-     * @return bool
-     */
     private function publishDateIsInFuture(): bool
     {
         if (null === $this->getPublishDate()) {
@@ -339,9 +266,6 @@ trait PageSettingsTrait
         return false;
     }
 
-    /**
-     * @return bool
-     */
     private function unpublishDateIsInPast(): bool
     {
         if (null === $this->getUnpublishDate()) {

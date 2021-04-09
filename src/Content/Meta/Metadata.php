@@ -9,42 +9,28 @@ use ArrayAccess;
  */
 class Metadata implements ArrayAccess
 {
-    /**
-     * @var array
-     */
-    private $values;
+    private array $values;
 
     /**
      * Metadata constructor.
-     *
-     * @param array $values
      */
     public function __construct(array $values)
     {
         $this->values = $values;
     }
 
-    /**
-     * @return array
-     */
     public function getAll(): array
     {
         return $this->values;
     }
 
-    /**
-     * @param array $values
-     *
-     * @return array
-     */
     public function setAll(array $values): array
     {
         return $this->values = $values;
     }
 
     /**
-     * @param string $key
-     * @param mixed  $default
+     * @param mixed|null $default
      *
      * @return mixed|null
      */
@@ -57,12 +43,6 @@ class Metadata implements ArrayAccess
         return $default;
     }
 
-    /**
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return self
-     */
     public function setValue(string $key, $value): self
     {
         $this->values[$key] = $value;
@@ -70,7 +50,7 @@ class Metadata implements ArrayAccess
         return $this;
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->values);
     }
@@ -80,12 +60,12 @@ class Metadata implements ArrayAccess
         return $this->getValue($offset);
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->setValue($offset, $value);
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->values[$offset]);
     }

@@ -17,8 +17,7 @@ class PublishedFilterIterator extends \FilterIterator
     private $published;
 
     /**
-     * @param \Iterator $iterator  The Iterator to filter
-     * @param bool      $published
+     * @param \Iterator $iterator The Iterator to filter
      */
     public function __construct(\Iterator $iterator, bool $published)
     {

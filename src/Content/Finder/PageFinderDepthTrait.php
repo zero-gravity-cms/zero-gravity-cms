@@ -34,11 +34,6 @@ trait PageFinderDepthTrait
         return $this;
     }
 
-    /**
-     * @param \RecursiveIteratorIterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyDepthsIterator(\RecursiveIteratorIterator $iterator): \Iterator
     {
         $minDepth = 0;

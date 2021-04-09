@@ -31,10 +31,6 @@ class TaxonomyTester
 
     /**
      * Return true if value matches the taxonomies to test against, false if not.
-     *
-     * @param Page $page
-     *
-     * @return bool
      */
     public function pageMatchesTaxonomy(Page $page): bool
     {
@@ -49,8 +45,6 @@ class TaxonomyTester
 
     /**
      * @param $pageValues
-     *
-     * @return bool
      */
     private function testOr($pageValues): bool
     {
@@ -65,8 +59,6 @@ class TaxonomyTester
 
     /**
      * @param $pageValues
-     *
-     * @return bool
      */
     private function testAnd($pageValues): bool
     {

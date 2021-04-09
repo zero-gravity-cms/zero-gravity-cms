@@ -7,7 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use Tests\Unit\ZeroGravity\Cms\Test\TwigExtensionTestTrait;
-use Twig_Loader_Filesystem;
+use Twig\Loader\FilesystemLoader;
+use Twig\Loader\LoaderInterface;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -50,9 +51,9 @@ class ZeroGravityExtensionTest extends BaseUnit
             ;
         });
 
-        return array(
+        return [
             new ZeroGravityExtension($repository, $routePageSelector, $filterRegistry),
-        );
+        ];
     }
 
     /**
@@ -69,11 +70,11 @@ class ZeroGravityExtensionTest extends BaseUnit
     }
 
     /**
-     * @return Twig_LoaderInterface[]
+     * @return LoaderInterface[]
      */
     protected function getTwigLoaders()
     {
-        $filesystemLoader = new Twig_Loader_Filesystem();
+        $filesystemLoader = new FilesystemLoader();
         $filesystemLoader->addPath($this->getValidPagesDir(), 'ZeroGravity');
 
         return [

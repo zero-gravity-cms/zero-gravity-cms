@@ -9,11 +9,6 @@ interface SinglePathResolver
 {
     /**
      * Resolve the given file name and path.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return null|File
      */
     public function get(Path $path, Path $parentPath = null): ? File;
 }

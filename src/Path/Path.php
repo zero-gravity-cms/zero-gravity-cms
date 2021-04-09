@@ -36,8 +36,6 @@ class Path
     /**
      * Checks whether the string is a regex.
      *
-     * @param string $pathString
-     *
      * @return bool True if the element contains a valid regular expression
      *
      * @see https://stackoverflow.com/a/12941133/22592
@@ -53,10 +51,6 @@ class Path
 
     /**
      * Simple check if the given string contains glob characters.
-     *
-     * @param string $pathString
-     *
-     * @return bool
      */
     public static function stringContainsGlob(string $pathString): bool
     {
@@ -72,17 +66,12 @@ class Path
 
     /**
      * Create a new Path object using the path string.
-     *
-     * @param string $pathString
      */
     public function __construct(string $pathString)
     {
         $this->init($pathString);
     }
 
-    /**
-     * @param string $pathString
-     */
     protected function init(string $pathString)
     {
         $this->parsePathString($pathString);
@@ -90,8 +79,6 @@ class Path
 
     /**
      * Parse the configured path string.
-     *
-     * @param string $pathString
      */
     protected function parsePathString(string $pathString): void
     {
@@ -150,10 +137,6 @@ class Path
 
     /**
      * Create a new PathElement instance.
-     *
-     * @param string $part
-     *
-     * @return PathElement
      */
     protected function createElement(string $part): PathElement
     {
@@ -164,10 +147,6 @@ class Path
 
     /**
      * Create a new PathElement instance that is allowed to contain regex.
-     *
-     * @param string $part
-     *
-     * @return PathElement
      */
     protected function createRegexElement(string $part): PathElement
     {
@@ -176,25 +155,16 @@ class Path
         return new $class($part, true);
     }
 
-    /**
-     * @return bool
-     */
     public function isAbsolute(): bool
     {
         return $this->isAbsolute;
     }
 
-    /**
-     * @return bool
-     */
     public function isDirectory(): bool
     {
         return $this->isDirectory;
     }
 
-    /**
-     * @return bool
-     */
     public function isRegex(): bool
     {
         foreach ($this->getElements() as $element) {
@@ -206,9 +176,6 @@ class Path
         return false;
     }
 
-    /**
-     * @return bool
-     */
     public function isGlob(): bool
     {
         if ($this->isRegex()) {
@@ -232,11 +199,6 @@ class Path
         return $this->elements;
     }
 
-    /**
-     * @param bool $forceRebuild
-     *
-     * @return string
-     */
     public function toString(bool $forceRebuild = false): string
     {
         if ($forceRebuild) {
@@ -261,25 +223,16 @@ class Path
         $this->pathString = $path;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->toString();
     }
 
-    /**
-     * @return bool
-     */
     public function hasElements(): bool
     {
         return count($this->getElements()) > 0;
     }
 
-    /**
-     * @return bool
-     */
     public function isSingleElement(): bool
     {
         return 1 === count($this->getElements());
@@ -295,9 +248,6 @@ class Path
         $this->rebuildString();
     }
 
-    /**
-     * @param PathElement $element
-     */
     public function appendElement(PathElement $element): void
     {
         $this->elements[] = $element;
@@ -370,8 +320,6 @@ class Path
     /**
      * Get the last PathElement of this path.
      * Returns null if Path is empty.
-     *
-     * @return PathElement|null
      */
     public function getLastElement(): ? PathElement
     {

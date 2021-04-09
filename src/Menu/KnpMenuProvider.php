@@ -35,10 +35,6 @@ class KnpMenuProvider implements MenuProviderInterface
 
     /**
      * KnpMenuBuilder constructor.
-     *
-     * @param ContentRepository        $contentRepository
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param FactoryInterface         $factory
      */
     public function __construct(
         ContentRepository $contentRepository,
@@ -54,7 +50,6 @@ class KnpMenuProvider implements MenuProviderInterface
      * Retrieves a menu by its name.
      *
      * @param string $name
-     * @param array  $options
      *
      * @return ItemInterface
      *
@@ -73,7 +68,6 @@ class KnpMenuProvider implements MenuProviderInterface
      * Checks whether a menu exists in this provider.
      *
      * @param string $name
-     * @param array  $options
      *
      * @return bool
      */
@@ -88,34 +82,23 @@ class KnpMenuProvider implements MenuProviderInterface
         return false;
     }
 
-    /**
-     * @param string $menuName
-     * @param array  $options
-     *
-     * @return ItemInterface
-     */
     public function buildMenu(string $menuName, array $options = []): ItemInterface
     {
         $rootItem = $this->factory->createItem('root');
 
-        $this->eventDispatcher->dispatch(BeforeBuildMenu::BEFORE_BUILD_MENU, new BeforeBuildMenu($menuName, $rootItem));
+        $this->eventDispatcher->dispatch(new BeforeBuildMenu($menuName, $rootItem));
 
         foreach ($this->contentRepository->getPageTree() as $page) {
             $this->addPageItem($page, $rootItem, $menuName, $options);
         }
 
-        $this->eventDispatcher->dispatch(AfterBuildMenu::AFTER_BUILD_MENU, new AfterBuildMenu($menuName, $rootItem));
+        $this->eventDispatcher->dispatch(new AfterBuildMenu($menuName, $rootItem));
 
         return $rootItem;
     }
 
     /**
      * Adds item to the given parent item if page should have an item.
-     *
-     * @param Page          $page
-     * @param ItemInterface $parent
-     * @param string        $menuName
-     * @param array         $defaultOptions
      */
     protected function addPageItem(Page $page, ItemInterface $parent, string $menuName, array $defaultOptions): void
     {
@@ -141,35 +124,20 @@ class KnpMenuProvider implements MenuProviderInterface
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 
-        $this->eventDispatcher->dispatch(
-            BeforeAddItem::BEFORE_ADD_ITEM,
-            new BeforeAddItem($menuName, $parent, $item)
-        );
+        $this->eventDispatcher->dispatch(new BeforeAddItem($menuName, $parent, $item));
 
         $parent->addChild($item);
-        $this->eventDispatcher->dispatch(
-            BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM,
-            new BeforeAddChildrenToItem($menuName, $item)
-        );
+        $this->eventDispatcher->dispatch(new BeforeAddChildrenToItem($menuName, $item));
         foreach ($page->getChildren() as $childPage) {
             $this->addPageItem($childPage, $item, $menuName, $defaultOptions);
         }
-        $this->eventDispatcher->dispatch(
-            AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM,
-            new AfterAddChildrenToItem($menuName, $item)
-        );
+        $this->eventDispatcher->dispatch(new AfterAddChildrenToItem($menuName, $item));
 
-        $this->eventDispatcher->dispatch(
-            AfterAddItem::AFTER_ADD_ITEM,
-            new AfterAddItem($menuName, $parent, $item)
-        );
+        $this->eventDispatcher->dispatch(new AfterAddItem($menuName, $parent, $item));
     }
 
     /**
-     * @param Page $page
-     * @param      $menuName
-     *
-     * @return bool
+     * @param $menuName
      */
     protected function pageHasItem(Page $page, $menuName): bool
     {

@@ -18,17 +18,12 @@ class RouterPageSelector
 
     /**
      * RouterPageSelector constructor.
-     *
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @return null|Page
-     */
     public function getCurrentPage(): ? Page
     {
         $request = $this->requestStack->getCurrentRequest();

@@ -2,13 +2,11 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 
 class AfterPageCreate extends Event
 {
-    public const AFTER_PAGE_CREATE = 'zerogravity.filesystem.after_page_create';
-
     /**
      * @var Page
      */
@@ -19,9 +17,6 @@ class AfterPageCreate extends Event
         $this->page = $page;
     }
 
-    /**
-     * @return Page
-     */
     public function getPage(): Page
     {
         return $this->page;

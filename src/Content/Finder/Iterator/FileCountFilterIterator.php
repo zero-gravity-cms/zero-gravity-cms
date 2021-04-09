@@ -16,7 +16,7 @@ class FileCountFilterIterator extends \FilterIterator
     const MODE_IMAGES = 'images';
     const MODE_DOCUMENTS = 'documents';
 
-    private $comparators = array();
+    private $comparators = [];
 
     /**
      * @var string

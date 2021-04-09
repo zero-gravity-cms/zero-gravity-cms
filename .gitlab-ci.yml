@@ -1,4 +1,4 @@
-image: c33s/php:7.1
+image: c33s/php:7.4
 
 stages:
     - test
@@ -17,9 +17,9 @@ cache:
     paths:
         - $COMPOSER_HOME
         - vendor/
-        - .ci/bin
-        - .ci/cache
-        - .ci/vendor
+        - .robo/bin
+        - .robo/cache
+        - .robo/vendor
 
 before_script:
     - pwd

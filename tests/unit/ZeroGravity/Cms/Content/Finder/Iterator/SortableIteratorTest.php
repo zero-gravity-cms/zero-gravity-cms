@@ -31,8 +31,7 @@ class SortableIteratorTest extends BaseUnit
      * @test
      * @dataProvider provideSortResults
      *
-     * @param       $method
-     * @param array $expectedElements
+     * @param $method
      */
     public function sortMethodWorks($method, array $expectedElements)
     {

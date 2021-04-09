@@ -13,9 +13,7 @@ class PageResolverTest extends BaseUnit
      * @test
      * @dataProvider provideSingleFilePaths
      *
-     * @param string $path
      * @param string $inPath
-     * @param string $expectedPath
      */
     public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath)
     {
@@ -61,7 +59,6 @@ class PageResolverTest extends BaseUnit
      * @test
      * @dataProvider provideNonExistingPagePaths
      *
-     * @param string $path
      * @param string $inPath
      */
     public function singlePagesThatAreNotFound(string $path, $inPath)

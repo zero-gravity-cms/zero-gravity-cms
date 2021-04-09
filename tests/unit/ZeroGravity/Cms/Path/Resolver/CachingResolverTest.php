@@ -19,10 +19,6 @@ class CachingResolverTest extends BaseUnit
     /**
      * @test
      * @dataProvider provideMethods
-     *
-     * @param string      $method
-     * @param mixed       $expectedReturnValue
-     * @param string|null $calledMethod
      */
     public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null)
     {
@@ -84,8 +80,7 @@ class CachingResolverTest extends BaseUnit
     }
 
     /**
-     * @param string   $method
-     * @param callable $callback
+     * @param string $method
      *
      * @return MultiPathResolver
      */

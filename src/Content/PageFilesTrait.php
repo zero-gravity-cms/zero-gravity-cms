@@ -6,10 +6,7 @@ use ZeroGravity\Cms\Content\Meta\PageFiles;
 
 trait PageFilesTrait
 {
-    /**
-     * @var PageFiles
-     */
-    private $files;
+    private ?PageFiles $files;
 
     /**
      * @param File[] $files
@@ -27,18 +24,13 @@ trait PageFilesTrait
         return $this->files->toArray();
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return null|File
-     */
-    public function getFile(string $filename): ? File
+    public function getFile(string $filename): ?File
     {
         return $this->files->get($filename);
     }
 
     /**
-     * Get names/aliases for all available image files.
+     * Get representations for all available image files.
      *
      * @return File[]
      */
@@ -48,7 +40,7 @@ trait PageFilesTrait
     }
 
     /**
-     * Get names/aliases and paths for all available document files.
+     * Get representations for all available document files.
      *
      * @return File[]
      */
@@ -58,31 +50,25 @@ trait PageFilesTrait
     }
 
     /**
-     * Get path to single markdown file if available.
-     *
-     * @return File|null
+     * Get single markdown file representation if available.
      */
-    public function getMarkdownFile(): ? File
+    public function getMarkdownFile(): ?File
     {
         return $this->files->getMarkdownFile();
     }
 
     /**
-     * Get path to single YAML file if available.
-     *
-     * @return File|null
+     * Get single YAML file representation if available.
      */
-    public function getYamlFile(): ? File
+    public function getYamlFile(): ?File
     {
         return $this->files->getYamlFile();
     }
 
     /**
-     * Get path to single Twig file if available.
-     *
-     * @return File|null
+     * Get single Twig file representation if available.
      */
-    public function getTwigFile(): ? File
+    public function getTwigFile(): ?File
     {
         return $this->files->getTwigFile();
     }

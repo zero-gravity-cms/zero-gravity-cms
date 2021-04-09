@@ -136,11 +136,6 @@ trait PageFinderSortingTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applySortIterator(\Iterator $iterator): \Iterator
     {
         if (null !== $this->sort) {

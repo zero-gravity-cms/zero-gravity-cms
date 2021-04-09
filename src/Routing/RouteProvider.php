@@ -146,8 +146,6 @@ class RouteProvider implements RouteProviderInterface
     }
 
     /**
-     * @param Page $page
-     *
      * @return Route
      */
     public function createRouteFromPage(Page $page)

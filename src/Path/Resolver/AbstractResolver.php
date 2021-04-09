@@ -8,7 +8,6 @@ use ZeroGravity\Cms\Path\Path;
 abstract class AbstractResolver implements SinglePathResolver
 {
     /**
-     * @param Path      $path
      * @param Path|null $parentPath
      */
     protected function moveNonGlobsToParent(Path $path, Path $parentPath)
@@ -24,10 +23,6 @@ abstract class AbstractResolver implements SinglePathResolver
     /**
      * Converts strings to regular expression with starting match.
      * Glob patterns are replaced using Finder's Glob engine.
-     *
-     * @param Path $path
-     *
-     * @return Path
      */
     protected function toRegexMatchStart(Path $path): Path
     {

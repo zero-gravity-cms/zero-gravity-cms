@@ -65,11 +65,6 @@ trait PageFinderFlagsTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyFlagsIterator(\Iterator $iterator): \Iterator
     {
         if (null !== $this->modular) {
@@ -87,11 +82,6 @@ trait PageFinderFlagsTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyPublishedIterator(\Iterator $iterator): \Iterator
     {
         if (null !== $this->published) {

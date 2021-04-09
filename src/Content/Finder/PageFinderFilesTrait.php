@@ -77,11 +77,6 @@ trait PageFinderFilesTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyNumberOfFilesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->numFiles)) {
@@ -95,11 +90,6 @@ trait PageFinderFilesTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyNumberOfImagesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->numImages)) {
@@ -113,11 +103,6 @@ trait PageFinderFilesTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyNumberOfDocumentsIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->numDocuments)) {

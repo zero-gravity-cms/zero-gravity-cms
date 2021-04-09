@@ -2,7 +2,7 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Filesystem\Directory;
 
 abstract class FileEvent extends Event
@@ -29,25 +29,16 @@ abstract class FileEvent extends Event
         $this->directory = $directory;
     }
 
-    /**
-     * @return string
-     */
     public function getRealPath(): string
     {
         return $this->realPath;
     }
 
-    /**
-     * @return string
-     */
     public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * @return Directory
-     */
     public function getDirectory(): Directory
     {
         return $this->directory;

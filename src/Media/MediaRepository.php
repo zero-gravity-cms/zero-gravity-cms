@@ -20,8 +20,6 @@ class MediaRepository
 
     /**
      * @param string|Path $relativePath
-     *
-     * @return null|File
      */
     public function getFile($relativePath): ? File
     {

@@ -2,14 +2,12 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
 
 class BeforePageCreate extends Event
 {
-    public const BEFORE_PAGE_CREATE = 'zerogravity.filesystem.before_page_create';
-
     /**
      * @var Directory
      */
@@ -32,33 +30,21 @@ class BeforePageCreate extends Event
         $this->parentPage = $parentPage;
     }
 
-    /**
-     * @return Directory
-     */
     public function getDirectory(): Directory
     {
         return $this->directory;
     }
 
-    /**
-     * @return array
-     */
     public function getSettings(): array
     {
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings): void
     {
         $this->settings = $settings;
     }
 
-    /**
-     * @return null|Page
-     */
     public function getParentPage(): ?Page
     {
         return $this->parentPage;

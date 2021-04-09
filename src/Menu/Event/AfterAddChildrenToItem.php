@@ -6,8 +6,6 @@ use Knp\Menu\ItemInterface;
 
 class AfterAddChildrenToItem extends MenuEvent
 {
-    public const AFTER_ADD_CHILDREN_TO_ITEM = 'zerogravity.after_add_children_to_item';
-
     /**
      * @var ItemInterface
      */
@@ -25,9 +23,6 @@ class AfterAddChildrenToItem extends MenuEvent
         $this->item = $item;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getItem(): ItemInterface
     {
         return $this->item;
