@@ -6,8 +6,6 @@ use Knp\Menu\ItemInterface;
 
 class BeforeAddItem extends MenuEvent
 {
-    public const BEFORE_ADD_ITEM = 'zerogravity.before_add_item';
-
     /**
      * @var ItemInterface
      */

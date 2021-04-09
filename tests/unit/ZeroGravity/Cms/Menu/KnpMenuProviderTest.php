@@ -172,9 +172,9 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // menu start
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeBuildMenu::BEFORE_BUILD_MENU, $this->callback($beforeBuildMenuCallback))
+            ->with(self::callback($beforeBuildMenuCallback))
         ;
 
         $beforeAddHomeItemCallback = function ($argument) {
@@ -195,9 +195,9 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // first item
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->callback($beforeAddHomeItemCallback))
+            ->with(self::callback($beforeAddHomeItemCallback))
         ;
 
         $beforeAddHomeChildrenCallback = function ($argument) {
@@ -218,9 +218,9 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // first item's children pre-event
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->callback($beforeAddHomeChildrenCallback))
+            ->with(self::callback($beforeAddHomeChildrenCallback))
         ;
 
         $afterAddHomeChildrenCallback = function ($argument) {
@@ -241,42 +241,41 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // first item's children post-event
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->callback($afterAddHomeChildrenCallback))
+            ->with(self::callback($afterAddHomeChildrenCallback))
         ;
-
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
+            ->with(self::isInstanceOf(AfterAddItem::class))
         ;
 
         // second item
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+            ->with(self::isInstanceOf(BeforeAddItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
         ;
 
         // second item first child
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+            ->with(self::isInstanceOf(BeforeAddItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
+            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
+            ->with(self::isInstanceOf(AfterAddItem::class))
         ;
 
         $afterAddSecondSubChildItemCallback = function ($argument) {
@@ -297,21 +296,21 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // second item second child
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+            ->with(self::isInstanceOf(BeforeAddItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
+            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddItem::AFTER_ADD_ITEM, $this->callback($afterAddSecondSubChildItemCallback))
+            ->with(self::callback($afterAddSecondSubChildItemCallback))
         ;
 
         $afterAddSecondItemChildrenCallback = function ($argument) {
@@ -332,37 +331,37 @@ class KnpMenuProviderTest extends BaseUnit
         };
 
         // second item finished
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->callback($afterAddSecondItemChildrenCallback))
+            ->with(self::callback($afterAddSecondItemChildrenCallback))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
+            ->with(self::isInstanceOf(AfterAddItem::class))
         ;
 
         // third item
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddItem::BEFORE_ADD_ITEM, $this->isInstanceOf(BeforeAddItem::class))
+            ->with(self::isInstanceOf(BeforeAddItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(BeforeAddChildrenToItem::class))
+            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM, $this->isInstanceOf(AfterAddChildrenToItem::class))
+            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
         ;
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterAddItem::AFTER_ADD_ITEM, $this->isInstanceOf(AfterAddItem::class))
+            ->with(self::isInstanceOf(AfterAddItem::class))
         ;
 
         // menu finished
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(AfterBuildMenu::AFTER_BUILD_MENU, $this->isInstanceOf(AfterBuildMenu::class))
+            ->with(self::isInstanceOf(AfterBuildMenu::class))
         ;
 
         $provider = $this->getProvider($dispatcher);

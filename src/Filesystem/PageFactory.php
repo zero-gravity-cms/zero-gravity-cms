@@ -66,7 +66,6 @@ class PageFactory
 
         /* @var $handledBeforeCreatePage BeforePageCreate */
         $handledBeforeCreatePage = $this->eventDispatcher->dispatch(
-            BeforePageCreate::BEFORE_PAGE_CREATE,
             new BeforePageCreate($directory, $settings, $parentPage)
         );
         $page = new Page($directory->getName(), $handledBeforeCreatePage->getSettings(), $parentPage);
@@ -82,10 +81,7 @@ class PageFactory
             }
         }
         $page->setFiles($files);
-        $this->eventDispatcher->dispatch(
-            AfterPageCreate::AFTER_PAGE_CREATE,
-            new AfterPageCreate($page)
-        );
+        $this->eventDispatcher->dispatch(new AfterPageCreate($page));
         $this->directories[$page->getPath()->toString()] = $directory;
 
         return $page;

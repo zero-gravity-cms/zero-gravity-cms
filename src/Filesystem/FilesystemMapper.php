@@ -151,17 +151,11 @@ class FilesystemMapper implements StructureMapper
      */
     public function saveChanges(PageDiff $diff): void
     {
-        $this->eventDispatcher->dispatch(
-            BeforePageSaveValidate::BEFORE_PAGE_SAVE_VALIDATE,
-            new BeforePageSaveValidate($diff)
-        );
+        $this->eventDispatcher->dispatch(new BeforePageSaveValidate($diff));
 
         $this->validateDiff($diff);
 
-        $this->eventDispatcher->dispatch(
-            BeforePageSave::BEFORE_PAGE_SAVE,
-            new BeforePageSave($diff)
-        );
+        $this->eventDispatcher->dispatch(new BeforePageSave($diff));
 
         /* @var $directory Directory */
         $directory = $diff->getNew()->getDirectory();
@@ -181,10 +175,7 @@ class FilesystemMapper implements StructureMapper
             $directory->renameOrMove($this->path.$diff->getNewFilesystemPath());
         }
 
-        $this->eventDispatcher->dispatch(
-            AfterPageSave::AFTER_PAGE_SAVE,
-            new AfterPageSave($diff)
-        );
+        $this->eventDispatcher->dispatch(new AfterPageSave($diff));
     }
 
     /**

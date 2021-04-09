@@ -2,7 +2,7 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Filesystem\Directory;
 
 abstract class FileEvent extends Event

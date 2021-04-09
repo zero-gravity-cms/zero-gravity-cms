@@ -2,14 +2,12 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
 
 class BeforePageCreate extends Event
 {
-    public const BEFORE_PAGE_CREATE = 'zerogravity.filesystem.before_page_create';
-
     /**
      * @var Directory
      */

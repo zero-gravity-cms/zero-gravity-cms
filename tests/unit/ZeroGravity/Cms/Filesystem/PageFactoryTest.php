@@ -189,10 +189,10 @@ class PageFactoryTest extends BaseUnit
             return true;
         };
 
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::at($run++))
             ->method('dispatch')
-            ->with(BeforePageCreate::BEFORE_PAGE_CREATE, $this->callback($beforeCreatePageCallback))
-            ->willReturnArgument(1)
+            ->with(self::callback($beforeCreatePageCallback))
+            ->willReturnArgument(0)
         ;
 
         $afterCreatePageCallback = function ($argument) {
@@ -208,8 +208,8 @@ class PageFactoryTest extends BaseUnit
 
         $dispatcher->expects($this->at($run++))
             ->method('dispatch')
-            ->with(AfterPageCreate::AFTER_PAGE_CREATE, $this->callback($afterCreatePageCallback))
-            ->willReturnArgument(1)
+            ->with($this->callback($afterCreatePageCallback))
+            ->willReturnArgument(0)
         ;
 
         $pageFactory = new PageFactory(new NullLogger(), $dispatcher);
@@ -223,7 +223,7 @@ class PageFactoryTest extends BaseUnit
     public function settingsCanBeModifiedDuringBeforeCreatePage()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(BeforePageCreate::BEFORE_PAGE_CREATE, function (BeforePageCreate $event) {
+        $dispatcher->addListener(BeforePageCreate::class, function (BeforePageCreate $event) {
             $settings = $event->getSettings();
             $settings['extra']['very_custom_key'] = 'very custom value';
             $event->setSettings($settings);

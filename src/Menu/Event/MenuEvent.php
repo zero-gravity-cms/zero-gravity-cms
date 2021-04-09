@@ -3,7 +3,7 @@
 namespace ZeroGravity\Cms\Menu\Event;
 
 use Knp\Menu\ItemInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class MenuEvent extends Event
 {

@@ -599,18 +599,12 @@ FRONTMATTER;
     private function writeFile(string $realPath, string $content)
     {
         /* @var $handledEvent BeforeFileWrite */
-        $handledEvent = $this->eventDispatcher->dispatch(
-            BeforeFileWrite::BEFORE_FILE_WRITE,
-            new BeforeFileWrite($realPath, $content, $this)
-        );
+        $handledEvent = $this->eventDispatcher->dispatch(new BeforeFileWrite($realPath, $content, $this));
         $content = $handledEvent->getContent();
 
         $this->logger->info("Writing to file {$realPath} for directory {$this->getPath()}");
         file_put_contents($realPath, $content);
 
-        $this->eventDispatcher->dispatch(
-            AfterFileWrite::AFTER_FILE_WRITE,
-            new AfterFileWrite($realPath, $content, $this)
-        );
+        $this->eventDispatcher->dispatch(new AfterFileWrite($realPath, $content, $this));
     }
 }

@@ -98,13 +98,13 @@ class KnpMenuProvider implements MenuProviderInterface
     {
         $rootItem = $this->factory->createItem('root');
 
-        $this->eventDispatcher->dispatch(BeforeBuildMenu::BEFORE_BUILD_MENU, new BeforeBuildMenu($menuName, $rootItem));
+        $this->eventDispatcher->dispatch(new BeforeBuildMenu($menuName, $rootItem));
 
         foreach ($this->contentRepository->getPageTree() as $page) {
             $this->addPageItem($page, $rootItem, $menuName, $options);
         }
 
-        $this->eventDispatcher->dispatch(AfterBuildMenu::AFTER_BUILD_MENU, new AfterBuildMenu($menuName, $rootItem));
+        $this->eventDispatcher->dispatch(new AfterBuildMenu($menuName, $rootItem));
 
         return $rootItem;
     }
@@ -141,28 +141,16 @@ class KnpMenuProvider implements MenuProviderInterface
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 
-        $this->eventDispatcher->dispatch(
-            BeforeAddItem::BEFORE_ADD_ITEM,
-            new BeforeAddItem($menuName, $parent, $item)
-        );
+        $this->eventDispatcher->dispatch(new BeforeAddItem($menuName, $parent, $item));
 
         $parent->addChild($item);
-        $this->eventDispatcher->dispatch(
-            BeforeAddChildrenToItem::BEFORE_ADD_CHILDREN_TO_ITEM,
-            new BeforeAddChildrenToItem($menuName, $item)
-        );
+        $this->eventDispatcher->dispatch(new BeforeAddChildrenToItem($menuName, $item));
         foreach ($page->getChildren() as $childPage) {
             $this->addPageItem($childPage, $item, $menuName, $defaultOptions);
         }
-        $this->eventDispatcher->dispatch(
-            AfterAddChildrenToItem::AFTER_ADD_CHILDREN_TO_ITEM,
-            new AfterAddChildrenToItem($menuName, $item)
-        );
+        $this->eventDispatcher->dispatch(new AfterAddChildrenToItem($menuName, $item));
 
-        $this->eventDispatcher->dispatch(
-            AfterAddItem::AFTER_ADD_ITEM,
-            new AfterAddItem($menuName, $parent, $item)
-        );
+        $this->eventDispatcher->dispatch(new AfterAddItem($menuName, $parent, $item));
     }
 
     /**
