@@ -10,8 +10,6 @@ use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
 class FilesystemException extends RuntimeException implements ZeroGravityException
 {
     /**
-     * @param string $path
-     *
      * @return static
      */
     public static function contentDirectoryDoesNotExist(string $path)
@@ -20,8 +18,6 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
     }
 
     /**
-     * @param PageDiff $diff
-     *
      * @return static
      */
     public static function unsupportedWritablePageClass(PageDiff $diff)
@@ -36,8 +32,6 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
     }
 
     /**
-     * @param Page $page
-     *
      * @return static
      */
     public static function cannotFindDirectoryForPage(Page $page)

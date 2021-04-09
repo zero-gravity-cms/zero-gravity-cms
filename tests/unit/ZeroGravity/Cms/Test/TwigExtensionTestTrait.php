@@ -98,7 +98,7 @@ trait TwigExtensionTestTrait
     public function getTests($name, $legacyTests = false)
     {
         $fixturesDir = realpath($this->getFixturesDir());
-        $tests = array();
+        $tests = [];
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fixturesDir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
             if (!preg_match('/\.test$/', $file)) {
@@ -116,7 +116,7 @@ trait TwigExtensionTestTrait
                 $condition = $match[2];
                 $templates = self::parseTemplates($match[3]);
                 $exception = $match[5];
-                $outputs = array(array(null, $match[4], null, ''));
+                $outputs = [[null, $match[4], null, '']];
             } elseif (preg_match('/--TEST--\s*(.*?)\s*(?:--CONDITION--\s*(.*))?\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)--DATA--.*?--EXPECT--.*/s', $test, $match)) {
                 $message = $match[1];
                 $condition = $match[2];
@@ -130,12 +130,12 @@ trait TwigExtensionTestTrait
             while (isset($tests[$message])) {
                 $message .= '.';
             }
-            $tests[$message] = array(str_replace($fixturesDir.'/', '', $file), $message, $condition, $templates, $exception, $outputs);
+            $tests[$message] = [str_replace($fixturesDir.'/', '', $file), $message, $condition, $templates, $exception, $outputs];
         }
 
         if ($legacyTests && empty($tests)) {
             // add a dummy test to avoid a PHPUnit message
-            return array(array('not', '-', '', array(), '', array()));
+            return [['not', '-', '', [], '', []]];
         }
 
         return $tests;
@@ -166,10 +166,10 @@ trait TwigExtensionTestTrait
         $loader->addLoader(new ArrayLoader($templates));
 
         foreach ($outputs as $i => $match) {
-            $config = array_merge(array(
+            $config = array_merge([
                 'cache' => false,
                 'strict_variables' => true,
-            ), $match[2] ? eval($match[2].';') : array());
+            ], $match[2] ? eval($match[2].';') : []);
             $twig = new Environment($loader, $config);
             $twig->addGlobal('global', 'global');
             foreach ($this->getRuntimeLoaders() as $runtimeLoader) {
@@ -248,7 +248,7 @@ trait TwigExtensionTestTrait
 
     protected static function parseTemplates($test)
     {
-        $templates = array();
+        $templates = [];
         preg_match_all('/--TEMPLATE(?:\((.*?)\))?--(.*?)(?=\-\-TEMPLATE|$)/s', $test, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $templates[($match[1] ? $match[1] : 'index.twig')] = $match[2];

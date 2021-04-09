@@ -12,7 +12,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class DateRangeFilterIterator extends \FilterIterator
 {
-    private $comparators = array();
+    private $comparators = [];
 
     /**
      * @param \Iterator        $iterator    The Iterator to filter

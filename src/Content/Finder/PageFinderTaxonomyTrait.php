@@ -120,11 +120,6 @@ trait PageFinderTaxonomyTrait
         return $this->notTaxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyTaxonomyIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->taxonomies) || !empty($this->notTaxonomies)) {

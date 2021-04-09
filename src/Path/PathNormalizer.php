@@ -14,9 +14,6 @@ class PathNormalizer
      * If the path would leave the base level, an exception is thrown.
      *
      * $parentPath can be used to step outside the filename level.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
      */
     public static function normalizePath(Path $path, Path $parentPath = null)
     {

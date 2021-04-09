@@ -28,7 +28,6 @@ class FilterException extends RuntimeException implements ZeroGravityException
 
     /**
      * @param string $name
-     * @param mixed  $filter
      *
      * @return static
      */

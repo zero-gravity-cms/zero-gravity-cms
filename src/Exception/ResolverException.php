@@ -8,7 +8,6 @@ use ZeroGravity\Cms\Content\File;
 class ResolverException extends RuntimeException implements ZeroGravityException
 {
     /**
-     * @param string $pattern
      * @param File[] $files
      *
      * @return static

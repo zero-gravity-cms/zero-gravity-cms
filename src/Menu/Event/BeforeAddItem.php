@@ -29,17 +29,11 @@ class BeforeAddItem extends MenuEvent
         $this->itemToBeAdded = $addedItem;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getParentItem(): ItemInterface
     {
         return $this->parentItem;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getItemToBeAdded(): ItemInterface
     {
         return $this->itemToBeAdded;

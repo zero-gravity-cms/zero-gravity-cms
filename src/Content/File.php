@@ -39,8 +39,6 @@ class File
 
     /**
      * Get assigned metadata.
-     *
-     * @return Metadata
      */
     public function getMetadata(): Metadata
     {
@@ -49,8 +47,6 @@ class File
 
     /**
      * Get the file type.
-     *
-     * @return string
      */
     public function getType(): string
     {
@@ -59,8 +55,6 @@ class File
 
     /**
      * Gets the filename.
-     *
-     * @return string
      */
     public function getFilename(): string
     {
@@ -69,10 +63,6 @@ class File
 
     /**
      * Get the base name of the file, optionally excluding a given suffix.
-     *
-     * @param string|null $suffix
-     *
-     * @return string
      */
     public function getBasename(string $suffix = null): string
     {
@@ -81,8 +71,6 @@ class File
 
     /**
      * Get basename, applying detected extension.
-     *
-     * @return string
      */
     public function getDefaultBasename(): string
     {
@@ -96,8 +84,6 @@ class File
 
     /**
      * Get the (relative) path to the file.
-     *
-     * @return string
      */
     public function getPathname(): string
     {
@@ -106,25 +92,17 @@ class File
 
     /**
      * Get the file extension.
-     *
-     * @return string
      */
     public function getExtension(): string
     {
         return pathinfo($this->pathName, PATHINFO_EXTENSION);
     }
 
-    /**
-     * @return string
-     */
     public function getFilesystemPathname(): string
     {
         return $this->baseDir.$this->pathName;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->getPathname();

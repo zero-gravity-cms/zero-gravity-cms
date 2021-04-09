@@ -237,8 +237,6 @@ class PageFactoryTest extends BaseUnit
     }
 
     /**
-     * @param string $path
-     *
      * @return Directory
      */
     private function createParsedDirectoryFromPath(string $path)

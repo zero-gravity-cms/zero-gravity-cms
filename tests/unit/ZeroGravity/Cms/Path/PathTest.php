@@ -14,8 +14,7 @@ class PathTest extends BaseUnit
      * @test
      * @dataProvider providePathData
      *
-     * @param       $pathString
-     * @param array $expectations
+     * @param $pathString
      */
     public function pathIsParsedAndAnalyzed($pathString, array $expectations)
     {
@@ -36,8 +35,7 @@ class PathTest extends BaseUnit
      * @test
      * @dataProvider providePathData
      *
-     * @param       $pathString
-     * @param array $expectations
+     * @param $pathString
      */
     public function toStringRebuildsPath($pathString, array $expectations)
     {
@@ -228,11 +226,6 @@ class PathTest extends BaseUnit
     /**
      * @test
      * @dataProvider provideAppendedPathData
-     *
-     * @param string $pathString
-     * @param string $childString
-     * @param string $newString
-     * @param array  $expect
      */
     public function appendReturnsAppendedPathWithChildSettings(
         string $pathString,

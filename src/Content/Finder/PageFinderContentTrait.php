@@ -93,11 +93,6 @@ trait PageFinderContentTrait
         return $this;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyNamesIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->names) || !empty($this->notNames)) {
@@ -107,11 +102,6 @@ trait PageFinderContentTrait
         return $iterator;
     }
 
-    /**
-     * @param \Iterator $iterator
-     *
-     * @return \Iterator
-     */
     private function applyContentIterator(\Iterator $iterator): \Iterator
     {
         if (!empty($this->contains) || !empty($this->notContains)) {

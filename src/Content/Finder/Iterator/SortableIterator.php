@@ -82,10 +82,6 @@ class SortableIterator implements \IteratorAggregate
         return new \ArrayIterator($array);
     }
 
-    /**
-     * @param string $getter
-     * @param mixed  $parameter
-     */
     private function sortByGetterOrPath(string $getter, $parameter = null): void
     {
         $this->sort = function (Page $pageA, Page $pageB) use ($getter, $parameter) {

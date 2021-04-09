@@ -13,9 +13,6 @@ class PageResolver extends AbstractResolver
      */
     private $contentRepository;
 
-    /**
-     * @param ContentRepository $contentRepository
-     */
     public function __construct(ContentRepository $contentRepository)
     {
         $this->contentRepository = $contentRepository;
@@ -23,11 +20,6 @@ class PageResolver extends AbstractResolver
 
     /**
      * Resolve the given file name and path.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return null|File
      */
     public function get(Path $path, Path $parentPath = null): ? File
     {

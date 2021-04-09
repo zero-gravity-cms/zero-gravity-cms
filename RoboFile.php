@@ -41,8 +41,6 @@ require $roboDir.'/vendor/autoload.php';
 
 use Identicon\Identicon;
 use Symfony\Component\Filesystem\Filesystem;
-use Consolidation\AnnotatedCommand\CommandData;
-use Robo\Exception\TaskException;
 
 /**
  * This is project's console commands configuration for Robo task runner.

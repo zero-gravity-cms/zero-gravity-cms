@@ -41,8 +41,7 @@ class PageFinderTest extends BaseUnit
      * @test
      * @dataProvider provideFinderMethods
      *
-     * @param string $method
-     * @param        $param
+     * @param $param
      */
     public function finderMethodReturnsThisForChaining(string $method, $param)
     {

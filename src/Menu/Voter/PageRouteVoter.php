@@ -15,9 +15,6 @@ class PageRouteVoter implements VoterInterface
      */
     private $request;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -28,8 +25,6 @@ class PageRouteVoter implements VoterInterface
      *
      * If the voter is not able to determine a result,
      * it should return null to let other voters do the job.
-     *
-     * @param ItemInterface $item
      *
      * @return bool|null
      */
@@ -49,9 +44,6 @@ class PageRouteVoter implements VoterInterface
     }
 
     /**
-     * @param array  $routes
-     * @param string $pagePath
-     *
      * @return bool|null
      */
     private function matchRoutes(array $routes, string $pagePath)

@@ -26,11 +26,6 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      */
     protected $slugify;
 
-    /**
-     * @param CacheInterface     $cache
-     * @param SinglePathResolver $wrappedResolver
-     * @param SlugifyInterface   $slugify
-     */
     public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
     {
         $this->cache = $cache;
@@ -40,9 +35,6 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
 
     /**
      * Resolve the given path or glob pattern and find the matching files.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
      *
      * @return File[]
      *
@@ -67,11 +59,6 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
     /**
      * Resolve the given file name and path.
      *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return null|File
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function get(Path $path, Path $parentPath = null): ? File
@@ -88,9 +75,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
     }
 
     /**
-     * @param string $method
-     * @param Path   $path
-     * @param Path   $parentPath
+     * @param Path $parentPath
      *
      * @return string
      */

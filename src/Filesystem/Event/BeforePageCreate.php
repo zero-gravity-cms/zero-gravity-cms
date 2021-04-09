@@ -30,33 +30,21 @@ class BeforePageCreate extends Event
         $this->parentPage = $parentPage;
     }
 
-    /**
-     * @return Directory
-     */
     public function getDirectory(): Directory
     {
         return $this->directory;
     }
 
-    /**
-     * @return array
-     */
     public function getSettings(): array
     {
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     */
     public function setSettings(array $settings): void
     {
         $this->settings = $settings;
     }
 
-    /**
-     * @return null|Page
-     */
     public function getParentPage(): ?Page
     {
         return $this->parentPage;

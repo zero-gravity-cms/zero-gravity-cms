@@ -88,11 +88,6 @@ class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param string $path
-     *
-     * @return null|Page
-     */
     public function getPage(string $path): ? Page
     {
         if (0 === strpos($path, './')) {
@@ -106,21 +101,11 @@ class ZeroGravityExtension extends AbstractExtension
         return $this->contentRepository->getPage($path);
     }
 
-    /**
-     * @return null|Page
-     */
     public function getCurrentPage(): ? Page
     {
         return $this->pageSelector->getCurrentPage();
     }
 
-    /**
-     * @param PageFinder $pageFinder
-     * @param string     $filterName
-     * @param array      $filterOptions
-     *
-     * @return PageFinder
-     */
     public function filterPages(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
     {
         $pageFinder = $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
@@ -130,8 +115,6 @@ class ZeroGravityExtension extends AbstractExtension
 
     /**
      * @param ReadablePage $page
-     *
-     * @return string
      */
     public function getPageHash(ReadablePage $page = null): string
     {
@@ -142,12 +125,6 @@ class ZeroGravityExtension extends AbstractExtension
         return 'page_'.md5($page->getPath()->toString());
     }
 
-    /**
-     * @param string $filterName
-     * @param array  $filterOptions
-     *
-     * @return PageFinder
-     */
     public function filterAllPages(string $filterName, array $filterOptions = []): PageFinder
     {
         $pageFinder = $this->contentRepository->getPageFinder();
@@ -172,9 +149,7 @@ class ZeroGravityExtension extends AbstractExtension
     }
 
     /**
-     * @param Page $page
-     *
-     * @return null|string
+     * @return string|null
      */
     public function renderPageContent(Page $page)
     {

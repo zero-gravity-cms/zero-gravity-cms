@@ -15,9 +15,7 @@ class FilesystemResolverTest extends BaseUnit
      * @dataProvider provideSingleValidFiles
      * @group resolver
      *
-     * @param string    $file
      * @param Path|null $inPath
-     * @param string    $pathName
      */
     public function singleValidFile(string $file, $inPath, string $pathName)
     {
@@ -138,9 +136,7 @@ class FilesystemResolverTest extends BaseUnit
      * @test
      * @dataProvider provideMultipleFilePatterns
      *
-     * @param string    $pattern
      * @param Path|null $inPath
-     * @param array     $foundFiles
      */
     public function multipleFiles(string $pattern, $inPath, array $foundFiles)
     {

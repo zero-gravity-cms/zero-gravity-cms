@@ -26,10 +26,6 @@ class PageFactory
      */
     private $directories = [];
 
-    /**
-     * @param LoggerInterface          $logger
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         LoggerInterface $logger,
         EventDispatcherInterface $eventDispatcher
@@ -41,12 +37,7 @@ class PageFactory
     /**
      * Create Page from directory content.
      *
-     * @param Directory $directory
-     * @param bool      $convertMarkdown
-     * @param array     $defaultSettings
-     * @param Page|null $parentPage
-     *
-     * @return null|Page
+     * @return Page|null
      */
     public function createPage(
         Directory $directory,
@@ -88,11 +79,7 @@ class PageFactory
     }
 
     /**
-     * @param array     $defaultSettings
-     * @param Directory $directory
-     * @param Page      $parentPage
-     *
-     * @return array
+     * @param Page $parentPage
      */
     private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
     {
@@ -124,8 +111,6 @@ class PageFactory
      * Merge 2 or more arrays, deep merging array values while replacing scalar values.
      *
      * @param array[] $params 1 or more arrays to merge
-     *
-     * @return array
      */
     private function mergeSettings(array ...$params): array
     {
@@ -145,10 +130,6 @@ class PageFactory
 
     /**
      * Get the directory for a previously created page instance.
-     *
-     * @param Page $page
-     *
-     * @return Directory
      */
     public function getDirectory(Page $page): Directory
     {

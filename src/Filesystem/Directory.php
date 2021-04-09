@@ -85,11 +85,6 @@ class Directory
      */
     private $eventDispatcher;
 
-    /**
-     * @param SplFileInfo $directoryInfo
-     * @param FileFactory $fileFactory
-     * @param string|null $parentPath
-     */
     public function __construct(
         SplFileInfo $directoryInfo,
         FileFactory $fileFactory,
@@ -160,8 +155,6 @@ class Directory
 
     /**
      * Get directory path relative to parsing base path.
-     *
-     * @return string
      */
     public function getPath(): string
     {
@@ -173,25 +166,16 @@ class Directory
         return $this->parentPath.'/'.$this->getName();
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->directoryInfo->getFilename();
     }
 
-    /**
-     * @return string
-     */
     public function getFilesystemPathname(): string
     {
         return $this->directoryInfo->getPathname();
     }
 
-    /**
-     * @return string
-     */
     public function getSlug(): string
     {
         if (preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
@@ -202,8 +186,6 @@ class Directory
     }
 
     /**
-     * @param string $type
-     *
      * @return File[]
      */
     public function getFilesByType(string $type)
@@ -213,17 +195,11 @@ class Directory
         });
     }
 
-    /**
-     * @return bool
-     */
     public function hasSortingPrefix(): bool
     {
         return (bool) preg_match(self::SORTING_PREFIX_PATTERN, $this->getName());
     }
 
-    /**
-     * @return bool
-     */
     public function hasUnderscorePrefix(): bool
     {
         return (bool) preg_match(self::MODULAR_PREFIX_PATTERN, $this->getName());
@@ -261,17 +237,10 @@ class Directory
     private function validateBasenames(): void
     {
         if (!$this->yamlAndMarkdownBasenamesMatch()) {
-            throw StructureException::yamlAndMarkdownFilesMismatch(
-                $this->directoryInfo,
-                $this->getYamlFile(),
-                $this->getMarkdownFile()
-            );
+            throw StructureException::yamlAndMarkdownFilesMismatch($this->directoryInfo, $this->getYamlFile(), $this->getMarkdownFile());
         }
     }
 
-    /**
-     * @return bool
-     */
     private function yamlAndMarkdownBasenamesMatch(): bool
     {
         return
@@ -281,9 +250,6 @@ class Directory
         ;
     }
 
-    /**
-     * @return null|File
-     */
     public function getYamlFile(): ? File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
@@ -291,17 +257,11 @@ class Directory
         return count($files) ? current($files) : null;
     }
 
-    /**
-     * @return bool
-     */
     public function hasYamlFile(): bool
     {
         return null !== $this->getYamlFile();
     }
 
-    /**
-     * @return null|File
-     */
     public function getMarkdownFile(): ? File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
@@ -309,9 +269,6 @@ class Directory
         return count($files) ? current($files) : null;
     }
 
-    /**
-     * @return bool
-     */
     public function hasMarkdownFile(): bool
     {
         return null !== $this->getMarkdownFile();
@@ -319,23 +276,19 @@ class Directory
 
     /**
      * Get default basename defined by YAML, Markdown file or directory slug.
-     *
-     * @return string
      */
     public function getDefaultBasename(): string
     {
         if ($this->hasYamlFile()) {
             return $this->getYamlFile()->getDefaultBasename();
-        } elseif ($this->hasMarkdownFile()) {
+        }
+        if ($this->hasMarkdownFile()) {
             return $this->getMarkdownFile()->getDefaultBasename();
         }
 
         return $this->getSlug();
     }
 
-    /**
-     * @return null|File
-     */
     public function getDefaultBasenameTwigFile(): ? File
     {
         foreach ($this->getTwigFiles() as $twigFile) {
@@ -393,9 +346,7 @@ class Directory
     }
 
     /**
-     * @param bool $convertMarkdown
-     *
-     * @return null|string
+     * @return string|null
      */
     public function fetchPageContent(bool $convertMarkdown)
     {
@@ -406,11 +357,6 @@ class Directory
         return null;
     }
 
-    /**
-     * @param bool $convertMarkdown
-     *
-     * @return Document
-     */
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
         $parser = new FrontYAMLParser();
@@ -433,7 +379,8 @@ class Directory
             $data = Yaml::parse(file_get_contents($this->getYamlFile()->getFilesystemPathname()));
 
             return is_array($data) ? $data : [];
-        } elseif ($this->hasMarkdownFile()) {
+        }
+        if ($this->hasMarkdownFile()) {
             return $this->getFrontYAMLDocument(false)->getYAML() ?: [];
         }
 
@@ -442,8 +389,6 @@ class Directory
 
     /**
      * Save the given raw content to the filesystem.
-     *
-     * @param string|null $newRawContent
      */
     public function saveContent(string $newRawContent = null): void
     {
@@ -460,8 +405,6 @@ class Directory
 
     /**
      * Save the given settings array to the filesystem.
-     *
-     * @param array $newSettings
      */
     public function saveSettings(array $newSettings): void
     {
@@ -481,8 +424,6 @@ class Directory
 
     /**
      * Rename/move the directory to another path.
-     *
-     * @param string $newRealPath
      */
     public function renameOrMove(string $newRealPath): void
     {
@@ -497,8 +438,6 @@ class Directory
 
     /**
      * Get the content strategy for this directory, one of the Directory::CONTENT_STRATEGY_* constants.
-     *
-     * @return string
      */
     public function getContentStrategy(): string
     {
@@ -584,11 +523,6 @@ FRONTMATTER;
         $this->parseFiles();
     }
 
-    /**
-     * @param array $settings
-     *
-     * @return string
-     */
     private function dumpSettingsToYaml(array $settings): string
     {
         $yamlContent = Yaml::dump($settings, 4);

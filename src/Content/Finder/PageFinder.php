@@ -79,8 +79,6 @@ class PageFinder implements \IteratorAggregate, \Countable
     /**
      * Set a finder limit.
      *
-     * @param int|null $limit
-     *
      * @return $this
      */
     public function limit(int $limit = null)
@@ -92,8 +90,6 @@ class PageFinder implements \IteratorAggregate, \Countable
 
     /**
      * Set a finder offset.
-     *
-     * @param int|null $offset
      *
      * @return $this
      */
@@ -166,8 +162,6 @@ class PageFinder implements \IteratorAggregate, \Countable
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param mixed $iterator
-     *
      * @return $this
      *
      * @throws \InvalidArgumentException when the given argument is not iterable
@@ -191,8 +185,6 @@ class PageFinder implements \IteratorAggregate, \Countable
 
     /**
      * @param $iterator
-     *
-     * @return \Iterator
      */
     private function appendPageArrayIterator($iterator): \Iterator
     {
@@ -216,9 +208,6 @@ class PageFinder implements \IteratorAggregate, \Countable
         }
     }
 
-    /**
-     * @return \Iterator
-     */
     private function buildIteratorFromPageListsAndIterators(): \Iterator
     {
         $iterator = new \AppendIterator();
@@ -233,11 +222,6 @@ class PageFinder implements \IteratorAggregate, \Countable
         return $iterator;
     }
 
-    /**
-     * @param array $pageList
-     *
-     * @return \Iterator
-     */
     private function buildIteratorFromSinglePageList(array $pageList): \Iterator
     {
         $mode = \RecursiveIteratorIterator::SELF_FIRST;
@@ -269,8 +253,6 @@ class PageFinder implements \IteratorAggregate, \Countable
 
     /**
      * @param $iterator
-     *
-     * @return \Iterator
      */
     private function applyCustomFiltersIterator(\Iterator $iterator): \Iterator
     {
@@ -283,8 +265,6 @@ class PageFinder implements \IteratorAggregate, \Countable
 
     /**
      * @param $iterator
-     *
-     * @return \Iterator
      */
     private function applyOffsetAndLimitIterator(\Iterator $iterator): \Iterator
     {

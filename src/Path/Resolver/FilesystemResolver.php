@@ -29,9 +29,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
      */
     private $fileFactory;
 
-    /**
-     * @param FileFactory $fileFactory
-     */
     public function __construct(FileFactory $fileFactory)
     {
         $this->filesystem = new Filesystem();
@@ -41,9 +38,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 
     /**
      * Resolve the given path or glob pattern and find the matching files.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
      *
      * @return File[]
      */
@@ -69,7 +63,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
     }
 
     /**
-     * @param Path $path
      * @param Path $parentPath
      */
     private function preparePaths(Path &$path, Path &$parentPath = null): void
@@ -88,12 +81,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
         }
     }
 
-    /**
-     * @param Finder $finder
-     * @param Path   $parentPath
-     *
-     * @return array
-     */
     private function doFind(Finder $finder, Path $parentPath): array
     {
         $found = [];
@@ -122,11 +109,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 
     /**
      * Resolve the given file name and path.
-     *
-     * @param Path      $path
-     * @param Path|null $parentPath
-     *
-     * @return null|File
      */
     public function get(Path $path, Path $parentPath = null): ? File
     {
@@ -150,8 +132,6 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 
     /**
      * @param Path $parentPath
-     *
-     * @return string
      */
     protected function buildBaseDir(Path $parentPath = null): string
     {

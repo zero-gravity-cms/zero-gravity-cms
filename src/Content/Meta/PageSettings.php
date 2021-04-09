@@ -20,10 +20,6 @@ class PageSettings
      */
     private $pageName;
 
-    /**
-     * @param array  $values
-     * @param string $pageName
-     */
     public function __construct(array $values, string $pageName)
     {
         $this->pageName = $pageName;
@@ -32,10 +28,6 @@ class PageSettings
 
     /**
      * Get a single setting value.
-     *
-     * @param string $name
-     *
-     * @return mixed
      */
     public function get(string $name)
     {
@@ -44,8 +36,6 @@ class PageSettings
 
     /**
      * Get array copy of all settings.
-     *
-     * @return array
      */
     public function toArray(): array
     {
@@ -54,8 +44,6 @@ class PageSettings
 
     /**
      * Get all values that wouldn't have been set by default.
-     *
-     * @return array
      */
     public function getNonDefaultValues(): array
     {
@@ -74,8 +62,6 @@ class PageSettings
     /**
      * Resolve and validate page settings.
      * If everything was fine, assign them.
-     *
-     * @param array $values
      */
     public function validate(array $values)
     {
@@ -88,8 +74,6 @@ class PageSettings
 
     /**
      * Configure validation rules for page settings.
-     *
-     * @param OptionsResolver $resolver
      */
     private function configureOptions(OptionsResolver $resolver)
     {
@@ -98,9 +82,6 @@ class PageSettings
         $this->configureNormalizers($resolver);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -126,9 +107,6 @@ class PageSettings
         ]);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
         $resolver->setAllowedTypes('extra', ['null', 'array']);
@@ -149,9 +127,6 @@ class PageSettings
         $resolver->setAllowedTypes('date', $dateTypes);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function configureNormalizers(OptionsResolver $resolver): void
     {
         $this->normalizeDates($resolver);
@@ -160,9 +135,6 @@ class PageSettings
         $this->normalizeArrayValues($resolver);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function normalizeDates(OptionsResolver $resolver): void
     {
         $normalizeDateTime = function (Options $options, $value) {
@@ -171,7 +143,8 @@ class PageSettings
             }
             if ($value instanceof DateTimeImmutable) {
                 return $value;
-            } elseif ($value instanceof DateTimeInterface) {
+            }
+            if ($value instanceof DateTimeInterface) {
                 $value = $value->format('c');
             } elseif (is_int($value)) {
                 $value = '@'.$value;
@@ -184,9 +157,6 @@ class PageSettings
         $resolver->setNormalizer('unpublish_date', $normalizeDateTime);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function normalizeTitle(OptionsResolver $resolver): void
     {
         $normalizeTitle = function (Options $options, $value) {
@@ -203,9 +173,6 @@ class PageSettings
         $resolver->setNormalizer('title', $normalizeTitle);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function normalizeTaxonomy(OptionsResolver $resolver): void
     {
         $normalizeTaxonomy = function (Options $options, $value) {
@@ -222,9 +189,6 @@ class PageSettings
         $resolver->setNormalizer('taxonomy', $normalizeTaxonomy);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function normalizeArrayValues(OptionsResolver $resolver): void
     {
         $normalizeArray = function (Options $options, $value) {

@@ -10,9 +10,6 @@ use ZeroGravity\Cms\Content\PageDiff;
 class StructureException extends RuntimeException implements ZeroGravityException
 {
     /**
-     * @param SplFileInfo $directory
-     * @param array       $files
-     *
      * @return StructureException
      */
     public static function moreThanOneYamlFile(SplFileInfo $directory, array $files)
@@ -21,9 +18,6 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
     }
 
     /**
-     * @param SplFileInfo $directory
-     * @param array       $files
-     *
      * @return StructureException
      */
     public static function moreThanOneMarkdownFile(SplFileInfo $directory, array $files)
@@ -32,10 +26,6 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
     }
 
     /**
-     * @param SplFileInfo $directory
-     * @param File        $yamlFile
-     * @param File        $markdownFile
-     *
      * @return StructureException
      */
     public static function yamlAndMarkdownFilesMismatch(
@@ -52,8 +42,6 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
     }
 
     /**
-     * @param PageDiff $diff
-     *
      * @return StructureException
      */
     public static function newPageNameAlreadyExists(PageDiff $diff)
@@ -66,9 +54,7 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
     }
 
     /**
-     * @param SplFileInfo $directory
-     * @param File[]      $files
-     * @param string      $type
+     * @param File[] $files
      *
      * @return static
      */

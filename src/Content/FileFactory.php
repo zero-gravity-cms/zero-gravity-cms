@@ -25,10 +25,6 @@ class FileFactory
 
     /**
      * FileFactory constructor.
-     *
-     * @param FileTypeDetector $fileTypeDetector
-     * @param MetadataLoader   $metadataLoader
-     * @param string           $basePath
      */
     public function __construct(FileTypeDetector $fileTypeDetector, MetadataLoader $metadataLoader, string $basePath)
     {
@@ -42,11 +38,6 @@ class FileFactory
         $this->basePath = $basePath;
     }
 
-    /**
-     * @param string $pathname
-     *
-     * @return File
-     */
     public function createFile(string $pathname): File
     {
         return new File(
@@ -57,9 +48,6 @@ class FileFactory
         );
     }
 
-    /**
-     * @return string
-     */
     public function getBasePath(): string
     {
         return $this->basePath;

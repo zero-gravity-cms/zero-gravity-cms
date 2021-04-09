@@ -51,9 +51,9 @@ class ZeroGravityExtensionTest extends BaseUnit
             ;
         });
 
-        return array(
+        return [
             new ZeroGravityExtension($repository, $routePageSelector, $filterRegistry),
-        );
+        ];
     }
 
     /**

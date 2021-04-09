@@ -17,9 +17,6 @@ class AfterPageCreate extends Event
         $this->page = $page;
     }
 
-    /**
-     * @return Page
-     */
     public function getPage(): Page
     {
         return $this->page;

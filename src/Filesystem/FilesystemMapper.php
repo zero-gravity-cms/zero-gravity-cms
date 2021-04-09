@@ -58,13 +58,6 @@ class FilesystemMapper implements StructureMapper
 
     /**
      * FilesystemMapper constructor.
-     *
-     * @param FileFactory              $fileFactory
-     * @param string                   $path
-     * @param bool                     $convertMarkdown
-     * @param array                    $defaultPageSettings
-     * @param LoggerInterface          $logger
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         FileFactory $fileFactory,
@@ -123,8 +116,6 @@ class FilesystemMapper implements StructureMapper
     }
 
     /**
-     * @param ReadablePage $page
-     *
      * @return WritableFilesystemPage
      */
     public function getWritablePageInstance(ReadablePage $page): WritablePage
@@ -133,8 +124,6 @@ class FilesystemMapper implements StructureMapper
     }
 
     /**
-     * @param ReadablePage|null $parentPage
-     *
      * @return WritableFilesystemPage
      */
     public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
@@ -144,8 +133,6 @@ class FilesystemMapper implements StructureMapper
 
     /**
      * Store changes of the given page diff.
-     *
-     * @param PageDiff $diff
      *
      * @throws FilesystemException|StructureException|ZeroGravityException
      */
@@ -179,8 +166,6 @@ class FilesystemMapper implements StructureMapper
     }
 
     /**
-     * @param PageDiff $diff
-     *
      * @throws ZeroGravityException
      */
     private function validateDiff(PageDiff $diff): void
@@ -193,19 +178,12 @@ class FilesystemMapper implements StructureMapper
         }
     }
 
-    /**
-     * @param PageDiff $diff
-     *
-     * @return bool
-     */
     private function newFilesystemPathAlreadyExists(PageDiff $diff): bool
     {
         return is_dir($this->path.$diff->getNew()->getFilesystemPath()->toString());
     }
 
     /**
-     * @param ZeroGravityException $exception
-     *
      * @throws ZeroGravityException
      */
     private function logAndThrow(ZeroGravityException $exception)
@@ -215,11 +193,6 @@ class FilesystemMapper implements StructureMapper
         throw $exception;
     }
 
-    /**
-     * @param PageDiff $diff
-     *
-     * @return Directory
-     */
     private function createDirectoryForNewPage(PageDiff $diff): Directory
     {
         $realPath = $this->path.$diff->getNewFilesystemPath();
@@ -232,11 +205,6 @@ class FilesystemMapper implements StructureMapper
         return $directory;
     }
 
-    /**
-     * @param PageDiff $diff
-     *
-     * @return array
-     */
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
     {
         $settings = $diff->getNewNonDefaultSettings();
@@ -253,12 +221,6 @@ class FilesystemMapper implements StructureMapper
         return $settings;
     }
 
-    /**
-     * @param string      $path
-     * @param string|null $parentPath
-     *
-     * @return Directory
-     */
     private function createDirectory(string $path, string $parentPath = null): Directory
     {
         $directory = new Directory(

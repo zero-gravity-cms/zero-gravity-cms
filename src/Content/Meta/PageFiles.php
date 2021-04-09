@@ -13,10 +13,6 @@ class PageFiles
      */
     private $files;
 
-    /**
-     * @param array $files
-     * @param array $fileAliases
-     */
     public function __construct(array $files, array $fileAliases = [])
     {
         Assert::allIsInstanceOf($files, File::class);
@@ -24,7 +20,7 @@ class PageFiles
         $this->applyFileAliases($fileAliases);
     }
 
-    private function applyFileAliases($fileAliases)
+    private function applyFileAliases(array $fileAliases): void
     {
         foreach ($fileAliases as $from => $to) {
             if (isset($this->files[$to])) {
@@ -33,11 +29,6 @@ class PageFiles
         }
     }
 
-    /**
-     * @param $name
-     *
-     * @return bool
-     */
     public function has(string $name): bool
     {
         return array_key_exists($name, $this->files);
@@ -46,12 +37,9 @@ class PageFiles
     /**
      * Get a single setting value or a default, if not defined.
      *
-     * @param string $filename
-     * @param mixed  $default
-     *
-     * @return File
+     * @param mixed|null $default
      */
-    public function get(string $filename, $default = null): ? File
+    public function get(string $filename, $default = null): ?File
     {
         if ($this->has($filename)) {
             return $this->files[$filename];
@@ -62,8 +50,6 @@ class PageFiles
 
     /**
      * Get all files for the given type.
-     *
-     * @param string $type
      *
      * @return File[]
      */
@@ -96,8 +82,6 @@ class PageFiles
 
     /**
      * Get path to single markdown file if available.
-     *
-     * @return File|null
      */
     public function getMarkdownFile(): ? File
     {
@@ -111,8 +95,6 @@ class PageFiles
 
     /**
      * Get path to single YAML file if available.
-     *
-     * @return File|null
      */
     public function getYamlFile(): ? File
     {
@@ -126,8 +108,6 @@ class PageFiles
 
     /**
      * Get path to single Twig file if available.
-     *
-     * @return File|null
      */
     public function getTwigFile(): ? File
     {

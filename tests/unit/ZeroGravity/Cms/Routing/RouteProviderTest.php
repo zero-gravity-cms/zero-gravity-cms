@@ -105,8 +105,7 @@ class RouteProviderTest extends BaseUnit
     }
 
     /**
-     * @param           $name
-     * @param Page|null $parent
+     * @param $name
      *
      * @return Page
      */

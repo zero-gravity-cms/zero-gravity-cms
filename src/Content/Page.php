@@ -49,9 +49,7 @@ class Page implements ReadablePage
     /**
      * Create a new page object.
      *
-     * @param string $name
-     * @param array  $settings
-     * @param Page   $parent
+     * @param Page $parent
      */
     public function __construct(string $name, array $settings = [], self $parent = null)
     {
@@ -68,8 +66,6 @@ class Page implements ReadablePage
 
     /**
      * Set parent page and initialize all dependent values.
-     *
-     * @param ReadablePage|null $parent
      */
     protected function initParent(ReadablePage $parent = null): void
     {
@@ -89,41 +85,26 @@ class Page implements ReadablePage
         return $this->parent;
     }
 
-    /**
-     * @param string|null $content
-     */
     public function setContent(string $content = null): void
     {
         $this->content = $content;
     }
 
-    /**
-     * @return string|null
-     */
     public function getContent(): ? string
     {
         return $this->content;
     }
 
-    /**
-     * @return Path
-     */
     public function getPath(): Path
     {
         return $this->path;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return Path
-     */
     public function getFilesystemPath(): Path
     {
         return $this->filesystemPath;
@@ -137,9 +118,6 @@ class Page implements ReadablePage
         $this->children[$childPage->getPath()->toString()] = $childPage;
     }
 
-    /**
-     * @return PageFinder
-     */
     public function getChildren(): PageFinder
     {
         return PageFinder::create()
@@ -148,9 +126,6 @@ class Page implements ReadablePage
         ;
     }
 
-    /**
-     * @return bool
-     */
     public function hasChildren(): bool
     {
         return count($this->children) > 0;

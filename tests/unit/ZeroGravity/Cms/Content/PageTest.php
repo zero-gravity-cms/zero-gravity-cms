@@ -462,8 +462,6 @@ class PageTest extends BaseUnit
     }
 
     /**
-     * @param array $fileNamesByType
-     *
      * @return File[]
      */
     private function createFiles(array $fileNamesByType)

@@ -35,8 +35,6 @@ class FileTypeDetector
      * It will NOT perform any mime detection or similar checks, since files are assumed to have been.
      *
      * @param string $filename File name or path
-     *
-     * @return string
      */
     public function getType(string $filename): string
     {

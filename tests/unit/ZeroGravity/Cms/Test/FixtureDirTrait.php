@@ -17,8 +17,6 @@ trait FixtureDirTrait
 {
     /**
      * Get the directory containing the page fixture data.
-     *
-     * @return string
      */
     protected function getPageFixtureDir(): string
     {
@@ -35,8 +33,6 @@ trait FixtureDirTrait
 
     /**
      * Get the path to the directory containg valid page data.
-     *
-     * @return string
      */
     protected function getValidPagesDir(): string
     {
@@ -45,8 +41,6 @@ trait FixtureDirTrait
 
     /**
      * Get a FileFactory instance leading to the valid pages fixture dir.
-     *
-     * @return FileFactory
      */
     public function getDefaultFileFactory(): FileFactory
     {
@@ -72,9 +66,6 @@ trait FixtureDirTrait
         return new FilesystemResolver($this->getDefaultFileFactory());
     }
 
-    /**
-     * @return ContentRepository
-     */
     protected function getDefaultContentRepository(): ContentRepository
     {
         $fileFactory = $this->getDefaultFileFactory();

@@ -10,8 +10,6 @@ trait TempDirTrait
 
     /**
      * Create temporary directory and optionally mirror the content of the given directory.
-     *
-     * @param string|null $copyDir
      */
     protected function setupTempDir(string $copyDir = null)
     {

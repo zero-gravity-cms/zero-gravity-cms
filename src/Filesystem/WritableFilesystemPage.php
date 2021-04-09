@@ -2,10 +2,10 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
+use ZeroGravity\Cms\Content\BasicWritablePageTrait;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\WritablePage;
-use ZeroGravity\Cms\Content\BasicWritablePageTrait;
 
 class WritableFilesystemPage extends Page implements WritablePage
 {

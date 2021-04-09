@@ -17,9 +17,6 @@ abstract class PageDiffEvent extends Event
         $this->diff = $diff;
     }
 
-    /**
-     * @return PageDiff
-     */
     public function getDiff(): PageDiff
     {
         return $this->diff;

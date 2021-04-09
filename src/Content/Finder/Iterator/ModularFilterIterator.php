@@ -18,7 +18,6 @@ class ModularFilterIterator extends \FilterIterator
 
     /**
      * @param \Iterator $iterator The Iterator to filter
-     * @param bool      $modular
      */
     public function __construct(\Iterator $iterator, bool $modular)
     {

@@ -18,7 +18,6 @@ class VisibleFilterIterator extends \FilterIterator
 
     /**
      * @param \Iterator $iterator The Iterator to filter
-     * @param bool      $visible
      */
     public function __construct(\Iterator $iterator, bool $visible)
     {

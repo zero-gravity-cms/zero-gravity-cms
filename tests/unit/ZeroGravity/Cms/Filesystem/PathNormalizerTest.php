@@ -63,11 +63,6 @@ class PathNormalizerTest extends BaseUnit
     /**
      * @test
      * @dataProvider providePathsWithInPath
-     *
-     * @param string $path
-     * @param string $parentPath
-     * @param string $resolvedPath
-     * @param string $resolvedParentPath
      */
     public function validPathAndParentPathIsNormalized(string $path, string $parentPath, string $resolvedPath, string $resolvedParentPath)
     {

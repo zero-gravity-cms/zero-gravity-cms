@@ -23,9 +23,6 @@ class BeforeAddChildrenToItem extends MenuEvent
         $this->item = $item;
     }
 
-    /**
-     * @return ItemInterface
-     */
     public function getItem(): ItemInterface
     {
         return $this->item;

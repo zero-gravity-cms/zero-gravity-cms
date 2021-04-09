@@ -33,8 +33,7 @@ class PathElement
     /**
      * Initialize settings for this element.
      *
-     * @param      $name
-     * @param bool $allowRegex
+     * @param $name
      */
     protected function init($name, bool $allowRegex = false): void
     {
@@ -43,41 +42,26 @@ class PathElement
         $this->isGlob = !$this->isRegex && Path::stringContainsGlob($name);
     }
 
-    /**
-     * @return bool
-     */
     public function isParentReference(): bool
     {
         return '..' === $this->name;
     }
 
-    /**
-     * @return bool
-     */
     public function isGlob(): bool
     {
         return $this->isGlob;
     }
 
-    /**
-     * @return bool
-     */
     public function isRegex(): bool
     {
         return $this->isRegex;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->getName();
