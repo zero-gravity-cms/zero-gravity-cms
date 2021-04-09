@@ -2,10 +2,13 @@
 
 namespace ZeroGravity\Cms\Twig\Extension;
 
-use Twig_Environment;
-use Twig_Extension;
-use Twig_SimpleFilter;
-use Twig_SimpleFunction;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -13,7 +16,7 @@ use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Routing\RouterPageSelector;
 
-class ZeroGravityExtension extends Twig_Extension
+class ZeroGravityExtension extends AbstractExtension
 {
     /**
      * @var ContentRepository
@@ -40,16 +43,16 @@ class ZeroGravityExtension extends Twig_Extension
     public function getFilters()
     {
         return [
-            new Twig_SimpleFilter('zg_filter', [$this, 'filterPages']),
-            new Twig_SimpleFilter('zg_page_hash', [$this, 'getPageHash']),
-            new Twig_SimpleFilter(
+            new TwigFilter('zg_filter', [$this, 'filterPages']),
+            new TwigFilter('zg_page_hash', [$this, 'getPageHash']),
+            new TwigFilter(
                 'zg_render_content',
                 [$this, 'renderPageContent'],
                 [
                     'is_safe' => ['html'],
                 ]
             ),
-            new Twig_SimpleFilter(
+            new TwigFilter(
                 'zg_render',
                 [$this, 'renderPage'],
                 [
@@ -63,18 +66,18 @@ class ZeroGravityExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            new Twig_SimpleFunction('zg_page', [$this, 'getPage']),
-            new Twig_SimpleFunction('zg_page_hash', [$this, 'getPageHash']),
-            new Twig_SimpleFunction('zg_current_page', [$this, 'getCurrentPage']),
-            new Twig_SimpleFunction('zg_filter', [$this, 'filterAllPages']),
-            new Twig_SimpleFunction(
+            new TwigFunction('zg_page', [$this, 'getPage']),
+            new TwigFunction('zg_page_hash', [$this, 'getPageHash']),
+            new TwigFunction('zg_current_page', [$this, 'getCurrentPage']),
+            new TwigFunction('zg_filter', [$this, 'filterAllPages']),
+            new TwigFunction(
                 'zg_render_content',
                 [$this, 'renderPageContent'],
                 [
                     'is_safe' => ['html'],
                 ]
             ),
-            new Twig_SimpleFunction(
+            new TwigFunction(
                 'zg_render',
                 [$this, 'renderPage'],
                 [
@@ -153,17 +156,11 @@ class ZeroGravityExtension extends Twig_Extension
     }
 
     /**
-     * @param Twig_Environment $environment
-     * @param Page             $page
-     * @param array            $context
-     *
-     * @return null|string
-     *
-     * @throws \Twig_Error_Loader
-     * @throws \Twig_Error_Runtime
-     * @throws \Twig_Error_Syntax
+     * @throws LoaderError  When the template cannot be found
+     * @throws SyntaxError  When an error occurred during compilation
+     * @throws RuntimeError When an error occurred during rendering
      */
-    public function renderPage(Twig_Environment $environment, Page $page, array $context = [])
+    public function renderPage(Environment $environment, Page $page, array $context = []): ?string
     {
         if (!empty($page->getContentTemplate())) {
             $context['page'] = $page;
