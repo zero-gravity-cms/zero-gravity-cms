@@ -1,21 +1,38 @@
 <?php
 
+// https://github.com/squizlabs/PHP_CodeSniffer/issues/2015
+// phpcs:disable PSR1.Files.SideEffects
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
+// phpcs:disable Generic.Files.LineLength.TooLong
+// phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClass
+define('C33S_SKIP_LOAD_DOT_ENV', true);
 /*
  * =================================================================
  * Start CI auto fetch (downloading robo dependencies automatically)
  * =================================================================.
  */
-if (!is_file('.ci/vendor/autoload.php')) {
-    (is_dir('.ci') || mkdir('.ci')) && chdir('.ci');
-    exec('composer req c33s-toolkit/robo-file -n', $output, $resultCode);
+define('C33S_ROBO_DIR', '.robo');
+
+$roboDir = C33S_ROBO_DIR;
+$previousWorkingDir = getcwd();
+(is_dir($roboDir) || mkdir($roboDir)) && chdir($roboDir);
+if (!is_file('composer.json')) {
+    exec('composer init --no-interaction', $output, $resultCode);
+    exec('composer require c33s/robofile --no-interaction', $output, $resultCode);
+    exec('rm composer.yaml || rm composer.yml || return true', $output, $resultCode2);
     if ($resultCode > 0) {
         copy('https://getcomposer.org/composer.phar', 'composer');
-        exec('php composer req c33s-toolkit/robo-file -n');
+        exec('php composer require c33s/robofile --no-interaction');
         unlink('composer');
     }
-    chdir('..');
+} else {
+    exec('composer install --dry-run --no-interaction 2>&1', $output);
+    if (false === in_array('Nothing to install or update', $output)) {
+        fwrite(STDERR, "\n##### Updating .robo dependencies #####\n\n") && exec('composer install --no-interaction');
+    }
 }
-require '.ci/vendor/autoload.php';
+chdir($previousWorkingDir);
+require $roboDir.'/vendor/autoload.php';
 /*
  * =================================================================
  *                        End CI auto fetch
@@ -24,6 +41,8 @@ require '.ci/vendor/autoload.php';
 
 use Identicon\Identicon;
 use Symfony\Component\Filesystem\Filesystem;
+use Consolidation\AnnotatedCommand\CommandData;
+use Robo\Exception\TaskException;
 
 /**
  * This is project's console commands configuration for Robo task runner.
@@ -32,7 +51,10 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class RoboFile extends \Robo\Tasks
 {
+    const GLOBAL_COMPOSER_PACKAGES = [];
+
     use \C33s\Robo\C33sTasks;
+    use \C33s\Robo\C33sExtraTasks;
 
     protected $portsToCheck = [
         // 'http' => null,
@@ -50,9 +72,10 @@ class RoboFile extends \Robo\Tasks
     {
         $this->stopOnFail(true);
         $this->_prepareCiModules([
-            'codeception' => '2.3.7',
-            'composer' => '@latest',
-            'php-cs-fixer' => 'v2.9.0',
+            'composer' => '2.0.7',
+            'php-cs-fixer' => 'v2.17.3',
+            'phpstan' => '0.12.67',
+            'phpcs' => '3.4.0',
         ]);
     }
 
@@ -71,8 +94,9 @@ class RoboFile extends \Robo\Tasks
             }
         }
 
-        $this->composerGlobalRequire('fxp/composer-asset-plugin', '~1.3');
-        $this->composerGlobalRequire('hirak/prestissimo', '^0.3');
+        foreach (self::GLOBAL_COMPOSER_PACKAGES as $package => $version) {
+            $this->composerGlobalRequire($package, $version);
+        }
 
         $this->update();
     }
@@ -84,7 +108,7 @@ class RoboFile extends \Robo\Tasks
      */
     public function check($arguments = '')
     {
-        $this->_execPhp("php .ci/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
+        $this->_execPhp("php .robo/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
     }
 
     /**
@@ -95,7 +119,7 @@ class RoboFile extends \Robo\Tasks
     public function fix($arguments = '')
     {
         if ($this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
-            $this->_execPhp("php .ci/bin/php-cs-fixer.phar fix --verbose $arguments");
+            $this->_execPhp("php .robo/bin/php-cs-fixer.phar fix --verbose $arguments");
         } else {
             $this->abort();
         }
@@ -123,10 +147,10 @@ class RoboFile extends \Robo\Tasks
      */
     public function update()
     {
-        if ($this->isEnvironmentCi()) {
-            $this->_execPhp('php ./.ci/bin/composer.phar install --no-progress --no-suggest --prefer-dist --optimize-autoloader');
+        if ($this->isEnvironmentCi() || $this->isEnvironmentProduction()) {
+            $this->_execPhp('php ./.robo/bin/composer.phar install --no-progress --no-suggest --prefer-dist --optimize-autoloader');
         } else {
-            $this->_execPhp('php ./.ci/bin/composer.phar install');
+            $this->_execPhp('php ./.robo/bin/composer.phar install');
         }
     }
 

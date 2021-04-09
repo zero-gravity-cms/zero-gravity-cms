@@ -5,7 +5,7 @@ $finder = PhpCsFixer\Finder::create()
     ->notPath('tests/_support/_generated')
 ;
 
-$cacheDir = __DIR__.'/.ci/cache';
+$cacheDir = __DIR__.'/.robo/cache';
 if (!is_dir($cacheDir)) {
     mkdir($cacheDir, 0777, true);
 }
