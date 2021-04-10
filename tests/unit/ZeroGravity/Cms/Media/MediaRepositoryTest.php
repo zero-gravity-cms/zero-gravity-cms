@@ -22,7 +22,7 @@ class MediaRepositoryTest extends BaseUnit
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
-        $this->assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
+        static::assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
     }
 
     public function provideValidMediaPaths(): Iterator
@@ -41,7 +41,7 @@ class MediaRepositoryTest extends BaseUnit
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
-        $this->assertNull($mediaRepository->getFile($pathString));
+        static::assertNull($mediaRepository->getFile($pathString));
     }
 
     public function provideInvalidMediaPaths(): Iterator

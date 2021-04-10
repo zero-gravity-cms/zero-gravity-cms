@@ -203,9 +203,9 @@ trait TwigExtensionTestTrait
             } catch (Exception $e) {
                 if (false !== $exception) {
                     $message = $e->getMessage();
-                    self::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $message)));
+                    static::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $message)));
                     $last = substr($message, strlen($message) - 1);
-                    self::assertTrue('.' === $last || '?' === $last, $message, 'Exception message must end with a dot or a question mark.');
+                    static::assertTrue('.' === $last || '?' === $last, $message, 'Exception message must end with a dot or a question mark.');
 
                     return;
                 }
@@ -217,7 +217,7 @@ trait TwigExtensionTestTrait
                 $output = trim($template->render(eval($match[1].';')), "\n ");
             } catch (Exception $e) {
                 if (false !== $exception) {
-                    self::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $e->getMessage())));
+                    static::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $e->getMessage())));
 
                     return;
                 }
@@ -230,7 +230,7 @@ trait TwigExtensionTestTrait
             if (false !== $exception) {
                 [$class] = explode(':', $exception);
                 $constraintClass = class_exists(\PHPUnit\Framework\Constraint\Exception::class) ? \PHPUnit\Framework\Constraint\Exception::class : 'PHPUnit_Framework_Constraint_Exception';
-                self::assertThat(null, new $constraintClass($class));
+                static::assertThat(null, new $constraintClass($class));
             }
 
             $expected = trim($match[3], "\n ");
@@ -243,7 +243,7 @@ trait TwigExtensionTestTrait
                     echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext($name))));
                 }
             }
-            self::assertEquals($expected, $output, $message.' (in '.$file.')');
+            static::assertEquals($expected, $output, $message.' (in '.$file.')');
         }
     }
 

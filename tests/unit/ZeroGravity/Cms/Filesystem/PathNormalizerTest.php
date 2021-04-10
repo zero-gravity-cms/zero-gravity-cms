@@ -22,7 +22,7 @@ class PathNormalizerTest extends BaseUnit
         $path = new Path($path);
         PathNormalizer::normalizePath($path);
 
-        $this->assertSame($resolvedPath, $path->toString());
+        static::assertSame($resolvedPath, $path->toString());
     }
 
     public function provideValidPaths(): Iterator
@@ -67,8 +67,8 @@ class PathNormalizerTest extends BaseUnit
         $parentPath = new Path($parentPath);
         PathNormalizer::normalizePath($path, $parentPath);
 
-        $this->assertSame($resolvedPath, $path->toString());
-        $this->assertSame($resolvedParentPath, $parentPath->toString());
+        static::assertSame($resolvedPath, $path->toString());
+        static::assertSame($resolvedParentPath, $parentPath->toString());
     }
 
     public function providePathsWithInPath(): Iterator

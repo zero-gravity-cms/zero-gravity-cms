@@ -35,8 +35,8 @@ class FilesystemMapperTest extends BaseUnit
         $mapper = new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         $pages = $mapper->parse();
-        $this->assertContainsOnlyInstancesOf(Page::class, $pages);
-        $this->assertCount(8, $pages);
+        static::assertContainsOnlyInstancesOf(Page::class, $pages);
+        static::assertCount(8, $pages);
     }
 
     /**
@@ -53,7 +53,7 @@ class FilesystemMapperTest extends BaseUnit
         $page = $pages['/yaml_only'];
 
         $writablePage = $mapper->getWritablePageInstance($page);
-        $this->assertInstanceOf(WritableFilesystemPage::class, $writablePage);
-        $this->assertSame('01.yaml_only', $writablePage->getName());
+        static::assertInstanceOf(WritableFilesystemPage::class, $writablePage);
+        static::assertSame('01.yaml_only', $writablePage->getName());
     }
 }

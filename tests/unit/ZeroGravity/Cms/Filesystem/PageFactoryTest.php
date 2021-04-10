@@ -31,7 +31,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getPageFixtureDir().'/invalid_pages/no_data');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertNull($page);
+        static::assertNull($page);
     }
 
     /**
@@ -47,7 +47,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/'.$path);
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertInstanceOf(Page::class, $page);
+        static::assertInstanceOf(Page::class, $page);
     }
 
     public function provideValidDirectories(): Iterator
@@ -71,7 +71,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertSame('testtitle', $page->getTitle());
+        static::assertSame('testtitle', $page->getTitle());
     }
 
     /**
@@ -87,8 +87,8 @@ class PageFactoryTest extends BaseUnit
             'menu_id' => 'defaultmenu',
         ], null);
 
-        $this->assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
-        $this->assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
+        static::assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
+        static::assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
     }
 
     /**
@@ -101,7 +101,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertEquals([
+        static::assertEquals([
             'page.yaml',
             '03.empty/child_file5.png',
             '03.empty/child_file6.png',
@@ -121,12 +121,12 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
         $parentPage = null;
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
-        $this->assertEquals('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
+        static::assertEquals('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/06.yaml_and_twig');
         $parentPage = new Page('');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
-        $this->assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
+        static::assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
     }
 
     /**
@@ -140,7 +140,7 @@ class PageFactoryTest extends BaseUnit
         $page1 = $pageFactory->createPage($dir, false, [], null);
         $page2 = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertEquals($page1, $page2);
+        static::assertEquals($page1, $page2);
     }
 
     /**
@@ -160,8 +160,8 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
 
-        $this->assertEquals('some value', $page->getExtra('some key'));
-        $this->assertEquals('another_custom_value', $page->getExtra('custom'));
+        static::assertEquals('some value', $page->getExtra('some key'));
+        static::assertEquals('another_custom_value', $page->getExtra('custom'));
     }
 
     /**
@@ -207,9 +207,9 @@ class PageFactoryTest extends BaseUnit
             return true;
         };
 
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(static::at($run++))
             ->method('dispatch')
-            ->with($this->callback($afterCreatePageCallback))
+            ->with(static::callback($afterCreatePageCallback))
             ->willReturnArgument(0)
         ;
 
@@ -234,7 +234,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, []);
 
-        $this->assertSame('very custom value', $page->getExtra('very_custom_key'));
+        static::assertSame('very custom value', $page->getExtra('very_custom_key'));
     }
 
     /**

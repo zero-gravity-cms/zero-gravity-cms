@@ -24,8 +24,8 @@ class FilesystemResolverTest extends BaseUnit
 
         $parent = (null !== $inPath) ? new Path($inPath) : null;
         $resolved = $resolver->get(new Path($file), $parent);
-        $this->assertInstanceOf(File::class, $resolved, 'path results in file: '.$file);
-        $this->assertSame($pathName, $resolved->getPathname(), 'pathname matches');
+        static::assertInstanceOf(File::class, $resolved, 'path results in file: '.$file);
+        static::assertSame($pathName, $resolved->getPathname(), 'pathname matches');
     }
 
     public function provideSingleValidFiles(): Iterator
@@ -80,8 +80,8 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('foo/bar/../../root_file1.png'));
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame('/root_file1.png', $resolved->getPathname(), 'pathname matches');
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/root_file1.png', $resolved->getPathname(), 'pathname matches');
     }
 
     /**
@@ -92,8 +92,8 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('../../images/person_a.png'), new Path('04.with_children/_child1'));
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame('/images/person_a.png', $resolved->getPathname(), 'pathname matches');
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/images/person_a.png', $resolved->getPathname(), 'pathname matches');
     }
 
     /**
@@ -105,7 +105,7 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path($file));
-        $this->assertNull($resolved);
+        static::assertNull($resolved);
     }
 
     public function provideSingleInvalidFiles(): Iterator
@@ -141,7 +141,7 @@ class FilesystemResolverTest extends BaseUnit
 
         $parent = (null !== $inPath) ? new Path($inPath) : null;
         $resolved = $resolver->find(new Path($pattern), $parent);
-        $this->assertEquals($foundFiles, array_keys($resolved), 'result matches when searching for '.$pattern);
+        static::assertEquals($foundFiles, array_keys($resolved), 'result matches when searching for '.$pattern);
     }
 
     public function provideMultipleFilePatterns(): Iterator
@@ -281,8 +281,8 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('01.yaml_only/file1.png'));
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
     }
 
     /**
@@ -293,11 +293,11 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('file1.png'));
-        $this->assertNull($resolved);
+        static::assertNull($resolved);
 
         $resolved = $resolver->findOne(new Path('file1.png'), null, false);
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
     }
 
     /**
@@ -308,7 +308,7 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('does_not_exist.png'), null, false);
-        $this->assertNull($resolved);
+        static::assertNull($resolved);
     }
 
     /**
@@ -319,7 +319,7 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('does_not_exist.png'), null, true);
-        $this->assertNull($resolved);
+        static::assertNull($resolved);
     }
 
     /**
@@ -330,11 +330,8 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('child_file8.png'), null, true);
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame(
-            '/04.with_children/03.empty/sub/dir/child_file8.png',
-            $resolved->getPathname()
-        );
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
     }
 
     /**
@@ -356,10 +353,7 @@ class FilesystemResolverTest extends BaseUnit
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('child_file8.png'), new Path('04.with_children/03.empty'), true);
-        $this->assertInstanceOf(File::class, $resolved);
-        $this->assertSame(
-            '/04.with_children/03.empty/sub/dir/child_file8.png',
-            $resolved->getPathname()
-        );
+        static::assertInstanceOf(File::class, $resolved);
+        static::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
     }
 }

@@ -38,7 +38,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $this->assertFalse($provider->has('invalid-menu-name'));
+        static::assertFalse($provider->has('invalid-menu-name'));
 
         $this->expectException(InvalidMenuNameException::class);
         $provider->get('invalid-menu-name');
@@ -52,7 +52,7 @@ class KnpMenuProviderTest extends BaseUnit
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        $this->assertInstanceOf(ItemInterface::class, $rootItem);
+        static::assertInstanceOf(ItemInterface::class, $rootItem);
     }
 
     /**
@@ -63,7 +63,7 @@ class KnpMenuProviderTest extends BaseUnit
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        $this->assertCount(3, $rootItem->getChildren());
+        static::assertCount(3, $rootItem->getChildren());
     }
 
     /**
@@ -75,7 +75,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        $this->assertCount(2, $child->getChildren());
+        static::assertCount(2, $child->getChildren());
     }
 
     /**
@@ -87,7 +87,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        $this->assertSame('first-sibling', $child->getExtra('page_slug'));
+        static::assertSame('first-sibling', $child->getExtra('page_slug'));
     }
 
     /**
@@ -99,7 +99,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        $this->assertSame('custom second sibling label', $child->getLabel());
+        static::assertSame('custom second sibling label', $child->getLabel());
     }
 
     /**
@@ -111,7 +111,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        $this->assertSame('custom_value', $child->getExtra('custom_extra'));
+        static::assertSame('custom_value', $child->getExtra('custom_extra'));
     }
 
     /**
@@ -136,14 +136,14 @@ class KnpMenuProviderTest extends BaseUnit
 
         foreach ($expectedItemUris as $childName => $uri) {
             $child = $rootItem->getChild($childName);
-            $this->assertInstanceOf(ItemInterface::class, $child);
-            $this->assertSame($uri, $child->getUri());
+            static::assertInstanceOf(ItemInterface::class, $child);
+            static::assertSame($uri, $child->getUri());
 
             if (isset($expectedChildItemUris[$childName])) {
                 foreach ($expectedChildItemUris[$childName] as $subChildName => $subUri) {
                     $subChild = $child->getChild($subChildName);
-                    $this->assertInstanceOf(ItemInterface::class, $subChild);
-                    $this->assertSame($subUri, $subChild->getUri());
+                    static::assertInstanceOf(ItemInterface::class, $subChild);
+                    static::assertSame($subUri, $subChild->getUri());
                 }
             }
         }
@@ -412,7 +412,7 @@ class KnpMenuProviderTest extends BaseUnit
     protected function getMockUrlGenerator(): UrlGeneratorInterface
     {
         $generator = $this->createMock(UrlGeneratorInterface::class);
-        $generator->expects($this->any())
+        $generator
             ->method('generate')
             ->willReturnArgument(0)
         ;

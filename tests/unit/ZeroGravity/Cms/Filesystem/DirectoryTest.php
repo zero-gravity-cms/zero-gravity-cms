@@ -29,7 +29,7 @@ class DirectoryTest extends BaseUnit
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        $this->assertSame('', $dir->getPath());
+        static::assertSame('', $dir->getPath());
     }
 
     /**
@@ -42,7 +42,7 @@ class DirectoryTest extends BaseUnit
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        $this->assertSame('some/path/01.yaml_only', $dir->getPath());
+        static::assertSame('some/path/01.yaml_only', $dir->getPath());
     }
 
     /**
@@ -71,7 +71,7 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameReturnsYamlBasenameIfPresent()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
-        $this->assertSame('page', $dir->getDefaultBasename());
+        static::assertSame('page', $dir->getDefaultBasename());
     }
 
     /**
@@ -80,7 +80,7 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameReturnsMarkdownBasenameIfPresent()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/02.markdown_only');
-        $this->assertSame('page', $dir->getDefaultBasename());
+        static::assertSame('page', $dir->getDefaultBasename());
     }
 
     /**
@@ -89,8 +89,8 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameTwigFileReturnsTwigFileIfMatchesDefaultBasename()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
-        $this->assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
-        $this->assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
+        static::assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
+        static::assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
     }
 
     /**
@@ -104,7 +104,7 @@ class DirectoryTest extends BaseUnit
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().$path);
 
-        $this->assertSame($expectedStrategy, $dir->getContentStrategy());
+        static::assertSame($expectedStrategy, $dir->getContentStrategy());
     }
 
     public function providePathsAndStrategies(): Iterator

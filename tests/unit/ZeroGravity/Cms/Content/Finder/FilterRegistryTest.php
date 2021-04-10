@@ -19,7 +19,7 @@ class FilterRegistryTest extends BaseUnit
     /**
      * @test
      */
-    public function throwsExceptionIfNotValidType()
+    public function throwsExceptionIfNotValidType(): void
     {
         $registry = new FilterRegistry();
 
@@ -31,7 +31,7 @@ class FilterRegistryTest extends BaseUnit
      * @test
      * @doesNotPerformAssertions
      */
-    public function allowsPageFinderFilterToBeAdded()
+    public function allowsPageFinderFilterToBeAdded(): void
     {
         $registry = new FilterRegistry();
         $filter = $this->createMock(PageFinderFilter::class);
@@ -42,7 +42,7 @@ class FilterRegistryTest extends BaseUnit
      * @test
      * @doesNotPerformAssertions
      */
-    public function allowsCallableToBeAdded()
+    public function allowsCallableToBeAdded(): void
     {
         $registry = new FilterRegistry();
         $filter = function () {};
@@ -52,7 +52,7 @@ class FilterRegistryTest extends BaseUnit
     /**
      * @test
      */
-    public function throwsExceptionIfFilterAlreadyExists()
+    public function throwsExceptionIfFilterAlreadyExists(): void
     {
         $registry = new FilterRegistry();
         $registry->addFilter('somename', function () {});
@@ -64,15 +64,15 @@ class FilterRegistryTest extends BaseUnit
     /**
      * @test
      */
-    public function callableFilterWillBeApplied()
+    public function callableFilterWillBeApplied(): void
     {
         $filter = $this->getMockBuilder(stdClass::class)
             ->setMethods(['myMethod'])
             ->getMock()
         ;
-        $filter->expects($this->once())
+        $filter->expects(static::once())
             ->method('myMethod')
-            ->will($this->returnArgument(0))
+            ->willReturnArgument(0)
         ;
 
         $registry = new FilterRegistry();
@@ -82,21 +82,21 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        $this->assertSame($pageFinder, $resultFinder);
+        static::assertSame($pageFinder, $resultFinder);
     }
 
     /**
      * @test
      */
-    public function pageFinderFilterInstanceWillBeApplied()
+    public function pageFinderFilterInstanceWillBeApplied(): void
     {
         $filter = $this->getMockBuilder(PageFinderFilter::class)
             ->setMethods(['apply'])
             ->getMock()
         ;
-        $filter->expects($this->once())
+        $filter->expects(static::once())
             ->method('apply')
-            ->will($this->returnArgument(0))
+            ->willReturnArgument(0)
         ;
 
         $registry = new FilterRegistry();
@@ -106,13 +106,13 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        $this->assertSame($pageFinder, $resultFinder);
+        static::assertSame($pageFinder, $resultFinder);
     }
 
     /**
      * @test
      */
-    public function throwsExceptionIfFilterToApplyDoesNotExist()
+    public function throwsExceptionIfFilterToApplyDoesNotExist(): void
     {
         $registry = new FilterRegistry();
         $pageFinder = new PageFinder();
@@ -124,7 +124,7 @@ class FilterRegistryTest extends BaseUnit
     /**
      * @test
      */
-    public function pageFinderFiltersObjectCanBeRegisteredAndApplied()
+    public function pageFinderFiltersObjectCanBeRegisteredAndApplied(): void
     {
         $filter = fn (PageFinder $finder) => $finder;
 
@@ -132,7 +132,7 @@ class FilterRegistryTest extends BaseUnit
             ->setMethods(['getFilters'])
             ->getMock()
         ;
-        $filters->expects($this->once())
+        $filters->expects(static::once())
             ->method('getFilters')
             ->willReturn(['somename' => $filter])
         ;
@@ -144,6 +144,6 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        $this->assertSame($pageFinder, $resultFinder);
+        static::assertSame($pageFinder, $resultFinder);
     }
 }

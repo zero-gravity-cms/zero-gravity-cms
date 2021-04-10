@@ -21,15 +21,13 @@ class PathTest extends BaseUnit
     {
         $path = new Path($pathString);
 
-        $this->assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
-        $this->assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
-        $this->assertSame($expectations['directory'], $path->isDirectory(),
-            'directory detection matches: '.$pathString
-        );
-        $this->assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
-        $this->assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
+        static::assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
+        static::assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
+        static::assertSame($expectations['directory'], $path->isDirectory(), 'directory detection matches: '.$pathString);
+        static::assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
+        static::assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
 
-        $this->assertSame($expectations['elements'] > 0, $path->hasElements());
+        static::assertSame($expectations['elements'] > 0, $path->hasElements());
     }
 
     /**
@@ -46,7 +44,7 @@ class PathTest extends BaseUnit
         }
 
         $path = new Path($pathString);
-        $this->assertSame($pathString, $path->toString(true));
+        static::assertSame($pathString, $path->toString(true));
     }
 
     public function providePathData(): Iterator
@@ -192,14 +190,14 @@ class PathTest extends BaseUnit
     {
         $path = new Path('path/../with/parent');
         $path->normalize();
-        $this->assertSame('with/parent', $path->toString());
-        $this->assertSame('with/parent', (string) $path);
+        static::assertSame('with/parent', $path->toString());
+        static::assertSame('with/parent', (string) $path);
 
         $path = new Path('path/../../leaving/structure');
         $parent = new Path('parent/path');
         $path->normalize($parent);
-        $this->assertSame('leaving/structure', $path->toString());
-        $this->assertSame('parent', $parent->toString());
+        static::assertSame('leaving/structure', $path->toString());
+        static::assertSame('parent', $parent->toString());
     }
 
     /**
@@ -209,7 +207,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('#valid/regex/../stuff#');
         $path->normalize();
-        $this->assertSame('#valid/regex/../stuff#', $path->toString());
+        static::assertSame('#valid/regex/../stuff#', $path->toString());
     }
 
     /**
@@ -219,7 +217,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('/foo/../');
         $path->normalize();
-        $this->assertSame('/', $path->toString());
+        static::assertSame('/', $path->toString());
     }
 
     /**
@@ -237,15 +235,15 @@ class PathTest extends BaseUnit
 
         $newPath = $path->appendPath($child);
 
-        $this->assertSame($newString, $newPath->toString());
-        $this->assertNotSame($path, $newPath, 'appendPath returns new path instance');
+        static::assertSame($newString, $newPath->toString());
+        static::assertNotSame($path, $newPath, 'appendPath returns new path instance');
 
         $newPathStr = $newPath->toString();
-        $this->assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
-        $this->assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
-        $this->assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
-        $this->assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
-        $this->assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
+        static::assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
+        static::assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
+        static::assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
+        static::assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
+        static::assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
     }
 
     public function provideAppendedPathData(): Iterator
@@ -312,8 +310,8 @@ class PathTest extends BaseUnit
         $path = new Path($pathString);
         $directory = $path->getDirectory();
 
-        $this->assertSame($expectedDirectoryPath, $directory->toString());
-        $this->assertNotSame($path, $directory);
+        static::assertSame($expectedDirectoryPath, $directory->toString());
+        static::assertNotSame($path, $directory);
     }
 
     public function provideDirectoryPathData(): Iterator
@@ -353,11 +351,11 @@ class PathTest extends BaseUnit
         $file = $path->getFile();
 
         if (null === $expectedFilePath) {
-            $this->assertNull($file);
+            static::assertNull($file);
         } else {
-            $this->assertSame($expectedFilePath, $file->toString());
+            static::assertSame($expectedFilePath, $file->toString());
         }
-        $this->assertNotSame($path, $file);
+        static::assertNotSame($path, $file);
     }
 
     public function provideFilePathData(): Iterator
@@ -394,7 +392,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsLastElement()
     {
         $path = new Path('sample/path/string');
-        $this->assertSame('string', $path->getLastElement()->getName());
+        static::assertSame('string', $path->getLastElement()->getName());
     }
 
     /**
@@ -403,7 +401,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsNullForEmptyPath()
     {
         $path = new Path('/');
-        $this->assertNull($path->getLastElement());
+        static::assertNull($path->getLastElement());
     }
 
     /**
@@ -413,7 +411,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('sample/path/string');
         $path->dropLastElement();
-        $this->assertSame('sample/path/', $path->toString());
-        $this->assertTrue($path->isDirectory());
+        static::assertSame('sample/path/', $path->toString());
+        static::assertTrue($path->isDirectory());
     }
 }

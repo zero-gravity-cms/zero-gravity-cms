@@ -18,7 +18,7 @@ class RouterPageSelectorTest extends Unit
         $stack = new RequestStack();
         $selector = new RouterPageSelector($stack);
 
-        $this->assertNull($selector->getCurrentPage());
+        static::assertNull($selector->getCurrentPage());
     }
 
     /**
@@ -32,7 +32,7 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        $this->assertNull($selector->getCurrentPage());
+        static::assertNull($selector->getCurrentPage());
     }
 
     /**
@@ -48,7 +48,7 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        $this->assertNull($selector->getCurrentPage());
+        static::assertNull($selector->getCurrentPage());
     }
 
     /**
@@ -64,6 +64,6 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        $this->assertInstanceOf(Page::class, $selector->getCurrentPage());
+        static::assertInstanceOf(Page::class, $selector->getCurrentPage());
     }
 }

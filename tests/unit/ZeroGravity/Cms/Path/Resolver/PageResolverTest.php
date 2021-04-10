@@ -21,8 +21,8 @@ class PageResolverTest extends BaseUnit
         $resolver = $this->getPageResolver();
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        $this->assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        $this->assertSame($expectedPath, $file->getPathname());
+        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
+        static::assertSame($expectedPath, $file->getPathname());
     }
 
     public function provideSingleFilePaths(): Iterator
@@ -65,7 +65,7 @@ class PageResolverTest extends BaseUnit
         $resolver = $this->getPageResolver();
         $pageFile = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        $this->assertNull($pageFile);
+        static::assertNull($pageFile);
     }
 
     public function provideNonExistingPagePaths(): Iterator

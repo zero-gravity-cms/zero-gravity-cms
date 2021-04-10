@@ -27,33 +27,33 @@ class PageDiffTest extends BaseUnit
 
         $diff = new PageDiff($oldPage, $newPage);
 
-        $this->assertFalse($diff->filesystemPathHasChanged());
-        $this->assertFalse($diff->contentHasChanged());
-        $this->assertFalse($diff->settingsHaveChanged());
+        static::assertFalse($diff->filesystemPathHasChanged());
+        static::assertFalse($diff->contentHasChanged());
+        static::assertFalse($diff->settingsHaveChanged());
 
-        $this->assertSame($newPage, $diff->getNew());
+        static::assertSame($newPage, $diff->getNew());
 
         $newPage->setName('foo');
-        $this->assertTrue($diff->filesystemPathHasChanged());
-        $this->assertSame('/foo', $diff->getNewFilesystemPath());
+        static::assertTrue($diff->filesystemPathHasChanged());
+        static::assertSame('/foo', $diff->getNewFilesystemPath());
 
         $newPage->setName('page');
-        $this->assertFalse($diff->filesystemPathHasChanged());
+        static::assertFalse($diff->filesystemPathHasChanged());
 
         $newParent = new Page('some-path');
         $newPage->setParent($newParent);
-        $this->assertTrue($diff->filesystemPathHasChanged());
-        $this->assertSame('/some-path/page', $diff->getNewFilesystemPath());
+        static::assertTrue($diff->filesystemPathHasChanged());
+        static::assertSame('/some-path/page', $diff->getNewFilesystemPath());
 
         $newPage->setContentRaw('test');
-        $this->assertTrue($diff->contentHasChanged());
-        $this->assertSame('test', $diff->getNewContentRaw());
+        static::assertTrue($diff->contentHasChanged());
+        static::assertSame('test', $diff->getNewContentRaw());
 
         $settings = $newPage->getSettings();
         $settings['menu_id'] = 'another-menu';
         $newPage->setSettings($settings);
 
-        $this->assertTrue($diff->settingsHaveChanged());
-        $this->assertSame(['menu_id' => 'another-menu'], $diff->getNewNonDefaultSettings());
+        static::assertTrue($diff->settingsHaveChanged());
+        static::assertSame(['menu_id' => 'another-menu'], $diff->getNewNonDefaultSettings());
     }
 }

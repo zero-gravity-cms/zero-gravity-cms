@@ -33,8 +33,8 @@ class PageTest extends BaseUnit
         $childPage = new Page('the_child', [], $parentPage);
         $childChildPage = new Page('one_more_child', [], $childPage);
 
-        $this->assertSame('/the_parent/the_child', $childPage->getFilesystemPath()->toString());
-        $this->assertSame('/the_parent/the_child/one_more_child', $childChildPage->getFilesystemPath()->toString());
+        static::assertSame('/the_parent/the_child', $childPage->getFilesystemPath()->toString());
+        static::assertSame('/the_parent/the_child/one_more_child', $childChildPage->getFilesystemPath()->toString());
     }
 
     /**
@@ -46,9 +46,9 @@ class PageTest extends BaseUnit
         $childPage = new Page('the_child', ['slug' => 'foo'], $parentPage);
         $childChildPage = new Page('one_more_child', ['slug' => 'bar'], $childPage);
 
-        $this->assertSame('/', $parentPage->getPath()->toString());
-        $this->assertSame('/foo', $childPage->getPath()->toString());
-        $this->assertSame('/foo/bar', $childChildPage->getPath()->toString());
+        static::assertSame('/', $parentPage->getPath()->toString());
+        static::assertSame('/foo', $childPage->getPath()->toString());
+        static::assertSame('/foo/bar', $childChildPage->getPath()->toString());
     }
 
     /**
@@ -69,9 +69,9 @@ class PageTest extends BaseUnit
             ],
         ]));
 
-        $this->assertArrayHasKey('my_alias', $page->getFiles());
-        $this->assertArrayHasKey('some-image.jpg', $page->getFiles());
-        $this->assertSame($page->getFile('some-image.jpg'), $page->getFile('my_alias'));
+        static::assertArrayHasKey('my_alias', $page->getFiles());
+        static::assertArrayHasKey('some-image.jpg', $page->getFiles());
+        static::assertSame($page->getFile('some-image.jpg'), $page->getFile('my_alias'));
     }
 
     /**
@@ -100,22 +100,16 @@ class PageTest extends BaseUnit
             ],
         ]));
 
-        $this->assertSame(
-            [
-                'some-image.jpg',
-                'some-other-image.jpg',
-            ],
-            array_keys($page->getImages())
-        );
-        $this->assertSame(
-            [
-                'foo.pdf',
-            ],
-            array_keys($page->getDocuments())
-        );
-        $this->assertSame('/page.md', $page->getMarkdownFile()->getPathname());
-        $this->assertSame('/page.yaml', $page->getYamlFile()->getPathname());
-        $this->assertSame('/page.html.twig', $page->getTwigFile()->getPathname());
+        static::assertSame([
+            'some-image.jpg',
+            'some-other-image.jpg',
+        ], array_keys($page->getImages()));
+        static::assertSame([
+            'foo.pdf',
+        ], array_keys($page->getDocuments()));
+        static::assertSame('/page.md', $page->getMarkdownFile()->getPathname());
+        static::assertSame('/page.yaml', $page->getYamlFile()->getPathname());
+        static::assertSame('/page.html.twig', $page->getTwigFile()->getPathname());
     }
 
     /**
@@ -125,11 +119,11 @@ class PageTest extends BaseUnit
     {
         $page = new Page('page');
 
-        $this->assertEmpty($page->getImages());
-        $this->assertEmpty($page->getDocuments());
-        $this->assertNull($page->getMarkdownFile());
-        $this->assertNull($page->getYamlFile());
-        $this->assertNull($page->getTwigFile());
+        static::assertEmpty($page->getImages());
+        static::assertEmpty($page->getDocuments());
+        static::assertNull($page->getMarkdownFile());
+        static::assertNull($page->getYamlFile());
+        static::assertNull($page->getTwigFile());
     }
 
     /**
@@ -139,11 +133,11 @@ class PageTest extends BaseUnit
     {
         $page = new Page('page');
 
-        $this->assertNull($page->getContent());
+        static::assertNull($page->getContent());
         $page->setContent('This is the content');
-        $this->assertSame('This is the content', $page->getContent());
+        static::assertSame('This is the content', $page->getContent());
         $page->setContent(null);
-        $this->assertNull($page->getContent());
+        static::assertNull($page->getContent());
     }
 
     /**
@@ -154,7 +148,7 @@ class PageTest extends BaseUnit
         $parentPage = new Page('the_parent', [], null);
         $childPage = new Page('the_child', [], $parentPage);
 
-        $this->assertSame($parentPage, $childPage->getParent());
+        static::assertSame($parentPage, $childPage->getParent());
     }
 
     /**
@@ -177,15 +171,15 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame('Page title', $page->getTitle());
-        $this->assertTrue($page->isVisible());
-        $this->assertTrue($page->isModular());
-        $this->assertSame('main.html.twig', $page->getLayoutTemplate());
-        $this->assertSame('render_with_h1.html.twig', $page->getContentTemplate());
-        $this->assertSame('CustomBundle:Custom:action', $page->getController());
-        $this->assertSame('custom_id', $page->getMenuId());
-        $this->assertSame('custom label', $page->getMenuLabel());
-        $this->assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
+        static::assertSame('Page title', $page->getTitle());
+        static::assertTrue($page->isVisible());
+        static::assertTrue($page->isModular());
+        static::assertSame('main.html.twig', $page->getLayoutTemplate());
+        static::assertSame('render_with_h1.html.twig', $page->getContentTemplate());
+        static::assertSame('CustomBundle:Custom:action', $page->getController());
+        static::assertSame('custom_id', $page->getMenuId());
+        static::assertSame('custom label', $page->getMenuLabel());
+        static::assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
     }
 
     /**
@@ -197,7 +191,7 @@ class PageTest extends BaseUnit
         $child1 = new Page('child1', [], $parent);
         $child2 = new Page('child2', [], $parent);
 
-        $this->assertSame([
+        static::assertSame([
             '/page/child1' => $child1,
             '/page/child2' => $child2,
         ], $parent->getChildren()->toArray());
@@ -213,7 +207,7 @@ class PageTest extends BaseUnit
         $child2 = new Page('child2', [], $parent);
         $child3 = new Page('child3', [], $child2);
 
-        $this->assertSame([
+        static::assertSame([
             '/page/child1' => $child1,
             '/page/child2' => $child2,
         ], $parent->getChildren()->toArray());
@@ -229,7 +223,7 @@ class PageTest extends BaseUnit
         $child2 = new Page('child2', [], $parent);
         $child3 = new Page('child3', [], $child2);
 
-        $this->assertSame([
+        static::assertSame([
             '/page/child1' => $child1,
             '/page/child2' => $child2,
             '/page/child2/child3' => $child3,
@@ -247,9 +241,9 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
-        $this->assertNull($page->getExtra('does_not_exist'));
-        $this->assertSame('default', $page->getExtra('does_not_exist', 'default'));
+        static::assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
+        static::assertNull($page->getExtra('does_not_exist'));
+        static::assertSame('default', $page->getExtra('does_not_exist', 'default'));
     }
 
     /**
@@ -258,16 +252,16 @@ class PageTest extends BaseUnit
     public function publishDateIsCastToDateTimeImmutable()
     {
         $page = new Page('page');
-        $this->assertNull($page->getPublishDate());
+        static::assertNull($page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => new DateTime()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => new DateTimeImmutable()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
     }
 
     /**
@@ -276,16 +270,16 @@ class PageTest extends BaseUnit
     public function unpublishDateIsCastToDateTimeImmutable()
     {
         $page = new Page('page');
-        $this->assertNull($page->getUnpublishDate());
+        static::assertNull($page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => new DateTime()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => new DateTimeImmutable()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
     }
 
     /**
@@ -294,16 +288,16 @@ class PageTest extends BaseUnit
     public function dateIsCastToDateTimeImmutable()
     {
         $page = new Page('page');
-        $this->assertNull($page->getDate());
+        static::assertNull($page->getDate());
 
         $page = new Page('page', ['date' => new DateTime()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
         $page = new Page('page', ['date' => new DateTimeImmutable()]);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
         $page = new Page('page', ['date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
     }
 
     /**
@@ -312,7 +306,7 @@ class PageTest extends BaseUnit
     public function pageIsPublishedByDefault()
     {
         $page = new Page('page');
-        $this->assertTrue($page->isPublished());
+        static::assertTrue($page->isPublished());
     }
 
     /**
@@ -323,29 +317,29 @@ class PageTest extends BaseUnit
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
-        $this->assertTrue($page->isPublished());
+        static::assertTrue($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
             'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        $this->assertTrue($page->isPublished());
+        static::assertTrue($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
             'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
     }
 
     /**
@@ -356,19 +350,19 @@ class PageTest extends BaseUnit
         $page = new Page('page', [
             'publish' => false,
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish' => false,
             'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish' => false,
             'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        $this->assertFalse($page->isPublished());
+        static::assertFalse($page->isPublished());
     }
 
     /**
@@ -377,10 +371,10 @@ class PageTest extends BaseUnit
     public function defaultTitleIsGeneratedBasedOnName()
     {
         $page = new Page('page');
-        $this->assertSame('Page', $page->getTitle());
+        static::assertSame('Page', $page->getTitle());
 
         $page = new Page('name-with_dashes_and_underscores');
-        $this->assertSame('Name With Dashes And Underscores', $page->getTitle());
+        static::assertSame('Name With Dashes And Underscores', $page->getTitle());
     }
 
     /**
@@ -395,7 +389,7 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame([
+        static::assertSame([
             'tag' => ['foo', 'bar'],
             'category' => ['baz'],
         ], $page->getTaxonomies());
@@ -404,7 +398,7 @@ class PageTest extends BaseUnit
             'taxonomy' => null,
         ]);
 
-        $this->assertSame([], $page->getTaxonomies());
+        static::assertSame([], $page->getTaxonomies());
     }
 
     /**
@@ -418,8 +412,8 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
-        $this->assertSame([], $page->getTaxonomy('category'));
+        static::assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
+        static::assertSame([], $page->getTaxonomy('category'));
     }
 
     /**
@@ -435,9 +429,9 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        $this->assertSame(['foo', 'bar'], $page->getTags());
-        $this->assertSame(['baz'], $page->getCategories());
-        $this->assertSame(['David', 'Julian'], $page->getAuthors());
+        static::assertSame(['foo', 'bar'], $page->getTags());
+        static::assertSame(['baz'], $page->getCategories());
+        static::assertSame(['David', 'Julian'], $page->getAuthors());
     }
 
     /**
@@ -448,7 +442,7 @@ class PageTest extends BaseUnit
         $page = new Page('page', [
         ]);
 
-        $this->assertSame('page', $page->getContentType());
+        static::assertSame('page', $page->getContentType());
     }
 
     /**
@@ -460,7 +454,7 @@ class PageTest extends BaseUnit
             'content_type' => 'custom-type',
         ]);
 
-        $this->assertSame('custom-type', $page->getContentType());
+        static::assertSame('custom-type', $page->getContentType());
     }
 
     /**

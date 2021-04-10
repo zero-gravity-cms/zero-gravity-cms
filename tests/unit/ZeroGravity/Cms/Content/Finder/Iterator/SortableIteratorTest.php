@@ -54,7 +54,7 @@ class SortableIteratorTest extends BaseUnit
         // $getter = 'get'.ucfirst($method);
         // dump(array_map(function (Page $p) use ($getter) { return (string) $p->$getter(); }, $finder->toArray()));
 
-        $this->assertSame($expectedKeys, $keys);
+        static::assertSame($expectedKeys, $keys);
     }
 
     public function provideSortResults(): Iterator

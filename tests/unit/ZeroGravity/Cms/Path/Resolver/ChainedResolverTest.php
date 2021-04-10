@@ -29,8 +29,8 @@ class ChainedResolverTest extends BaseUnit
 
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        self::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        self::assertSame($expectedPath, $file->getPathname());
+        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
+        static::assertSame($expectedPath, $file->getPathname());
     }
 
     public function provideSingleFilePaths(): Iterator
