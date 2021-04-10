@@ -2,23 +2,37 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Tester;
 
-use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Page;
 
-class TaxonomyTester
+final class TaxonomyTester
 {
+    public const OPERATOR_AND = 'AND';
+    public const OPERATOR_OR = 'OR';
+
     private string $name;
-
+    /**
+     * @var string[]
+     */
     private array $values;
-
     private string $mode;
+    private bool $inverted;
 
-    public function __construct($name, array $values, ?string $mode)
+    public static function has(string $name, array $values, ?string $mode): self
     {
-        $mode ??= PageFinder::TAXONOMY_AND;
+        return new self($name, $values, $mode, false);
+    }
+
+    public static function hasNot(string $name, array $values, ?string $mode): self
+    {
+        return new self($name, $values, $mode, true);
+    }
+
+    public function __construct(string $name, array $values, ?string $mode, bool $inverted)
+    {
         $this->name = $name;
         $this->values = $values;
-        $this->mode = $mode;
+        $this->mode = $mode ?? self::OPERATOR_AND;
+        $this->inverted = $inverted;
     }
 
     /**
@@ -28,7 +42,7 @@ class TaxonomyTester
     {
         $pageValues = $page->getTaxonomy($this->name);
 
-        if (PageFinder::TAXONOMY_OR === $this->mode) {
+        if (self::OPERATOR_OR === $this->mode) {
             return $this->testOr($pageValues);
         }
 
@@ -36,12 +50,12 @@ class TaxonomyTester
     }
 
     /**
-     * @param $pageValues
+     * @param string[] $pageValues
      */
-    private function testOr($pageValues): bool
+    private function testOr(array $pageValues): bool
     {
         foreach ($this->values as $value) {
-            if (in_array($value, $pageValues)) {
+            if (in_array($value, $pageValues, true)) {
                 return true;
             }
         }
@@ -50,16 +64,21 @@ class TaxonomyTester
     }
 
     /**
-     * @param $pageValues
+     * @param string[] $pageValues
      */
-    private function testAnd($pageValues): bool
+    private function testAnd(array $pageValues): bool
     {
         foreach ($this->values as $value) {
-            if (!in_array($value, $pageValues)) {
+            if (!in_array($value, $pageValues, true)) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    public function isInverted(): bool
+    {
+        return $this->inverted;
     }
 }

@@ -7,7 +7,7 @@ use ArrayAccess;
 /**
  * This class represents metadata for a content file.
  */
-class Metadata implements ArrayAccess
+final class Metadata implements ArrayAccess
 {
     private array $values;
 

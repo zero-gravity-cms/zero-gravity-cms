@@ -11,19 +11,20 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class SettingFilterIterator extends FilterIterator
+final class SettingFilterIterator extends FilterIterator
 {
+    /**
+     * @var SettingFilter[]
+     */
     private array $settings;
 
-    private array $notSettings;
-
     /**
-     * @param Iterator $iterator The Iterator to filter
+     * @param Iterator        $iterator The Iterator to filter
+     * @param SettingFilter[] $settings
      */
-    public function __construct(Iterator $iterator, array $settings, array $notSettings)
+    public function __construct(Iterator $iterator, array $settings)
     {
         $this->settings = $settings;
-        $this->notSettings = $notSettings;
 
         parent::__construct($iterator);
     }
@@ -33,21 +34,14 @@ class SettingFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         $page = $this->current();
-        foreach ($this->settings as $settingSet) {
-            $key = $settingSet[0];
-            $value = $settingSet[1];
-            if ($page->getSetting($key) != $value) {
-                return false;
-            }
-        }
+        foreach ($this->settings as $settingFilter) {
+            $valuesMatch = $settingFilter->value() === $page->getSetting($settingFilter->name());
+            $isInverted = $settingFilter->isInverted();
 
-        foreach ($this->notSettings as $settingSet) {
-            $key = $settingSet[0];
-            $value = $settingSet[1];
-            if ($page->getSetting($key) == $value) {
+            if ($isInverted === $valuesMatch) {
                 return false;
             }
         }

@@ -11,7 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class ModularFilterIterator extends FilterIterator
+final class ModularFilterIterator extends FilterIterator
 {
     private bool $modular;
 
@@ -30,7 +30,7 @@ class ModularFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         return $this->current()->isModular() === $this->modular;
     }

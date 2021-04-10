@@ -21,7 +21,7 @@ use ZeroGravity\Cms\Content\ReadablePage;
 /**
  * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some of its code.
  */
-class PageFinder implements IteratorAggregate, Countable
+final class PageFinder implements IteratorAggregate, Countable
 {
     use PageFinderContentTrait;
     use PageFinderDepthTrait;
@@ -32,11 +32,7 @@ class PageFinder implements IteratorAggregate, Countable
     use PageFinderSortingTrait;
     use PageFinderTaxonomyTrait;
 
-    const TAXONOMY_AND = 'AND';
-    const TAXONOMY_OR = 'OR';
-
     private ?int $limit = null;
-
     private ?int $offset = null;
 
     /**
@@ -56,10 +52,8 @@ class PageFinder implements IteratorAggregate, Countable
 
     /**
      * Creates a new PageFinder for fluent interfaces.
-     *
-     * @return static
      */
-    public static function create()
+    public static function create(): PageFinder
     {
         return new static();
     }
@@ -71,10 +65,8 @@ class PageFinder implements IteratorAggregate, Countable
 
     /**
      * @param Page[]|ReadablePage[] $pages
-     *
-     * @return $this
      */
-    public function inPageList(array $pages)
+    public function inPageList(array $pages): self
     {
         $this->pageLists[] = $pages;
 
@@ -83,10 +75,8 @@ class PageFinder implements IteratorAggregate, Countable
 
     /**
      * Set a finder limit.
-     *
-     * @return $this
      */
-    public function limit(int $limit = null)
+    public function limit(int $limit = null): self
     {
         $this->limit = $limit;
 
@@ -95,10 +85,8 @@ class PageFinder implements IteratorAggregate, Countable
 
     /**
      * Set a finder offset.
-     *
-     * @return $this
      */
-    public function offset(int $offset = null)
+    public function offset(int $offset = null): self
     {
         $this->offset = $offset;
 
@@ -119,13 +107,9 @@ class PageFinder implements IteratorAggregate, Countable
      * The anonymous function receives a Page and must return false
      * to remove pages.
      *
-     * @param Closure $closure An anonymous function
-     *
-     * @return $this
-     *
      * @see CustomFilterIterator
      */
-    public function filter(Closure $closure)
+    public function filter(Closure $closure): self
     {
         $this->filters[] = $closure;
 
@@ -134,10 +118,8 @@ class PageFinder implements IteratorAggregate, Countable
 
     /**
      * Counts all the results collected by the iterators.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         return iterator_count($this->getIterator());
     }
@@ -151,7 +133,7 @@ class PageFinder implements IteratorAggregate, Countable
      *
      * @throws LogicException if the in() method has not been called
      */
-    public function getIterator()
+    public function getIterator(): Iterator
     {
         $this->validatePageListsAndIterators();
 
@@ -167,11 +149,9 @@ class PageFinder implements IteratorAggregate, Countable
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @return $this
-     *
      * @throws InvalidArgumentException when the given argument is not iterable
      */
-    public function append($iterator)
+    public function append($iterator): self
     {
         if ($iterator instanceof IteratorAggregate) {
             $this->iterators[] = $iterator->getIterator();

@@ -3,24 +3,19 @@
 namespace ZeroGravity\Cms\Exception;
 
 use RuntimeException;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
+use ZeroGravity\Cms\Content\ReadablePage;
+use ZeroGravity\Cms\Filesystem\Directory;
 use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
 
 class FilesystemException extends RuntimeException implements ZeroGravityException
 {
-    /**
-     * @return static
-     */
-    public static function contentDirectoryDoesNotExist(string $path)
+    public static function contentDirectoryDoesNotExist(string $path): self
     {
         return new static(sprintf('Cannot parse filesystem. Page content directory "%s" does not exist', $path));
     }
 
-    /**
-     * @return static
-     */
-    public static function unsupportedWritablePageClass(PageDiff $diff)
+    public static function unsupportedWritablePageClass(PageDiff $diff): self
     {
         return new static(sprintf(
             'FilesystemMapper can only handle PageDiffs containing "%s" instances. '.
@@ -31,14 +26,19 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
         ));
     }
 
-    /**
-     * @return static
-     */
-    public static function cannotFindDirectoryForPage(Page $page)
+    public static function cannotFindDirectoryForPage(ReadablePage $page): self
     {
         return new static(sprintf(
             'Cannot find directory for Page instance with path "%s".',
             $page->getPath()->toString()
+        ));
+    }
+
+    public static function missingMarkdownFile(Directory $directory): self
+    {
+        return new static(sprintf(
+            'Directory %s does not contain the requested markdown file.',
+            $directory->getPath()
         ));
     }
 }

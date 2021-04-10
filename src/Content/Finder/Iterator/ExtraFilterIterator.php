@@ -18,23 +18,20 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class ExtraFilterIterator extends FilterIterator
+final class ExtraFilterIterator extends FilterIterator
 {
-    const COMPARATOR_STRING = 'string';
-    const COMPARATOR_DATE = 'date';
-    const COMPARATOR_NUMERIC = 'number';
-
+    /**
+     * @var ExtraFilter[]
+     */
     private array $extras;
 
-    private array $notExtras;
-
     /**
-     * @param Iterator $iterator The Iterator to filter
+     * @param Iterator      $iterator The Iterator to filter
+     * @param ExtraFilter[] $extras
      */
-    public function __construct(Iterator $iterator, array $extras, array $notExtras)
+    public function __construct(Iterator $iterator, array $extras)
     {
         $this->extras = $extras;
-        $this->notExtras = $notExtras;
 
         parent::__construct($iterator);
     }
@@ -44,17 +41,14 @@ class ExtraFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         $page = $this->current();
-        foreach ($this->extras as $extraSet) {
-            if (!$this->compareExtra($extraSet, $page)) {
-                return false;
-            }
-        }
+        foreach ($this->extras as $extraFilter) {
+            $isInverted = $extraFilter->isInverted();
+            $valuesMatch = $this->compareExtra($extraFilter, $page);
 
-        foreach ($this->notExtras as $extraSet) {
-            if ($this->compareExtra($extraSet, $page)) {
+            if ($isInverted === $valuesMatch) {
                 return false;
             }
         }
@@ -62,34 +56,32 @@ class ExtraFilterIterator extends FilterIterator
         return true;
     }
 
-    private function compareExtra(array $extraSet, Page $page): bool
+    private function compareExtra(ExtraFilter $extraFilter, Page $page): bool
     {
-        $key = $extraSet[0];
-        $target = $extraSet[1];
-        $comparator = $this->getComparator($extraSet[2], $target);
-        $value = $this->getExtraValue($page, $key, $extraSet[2]);
+        $comparator = $this->getComparator($extraFilter);
+        $value = $this->getExtraValue($page, $extraFilter);
 
         return $comparator->test($value);
     }
 
-    private function getExtraValue(Page $page, $key, $type)
+    private function getExtraValue(Page $page, ExtraFilter $extraFilter)
     {
-        $value = $page->getExtra($key);
+        $value = $page->getExtra($extraFilter->name());
         if (null === $value) {
-            return $value;
+            return null;
         }
 
-        switch ($type) {
-            case self::COMPARATOR_NUMERIC:
+        switch ($extraFilter->comparator()) {
+            case ExtraFilter::COMPARATOR_NUMERIC:
                 return (int) $value;
 
-            case self::COMPARATOR_DATE:
+            case ExtraFilter::COMPARATOR_DATE:
                 if (is_int($value)) {
                     return $value;
                 }
 
                 try {
-                    return (new DateTime($value))->format('U');
+                    return (new DateTime($value))->getTimestamp();
                 } catch (Exception $e) {
                     return null;
                 }
@@ -98,31 +90,26 @@ class ExtraFilterIterator extends FilterIterator
         return $value;
     }
 
-    /**
-     * @param $name
-     * @param $target
-     *
-     * @return Comparator
-     */
-    private function getComparator($name, $target)
+    private function getComparator(ExtraFilter $extraFilter): Comparator
     {
-        switch ($name) {
-            case self::COMPARATOR_STRING:
+        $comparatorName = $extraFilter->comparator();
+        switch ($comparatorName) {
+            case ExtraFilter::COMPARATOR_STRING:
                 $class = StringComparator::class;
                 break;
 
-            case self::COMPARATOR_DATE:
+            case ExtraFilter::COMPARATOR_DATE:
                 $class = DateComparator::class;
                 break;
 
-            case self::COMPARATOR_NUMERIC:
+            case ExtraFilter::COMPARATOR_NUMERIC:
                 $class = NumberComparator::class;
                 break;
 
             default:
-                throw new InvalidArgumentException('Invalid comparator name: '.$name);
+                throw new InvalidArgumentException('Invalid comparator name: '.$comparatorName);
         }
 
-        return new $class($target);
+        return new $class($extraFilter->value());
     }
 }

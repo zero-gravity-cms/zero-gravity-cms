@@ -60,10 +60,8 @@ interface ReadablePage
 
     /**
      * Get values for a single taxonomy key.
-     *
-     * @param string $name
      */
-    public function getTaxonomy($name): array;
+    public function getTaxonomy(string $name): array;
 
     public function getTags(): array;
 

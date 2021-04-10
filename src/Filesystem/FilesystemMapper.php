@@ -19,25 +19,16 @@ use ZeroGravity\Cms\Filesystem\Event\AfterPageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
-class FilesystemMapper implements StructureMapper
+final class FilesystemMapper implements StructureMapper
 {
     private FileFactory $fileFactory;
-
     private string $path;
-
     private bool $convertMarkdown;
-
     private array $defaultPageSettings;
-
     private LoggerInterface $logger;
-
     private EventDispatcherInterface $eventDispatcher;
-
     private PageFactory $pageFactory;
 
-    /**
-     * FilesystemMapper constructor.
-     */
     public function __construct(
         FileFactory $fileFactory,
         string $path,
@@ -52,7 +43,6 @@ class FilesystemMapper implements StructureMapper
         $this->defaultPageSettings = $defaultPageSettings;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
-
         $this->pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
     }
 
@@ -63,9 +53,9 @@ class FilesystemMapper implements StructureMapper
      *
      * @throws ZeroGravityException|FilesystemException
      */
-    public function parse()
+    public function parse(): array
     {
-        $this->checkPath();
+        $this->checkPathExists();
 
         $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
         $directory = $this->createDirectory($this->path);
@@ -87,7 +77,7 @@ class FilesystemMapper implements StructureMapper
      *
      * @throws FilesystemException|ZeroGravityException
      */
-    private function checkPath()
+    private function checkPathExists(): void
     {
         if (!is_dir($this->path)) {
             $this->logAndThrow(FilesystemException::contentDirectoryDoesNotExist($this->path));
@@ -118,9 +108,7 @@ class FilesystemMapper implements StructureMapper
     public function saveChanges(PageDiff $diff): void
     {
         $this->eventDispatcher->dispatch(new BeforePageSaveValidate($diff));
-
         $this->validateDiff($diff);
-
         $this->eventDispatcher->dispatch(new BeforePageSave($diff));
 
         /* @var $directory Directory */
@@ -165,7 +153,7 @@ class FilesystemMapper implements StructureMapper
     /**
      * @throws ZeroGravityException
      */
-    private function logAndThrow(ZeroGravityException $exception)
+    private function logAndThrow(ZeroGravityException $exception): void
     {
         $this->logger->error($exception->getMessage());
 

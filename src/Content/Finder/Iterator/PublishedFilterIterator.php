@@ -11,7 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class PublishedFilterIterator extends FilterIterator
+final class PublishedFilterIterator extends FilterIterator
 {
     private bool $published;
 
@@ -30,7 +30,7 @@ class PublishedFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         return $this->current()->isPublished() === $this->published;
     }

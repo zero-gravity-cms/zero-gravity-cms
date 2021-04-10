@@ -2,6 +2,6 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-class BeforePageSaveValidate extends PageDiffEvent
+final class BeforePageSaveValidate extends PageDiffEvent
 {
 }

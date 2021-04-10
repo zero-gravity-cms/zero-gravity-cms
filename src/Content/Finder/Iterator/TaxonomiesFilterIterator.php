@@ -12,7 +12,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class TaxonomiesFilterIterator extends FilterIterator
+final class TaxonomiesFilterIterator extends FilterIterator
 {
     /**
      * @var TaxonomyTester[]
@@ -20,19 +20,12 @@ class TaxonomiesFilterIterator extends FilterIterator
     private array $taxonomies;
 
     /**
-     * @var TaxonomyTester[]
-     */
-    private array $notTaxonomies;
-
-    /**
-     * @param Iterator         $iterator      The Iterator to filter
+     * @param Iterator         $iterator   The Iterator to filter
      * @param TaxonomyTester[] $taxonomies
-     * @param TaxonomyTester[] $notTaxonomies
      */
-    public function __construct(Iterator $iterator, array $taxonomies, array $notTaxonomies)
+    public function __construct(Iterator $iterator, array $taxonomies)
     {
         $this->taxonomies = $taxonomies;
-        $this->notTaxonomies = $notTaxonomies;
 
         parent::__construct($iterator);
     }
@@ -42,17 +35,14 @@ class TaxonomiesFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         $page = $this->current();
         foreach ($this->taxonomies as $taxonomyTester) {
-            if (!$taxonomyTester->pageMatchesTaxonomy($page)) {
-                return false;
-            }
-        }
+            $isInverted = $taxonomyTester->isInverted();
+            $valuesMatch = $taxonomyTester->pageMatchesTaxonomy($page);
 
-        foreach ($this->notTaxonomies as $taxonomyTester) {
-            if ($taxonomyTester->pageMatchesTaxonomy($page)) {
+            if ($isInverted === $valuesMatch) {
                 return false;
             }
         }

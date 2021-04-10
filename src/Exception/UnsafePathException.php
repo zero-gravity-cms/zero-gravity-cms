@@ -6,12 +6,7 @@ use InvalidArgumentException;
 
 class UnsafePathException extends InvalidArgumentException implements ZeroGravityException
 {
-    /**
-     * @param $path
-     *
-     * @return static
-     */
-    public static function pathNotAllowed($path)
+    public static function pathNotAllowed(string $path): self
     {
         return new static(sprintf('Path %s is unsafe, because it leaves the parent structure', $path));
     }

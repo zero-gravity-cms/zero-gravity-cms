@@ -25,12 +25,10 @@ trait PageFinderDepthTrait
      *
      * @param string|int $level The depth level expression
      *
-     * @return $this
-     *
      * @see DepthRangeFilterIterator
      * @see NumberComparator
      */
-    public function depth($level)
+    public function depth($level): self
     {
         $this->depths[] = new NumberComparator($level);
 
@@ -64,7 +62,7 @@ trait PageFinderDepthTrait
         }
 
         if ($minDepth > 0 || $maxDepth < PHP_INT_MAX) {
-            $iterator = new DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
+            return new DepthRangeFilterIterator($iterator, $minDepth, $maxDepth);
         }
 
         return $iterator;

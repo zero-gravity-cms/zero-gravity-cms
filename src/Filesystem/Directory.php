@@ -2,60 +2,55 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
-use LogicException;
 use Mni\FrontYAML\Document;
 use Mni\FrontYAML\Parser as FrontYAMLParser;
 use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
+use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
-use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
-use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
-class Directory
+final class Directory
 {
-    const CONFIG_TYPE_YAML = 'yaml';
-    const CONFIG_TYPE_FRONTMATTER = 'frontmatter';
-    const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
-    const MODULAR_PREFIX_PATTERN = '/^_(.*)/';
+    use WritableDirectoryTrait;
+
+    public const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+    public const MODULAR_PREFIX_PATTERN = '/^_(.*)/';
 
     /**
      * This directory does not hold page content.
      */
-    const CONTENT_STRATEGY_NONE = 'none';
+    public const CONTENT_STRATEGY_NONE = 'none';
 
     /**
      * Single YAML file only.
      */
-    const CONTENT_STRATEGY_YAML_ONLY = 'yaml_only';
+    public const CONTENT_STRATEGY_YAML_ONLY = 'yaml_only';
 
     /**
      * Single markdown file with optional frontmatter YAML config.
      */
-    const CONTENT_STRATEGY_MARKDOWN_ONLY = 'markdown_only';
+    public const CONTENT_STRATEGY_MARKDOWN_ONLY = 'markdown_only';
 
     /**
      * Only twig files.
      */
-    const CONTENT_STRATEGY_TWIG_ONLY = 'twig_only';
+    public const CONTENT_STRATEGY_TWIG_ONLY = 'twig_only';
 
     /**
      * YAML config file and markdown content file.
      */
-    const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
+    public const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
 
     private SplFileInfo $directoryInfo;
-
     private FileFactory $fileFactory;
-
-    private ?string $parentPath = null;
+    private ?string $parentPath;
 
     /**
      * @var File[]
@@ -68,7 +63,6 @@ class Directory
     private ?array $directories = null;
 
     private LoggerInterface $logger;
-
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
@@ -90,7 +84,7 @@ class Directory
     /**
      * Parse this directory for files.
      */
-    private function parseFiles()
+    private function parseFiles(): void
     {
         $this->logger->debug("Scanning directory {$this->getPath()} for files");
         $fileFinder = Finder::create()
@@ -114,7 +108,7 @@ class Directory
     /**
      * Parse this directory for sub directories.
      */
-    private function parseDirectories()
+    private function parseDirectories(): void
     {
         $this->logger->debug("Scanning directory {$this->getPath()} for sub directories");
         $subDirectoryFinder = Finder::create()
@@ -174,9 +168,9 @@ class Directory
     /**
      * @return File[]
      */
-    public function getFilesByType(string $type)
+    public function getFilesByType(string $type): array
     {
-        return array_filter($this->getFiles(), fn (File $file) => $file->getType() === $type);
+        return array_filter($this->getFiles(), static fn (File $file) => $file->getType() === $type);
     }
 
     public function hasSortingPrefix(): bool
@@ -194,7 +188,7 @@ class Directory
      *
      * @throws StructureException
      */
-    public function validateFiles()
+    public function validateFiles(): void
     {
         $this->validateFileCounts();
         $this->validateBasenames();
@@ -329,10 +323,7 @@ class Directory
         return $files;
     }
 
-    /**
-     * @return string|null
-     */
-    public function fetchPageContent(bool $convertMarkdown)
+    public function fetchPageContent(bool $convertMarkdown): ?string
     {
         if ($this->hasMarkdownFile()) {
             return trim($this->getFrontYAMLDocument($convertMarkdown)->getContent());
@@ -343,20 +334,22 @@ class Directory
 
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
+        $markdownFile = $this->getMarkdownFile();
+        if (null === $markdownFile) {
+            throw FilesystemException::missingMarkdownFile($this);
+        }
         $parser = new FrontYAMLParser();
 
         return $parser->parse(
-            file_get_contents($this->getMarkdownFile()->getFilesystemPathname()),
+            file_get_contents($markdownFile->getFilesystemPathname()),
             $convertMarkdown
         );
     }
 
     /**
      * Fetch page settings from either YAML or markdown/frontmatter.
-     *
-     * @return array
      */
-    public function fetchPageSettings()
+    public function fetchPageSettings(): array
     {
         if ($this->hasYamlFile()) {
             $data = Yaml::parse(file_get_contents($this->getYamlFile()->getFilesystemPathname()));
@@ -368,55 +361,6 @@ class Directory
         }
 
         return [];
-    }
-
-    /**
-     * Save the given raw content to the filesystem.
-     */
-    public function saveContent(string $newRawContent = null): void
-    {
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-                $this->updateMarkdown($newRawContent);
-                break;
-
-            default:
-                $this->createMarkdown($newRawContent);
-        }
-    }
-
-    /**
-     * Save the given settings array to the filesystem.
-     */
-    public function saveSettings(array $newSettings): void
-    {
-        $newYaml = $this->dumpSettingsToYaml($newSettings);
-
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_ONLY:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-                $this->updateYaml($newYaml);
-                break;
-
-            default:
-                $this->createYaml($newYaml);
-        }
-    }
-
-    /**
-     * Rename/move the directory to another path.
-     */
-    public function renameOrMove(string $newRealPath): void
-    {
-        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to $newRealPath");
-        $fs = new Filesystem();
-        $fs->rename($this->getFilesystemPathname(), $newRealPath, false);
-
-        $this->directoryInfo = new SplFileInfo($newRealPath);
-        $this->parseFiles();
-        $this->parseDirectories();
     }
 
     /**
@@ -442,84 +386,5 @@ class Directory
         }
 
         return self::CONTENT_STRATEGY_NONE;
-    }
-
-    private function updateMarkdown($newRawContent)
-    {
-        $this->logger->debug("Updating markdown file in directory {$this->getPath()}");
-        $document = $this->getFrontYAMLDocument(false);
-        if (is_array($document->getYAML())) {
-            $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
-            $newRawContent = <<<FRONTMATTER
----
-$yamlContent
----
-$newRawContent
-FRONTMATTER;
-        }
-
-        $this->writeFile($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
-    }
-
-    private function createMarkdown($newRawContent)
-    {
-        $this->logger->debug("Creating new markdown file in directory {$this->getPath()}");
-        $path = sprintf('%s/%s.md',
-            $this->directoryInfo->getPathname(),
-            $this->getDefaultBasename()
-        );
-
-        $this->writeFile($path, $newRawContent);
-        $this->parseFiles();
-    }
-
-    private function updateYaml($newYaml)
-    {
-        $this->logger->debug("Updating YAML config in directory {$this->getPath()}");
-        if ($this->hasYamlFile()) {
-            $file = $this->getYamlFile();
-        } elseif ($this->hasMarkdownFile()) {
-            $file = $this->getMarkdownFile();
-            $document = $this->getFrontYAMLDocument(false);
-            $newYaml = <<<FRONTMATTER
----
-$newYaml
----
-{$document->getContent()}
-FRONTMATTER;
-        } else {
-            throw new LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
-        }
-
-        $this->writeFile($file->getFilesystemPathname(), $newYaml);
-    }
-
-    private function createYaml($newYaml)
-    {
-        $this->logger->debug("Creating new YAML config in directory {$this->getPath()}");
-        $path = sprintf('%s/%s.yaml',
-            $this->directoryInfo->getPathname(),
-            $this->getDefaultBasename()
-        );
-
-        $this->writeFile($path, $newYaml);
-        $this->parseFiles();
-    }
-
-    private function dumpSettingsToYaml(array $settings): string
-    {
-        return Yaml::dump($settings, 4);
-    }
-
-    private function writeFile(string $realPath, string $content)
-    {
-        /* @var $handledEvent BeforeFileWrite */
-        $handledEvent = $this->eventDispatcher->dispatch(new BeforeFileWrite($realPath, $content, $this));
-        $content = $handledEvent->getContent();
-
-        $this->logger->info("Writing to file {$realPath} for directory {$this->getPath()}");
-        file_put_contents($realPath, $content);
-
-        $this->eventDispatcher->dispatch(new AfterFileWrite($realPath, $content, $this));
     }
 }

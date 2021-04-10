@@ -8,10 +8,10 @@ use ZeroGravity\Cms\Content\Finder\Iterator\PathFilterIterator;
 
 trait PageFinderPathsTrait
 {
-    private $paths = [];
-    private $notPaths = [];
-    private $filesystemPaths = [];
-    private $notFilesystemPaths = [];
+    private array $paths = [];
+    private array $notPaths = [];
+    private array $filesystemPaths = [];
+    private array $notFilesystemPaths = [];
 
     /**
      * Adds rules that page paths must match.
@@ -28,7 +28,7 @@ trait PageFinderPathsTrait
      *
      * @see FilenameFilterIterator
      */
-    public function path($pattern)
+    public function path(string $pattern): self
     {
         $this->paths[] = $pattern;
 
@@ -46,11 +46,9 @@ trait PageFinderPathsTrait
      *
      * @param string $pattern A pattern (a regexp or a string)
      *
-     * @return $this
-     *
      * @see FilenameFilterIterator
      */
-    public function notPath($pattern)
+    public function notPath(string $pattern): self
     {
         $this->notPaths[] = $pattern;
 
@@ -68,11 +66,9 @@ trait PageFinderPathsTrait
      *
      * @param string $pattern A pattern (a regexp or a string)
      *
-     * @return $this
-     *
      * @see FilenameFilterIterator
      */
-    public function filesystemPath($pattern)
+    public function filesystemPath(string $pattern): self
     {
         $this->filesystemPaths[] = $pattern;
 
@@ -90,11 +86,9 @@ trait PageFinderPathsTrait
      *
      * @param string $pattern A pattern (a regexp or a string)
      *
-     * @return $this
-     *
      * @see FilenameFilterIterator
      */
-    public function notFilesystemPath($pattern)
+    public function notFilesystemPath(string $pattern): self
     {
         $this->notFilesystemPaths[] = $pattern;
 

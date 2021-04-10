@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 use ZeroGravity\Cms\Content\Meta\MetadataLoader;
 
-class YamlMetadataLoader implements MetadataLoader
+final class YamlMetadataLoader implements MetadataLoader
 {
     /**
      * Load and return the metadata for the given file.

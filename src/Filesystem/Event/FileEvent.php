@@ -8,9 +8,7 @@ use ZeroGravity\Cms\Filesystem\Directory;
 abstract class FileEvent extends Event
 {
     protected string $content;
-
     private string $realPath;
-
     private Directory $directory;
 
     public function __construct(string $realPath, string $content, Directory $directory)

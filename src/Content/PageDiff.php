@@ -2,10 +2,9 @@
 
 namespace ZeroGravity\Cms\Content;
 
-class PageDiff
+final class PageDiff
 {
     private WritablePage $old;
-
     private WritablePage $new;
 
     public function __construct(WritablePage $old, WritablePage $new)

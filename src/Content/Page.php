@@ -3,18 +3,23 @@
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Content\Meta\PagePublishingTrait;
 use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
+use ZeroGravity\Cms\Content\Meta\PageTaxonomyTrait;
 use ZeroGravity\Cms\Path\Path;
 
 class Page implements ReadablePage
 {
     use PageFilesTrait;
+    use PagePublishingTrait;
     use PageSettingsTrait;
+    use PageTaxonomyTrait;
 
-    const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
-    const TAXONOMY_TAG = 'tag';
-    const TAXONOMY_CATEGORY = 'category';
-    const TAXONOMY_AUTHOR = 'author';
+    public const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+
+    public const TAXONOMY_TAG = 'tag';
+    public const TAXONOMY_CATEGORY = 'category';
+    public const TAXONOMY_AUTHOR = 'author';
 
     protected string $name;
 
@@ -31,12 +36,7 @@ class Page implements ReadablePage
 
     private ?Path $filesystemPath = null;
 
-    /**
-     * Create a new page object.
-     *
-     * @param Page $parent
-     */
-    public function __construct(string $name, array $settings = [], self $parent = null)
+    public function __construct(string $name, array $settings = [], ReadablePage $parent = null)
     {
         $this->name = $name;
         $this->initSettings($settings, $name);
@@ -44,7 +44,7 @@ class Page implements ReadablePage
         $this->init();
     }
 
-    protected function init()
+    protected function init(): void
     {
         $this->setFiles([]);
     }

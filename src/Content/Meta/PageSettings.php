@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use ZeroGravity\Cms\Content\Page;
 
-class PageSettings
+final class PageSettings
 {
     private ?array $values = null;
 
@@ -57,7 +57,7 @@ class PageSettings
      * Resolve and validate page settings.
      * If everything was fine, assign them.
      */
-    public function validate(array $values)
+    public function validate(array $values): void
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
@@ -69,7 +69,7 @@ class PageSettings
     /**
      * Configure validation rules for page settings.
      */
-    private function configureOptions(OptionsResolver $resolver)
+    private function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureDefaults($resolver);
         $this->configureAllowedTypes($resolver);

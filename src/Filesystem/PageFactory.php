@@ -5,11 +5,12 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
-class PageFactory
+final class PageFactory
 {
     private EventDispatcherInterface $eventDispatcher;
 
@@ -30,15 +31,13 @@ class PageFactory
 
     /**
      * Create Page from directory content.
-     *
-     * @return Page|null
      */
     public function createPage(
         Directory $directory,
         bool $convertMarkdown,
         array $defaultSettings,
         Page $parentPage = null
-    ) {
+    ): ?Page {
         $directory->validateFiles();
         if (Directory::CONTENT_STRATEGY_NONE === $directory->getContentStrategy()) {
             return null;
@@ -72,10 +71,7 @@ class PageFactory
         return $page;
     }
 
-    /**
-     * @param Page $parentPage
-     */
-    private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
+    private function buildPageSettings(array $defaultSettings, Directory $directory, ?Page $parentPage = null): array
     {
         $settings = $directory->fetchPageSettings();
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();
@@ -89,11 +85,12 @@ class PageFactory
             );
         }
 
-        return $this->mergeSettings([
-            'slug' => $directory->getSlug(),
-            'visible' => $directory->hasSortingPrefix() && !$directory->hasUnderscorePrefix(),
-            'module' => $directory->hasUnderscorePrefix(),
-        ],
+        return $this->mergeSettings(
+            [
+                'slug' => $directory->getSlug(),
+                'visible' => $directory->hasSortingPrefix() && !$directory->hasUnderscorePrefix(),
+                'module' => $directory->hasUnderscorePrefix(),
+            ],
             $defaultSettings,
             $settings
         );
@@ -123,7 +120,7 @@ class PageFactory
     /**
      * Get the directory for a previously created page instance.
      */
-    public function getDirectory(Page $page): Directory
+    public function getDirectory(ReadablePage $page): Directory
     {
         if (!isset($this->directories[$page->getPath()->toString()])) {
             throw FilesystemException::cannotFindDirectoryForPage($page);

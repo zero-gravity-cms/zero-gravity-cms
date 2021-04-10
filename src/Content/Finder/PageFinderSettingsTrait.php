@@ -7,24 +7,111 @@ use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentTypeFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\DateRangeFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilter;
 use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilter;
 use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\SlugFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\TitleFilterIterator;
 
 trait PageFinderSettingsTrait
 {
-    private $dates = [];
-    private $slugs = [];
-    private $notSlugs = [];
-    private $titles = [];
-    private $notTitles = [];
-    private $extras = [];
-    private $notExtras = [];
-    private $settings = [];
-    private $notSettings = [];
-    private $contentTypes = [];
-    private $notContentTypes = [];
+    /**
+     * @var ExtraFilter[]
+     */
+    private array $extras = [];
+    /**
+     * @var SettingFilter[]
+     */
+    private array $settings = [];
+    /**
+     * @var DateComparator[]
+     */
+    private array $dates = [];
+    /**
+     * @var string[]
+     */
+    private array $slugs = [];
+    /**
+     * @var string[]
+     */
+    private array $notSlugs = [];
+    /**
+     * @var string[]
+     */
+    private array $titles = [];
+    /**
+     * @var string[]
+     */
+    private array $notTitles = [];
+    /**
+     * @var string[]
+     */
+    private array $contentTypes = [];
+    /**
+     * @var string[]
+     */
+    private array $notContentTypes = [];
+
+    /**
+     * Adds rules that pages extra setting values must match.
+     *
+     * $finder->extra('my_extra', 'value')
+     *
+     * @param string $comparator One of the ExtraFilter::COMPARATOR_* constants
+     *
+     * @see ExtraFilterIterator
+     */
+    public function extra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    {
+        $this->extras[] = ExtraFilter::has($name, $value, $comparator);
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages extra setting values must not match.
+     *
+     * $finder->notExtra('my_extra', 'value')
+     *
+     * @param string $comparator One of the ExtraFilter::COMPARATOR_* constants
+     *
+     * @see ExtraFilterIterator
+     */
+    public function notExtra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    {
+        $this->extras[] = ExtraFilter::hasNot($name, $value, $comparator);
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages setting values must match.
+     *
+     * $finder->setting('my_setting', 'value')
+     *
+     * @see SettingFilterIterator
+     */
+    public function setting(string $name, $value): self
+    {
+        $this->settings[] = SettingFilter::has($name, $value);
+
+        return $this;
+    }
+
+    /**
+     * Adds rules that pages setting values must not match.
+     *
+     * $finder->notSetting('my_setting', 'value')
+     *
+     * @see SettingFilterIterator
+     */
+    public function notSetting(string $name, $value): self
+    {
+        $this->settings[] = SettingFilter::hasNot($name, $value);
+
+        return $this;
+    }
 
     /**
      * Adds tests for page dates (if defined in page metadata).
@@ -38,85 +125,13 @@ trait PageFinderSettingsTrait
      *
      * @param string $date A date range string
      *
-     * @return $this
-     *
      * @see strtotime
      * @see DateRangeFilterIterator
      * @see DateComparator
      */
-    public function date($date)
+    public function date(string $date): self
     {
         $this->dates[] = new DateComparator($date);
-
-        return $this;
-    }
-
-    /**
-     * Adds rules that pages extra setting values must match.
-     *
-     * $finder->extra('my_extra', 'value')
-     *
-     * @param string $name
-     * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
-     *
-     * @return $this
-     *
-     * @see ExtraFilterIterator
-     */
-    public function extra($name, $value, $comparator = ExtraFilterIterator::COMPARATOR_STRING)
-    {
-        $this->extras[] = [$name, $value, $comparator];
-
-        return $this;
-    }
-
-    /**
-     * Adds rules that pages extra setting values must not match.
-     *
-     * $finder->notExtra('my_extra', 'value')
-     *
-     * @param string $name
-     * @param string $comparator One of the ExtraFilterIterator::COMPARATOR_* constants
-     *
-     * @return $this
-     *
-     * @see ExtraFilterIterator
-     */
-    public function notExtra($name, $value, $comparator = ExtraFilterIterator::COMPARATOR_STRING)
-    {
-        $this->notExtras[] = [$name, $value, $comparator];
-
-        return $this;
-    }
-
-    /**
-     * Adds rules that pages setting values must match.
-     *
-     * $finder->setting('my_setting', 'value')
-     *
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function setting($name, $value)
-    {
-        $this->settings[] = [$name, $value];
-
-        return $this;
-    }
-
-    /**
-     * Adds rules that pages setting values must not match.
-     *
-     * $finder->notSetting('my_setting', 'value')
-     *
-     * @param string $name
-     *
-     * @return $this
-     */
-    public function notSetting($name, $value)
-    {
-        $this->notSettings[] = [$name, $value];
 
         return $this;
     }
@@ -132,11 +147,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see SlugFilterIterator
      */
-    public function slug($pattern)
+    public function slug(string $pattern): self
     {
         $this->slugs[] = $pattern;
 
@@ -148,11 +161,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see SlugFilterIterator
      */
-    public function notSlug($pattern)
+    public function notSlug(string $pattern): self
     {
         $this->notSlugs[] = $pattern;
 
@@ -170,11 +181,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see TitleFilterIterator
      */
-    public function title($pattern)
+    public function title(string $pattern): self
     {
         $this->titles[] = $pattern;
 
@@ -186,11 +195,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see TitleFilterIterator
      */
-    public function notTitle($pattern)
+    public function notTitle(string $pattern): self
     {
         $this->notTitles[] = $pattern;
 
@@ -208,11 +215,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see ContentTypeFilterIterator
      */
-    public function contentType($pattern)
+    public function contentType(string $pattern): self
     {
         $this->contentTypes[] = $pattern;
 
@@ -224,11 +229,9 @@ trait PageFinderSettingsTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see ContentTypeFilterIterator
      */
-    public function notContentType($pattern)
+    public function notContentType(string $pattern): self
     {
         $this->notContentTypes[] = $pattern;
 
@@ -255,8 +258,8 @@ trait PageFinderSettingsTrait
 
     private function applyExtrasIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->extras) || !empty($this->notExtras)) {
-            $iterator = new ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
+        if (!empty($this->extras)) {
+            $iterator = new ExtraFilterIterator($iterator, $this->extras);
         }
 
         return $iterator;
@@ -264,8 +267,8 @@ trait PageFinderSettingsTrait
 
     private function applySettingsIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->settings) || !empty($this->notSettings)) {
-            $iterator = new SettingFilterIterator($iterator, $this->settings, $this->notSettings);
+        if (!empty($this->settings)) {
+            $iterator = new SettingFilterIterator($iterator, $this->settings);
         }
 
         return $iterator;

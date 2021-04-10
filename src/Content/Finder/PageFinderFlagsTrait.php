@@ -10,19 +10,17 @@ use ZeroGravity\Cms\Content\Finder\Iterator\VisibleFilterIterator;
 
 trait PageFinderFlagsTrait
 {
-    private $published;
-    private $modular;
-    private $module;
-    private $visible;
+    private ?bool $published = null;
+    private ?bool $modular = null;
+    private ?bool $module = null;
+    private ?bool $visible = null;
 
     /**
      * Restrict to published or unpublished pages.
      *
      * @param bool|null $published true for published pages, false for unpublished, null to ignore setting
-     *
-     * @return $this
      */
-    public function published($published)
+    public function published(?bool $published): self
     {
         $this->published = $published;
 
@@ -33,10 +31,8 @@ trait PageFinderFlagsTrait
      * Restrict to modular or non-modular pages.
      *
      * @param bool|null $modular true for modular pages, false for non-modular, null to ignore setting
-     *
-     * @return $this
      */
-    public function modular($modular)
+    public function modular(?bool $modular): self
     {
         $this->modular = $modular;
 
@@ -47,10 +43,8 @@ trait PageFinderFlagsTrait
      * Restrict to module or non-module pages.
      *
      * @param bool|null $module true for module pages, false for non-module, null to ignore setting
-     *
-     * @return $this
      */
-    public function module($module)
+    public function module(?bool $module): self
     {
         $this->module = $module;
 
@@ -61,10 +55,8 @@ trait PageFinderFlagsTrait
      * Restrict to visible or hidden pages.
      *
      * @param bool|null $visible true for visible pages, false for hidden, null to ignore setting
-     *
-     * @return $this
      */
-    public function visible($visible)
+    public function visible(?bool $visible): self
     {
         $this->visible = $visible;
 

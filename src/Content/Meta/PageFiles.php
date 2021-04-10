@@ -6,7 +6,7 @@ use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 
-class PageFiles
+final class PageFiles
 {
     /**
      * @var File[]

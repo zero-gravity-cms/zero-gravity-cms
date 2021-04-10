@@ -4,7 +4,7 @@ namespace ZeroGravity\Cms\Content;
 
 class FileTypeDetector
 {
-    const EXTENSIONS = [
+    public const EXTENSIONS = [
         'yaml' => ['yml', 'yaml'],
         'image' => ['jpg', 'jpeg', 'png', 'gif'],
         'markdown' => ['md'],
@@ -12,12 +12,12 @@ class FileTypeDetector
         'document' => ['pdf', 'docx', 'xlsx', 'txt'],
     ];
 
-    const TYPE_YAML = 'yaml';
-    const TYPE_IMAGE = 'image';
-    const TYPE_MARKDOWN = 'markdown';
-    const TYPE_TWIG = 'twig';
-    const TYPE_DOCUMENT = 'document';
-    const TYPE_UNKNOWN = 'unknown';
+    public const TYPE_YAML = 'yaml';
+    public const TYPE_IMAGE = 'image';
+    public const TYPE_MARKDOWN = 'markdown';
+    public const TYPE_TWIG = 'twig';
+    public const TYPE_DOCUMENT = 'document';
+    public const TYPE_UNKNOWN = 'unknown';
 
     protected array $extensionMap = [];
 
@@ -40,10 +40,6 @@ class FileTypeDetector
     {
         $ext = mb_strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-        if (isset($this->extensionMap[$ext])) {
-            return $this->extensionMap[$ext];
-        }
-
-        return self::TYPE_UNKNOWN;
+        return $this->extensionMap[$ext] ?? self::TYPE_UNKNOWN;
     }
 }

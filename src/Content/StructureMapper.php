@@ -2,6 +2,9 @@
 
 namespace ZeroGravity\Cms\Content;
 
+use ZeroGravity\Cms\Exception\StructureException;
+use ZeroGravity\Cms\Exception\ZeroGravityException;
+
 interface StructureMapper
 {
     /**
@@ -9,7 +12,7 @@ interface StructureMapper
      *
      * @return Page[]
      */
-    public function parse();
+    public function parse(): array;
 
     public function getWritablePageInstance(ReadablePage $page): WritablePage;
 
@@ -17,6 +20,8 @@ interface StructureMapper
 
     /**
      * Store changes of the given page diff.
+     *
+     * @throws StructureException|ZeroGravityException
      */
     public function saveChanges(PageDiff $diff): void;
 }

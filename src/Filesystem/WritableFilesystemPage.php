@@ -7,11 +7,11 @@ use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\WritablePage;
 
-class WritableFilesystemPage extends Page implements WritablePage
+final class WritableFilesystemPage extends Page implements WritablePage
 {
     use BasicWritablePageTrait;
 
-    private ?Directory $directory = null;
+    private ?Directory $directory;
 
     public function __construct(ReadablePage $page, Directory $directory = null)
     {

@@ -8,7 +8,7 @@ use Symfony\Component\Finder\Comparator\Comparator;
 /**
  * StringComparator compiles string comparisons.
  */
-class StringComparator extends Comparator
+final class StringComparator extends Comparator
 {
     /**
      * @param string|int $test A comparison string or an integer

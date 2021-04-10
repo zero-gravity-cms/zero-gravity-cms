@@ -6,7 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\Meta\MetadataLoader;
 use ZeroGravity\Cms\Exception\FilesystemException;
 
-class FileFactory
+final class FileFactory
 {
     private FileTypeDetector $fileTypeDetector;
 
@@ -14,9 +14,6 @@ class FileFactory
 
     private string $basePath;
 
-    /**
-     * FileFactory constructor.
-     */
     public function __construct(FileTypeDetector $fileTypeDetector, MetadataLoader $metadataLoader, string $basePath)
     {
         $fs = new Filesystem();
