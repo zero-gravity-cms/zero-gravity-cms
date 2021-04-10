@@ -43,8 +43,6 @@ class PageResolver extends AbstractResolver
             return null;
         }
 
-        $file = $page->getFile($subPath.$filePath->toString());
-
-        return $file;
+        return $page->getFile($subPath.$filePath->toString());
     }
 }

@@ -89,7 +89,7 @@ class PageFactory
             );
         }
 
-        $settings = $this->mergeSettings([
+        return $this->mergeSettings([
             'slug' => $directory->getSlug(),
             'visible' => $directory->hasSortingPrefix() && !$directory->hasUnderscorePrefix(),
             'module' => $directory->hasUnderscorePrefix(),
@@ -97,8 +97,6 @@ class PageFactory
             $defaultSettings,
             $settings
         );
-
-        return $settings;
     }
 
     /**

@@ -188,9 +188,6 @@ class PageFinder implements IteratorAggregate, Countable
         return $this;
     }
 
-    /**
-     * @param $iterator
-     */
     private function appendPageArrayIterator($iterator): Iterator
     {
         $pages = [];
@@ -251,14 +248,10 @@ class PageFinder implements IteratorAggregate, Countable
         $iterator = $this->applyContentIterator($iterator);
         $iterator = $this->applyCustomFiltersIterator($iterator);
         $iterator = $this->applySortIterator($iterator);
-        $iterator = $this->applyOffsetAndLimitIterator($iterator);
 
-        return $iterator;
+        return $this->applyOffsetAndLimitIterator($iterator);
     }
 
-    /**
-     * @param $iterator
-     */
     private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->filters)) {
@@ -268,9 +261,6 @@ class PageFinder implements IteratorAggregate, Countable
         return $iterator;
     }
 
-    /**
-     * @param $iterator
-     */
     private function applyOffsetAndLimitIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->limit || null !== $this->offset) {

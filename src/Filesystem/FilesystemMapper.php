@@ -179,9 +179,8 @@ class FilesystemMapper implements StructureMapper
 
         $fs = new Filesystem();
         $fs->mkdir($realPath);
-        $directory = $this->createDirectory($realPath, $parentPath);
 
-        return $directory;
+        return $this->createDirectory($realPath, $parentPath);
     }
 
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
@@ -202,14 +201,12 @@ class FilesystemMapper implements StructureMapper
 
     private function createDirectory(string $path, string $parentPath = null): Directory
     {
-        $directory = new Directory(
+        return new Directory(
             new SplFileInfo($path),
             $this->fileFactory,
             $this->logger,
             $this->eventDispatcher,
             $parentPath
         );
-
-        return $directory;
     }
 }

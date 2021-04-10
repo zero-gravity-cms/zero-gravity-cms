@@ -344,12 +344,11 @@ class Directory
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
         $parser = new FrontYAMLParser();
-        $document = $parser->parse(
+
+        return $parser->parse(
             file_get_contents($this->getMarkdownFile()->getFilesystemPathname()),
             $convertMarkdown
         );
-
-        return $document;
     }
 
     /**
@@ -509,9 +508,7 @@ FRONTMATTER;
 
     private function dumpSettingsToYaml(array $settings): string
     {
-        $yamlContent = Yaml::dump($settings, 4);
-
-        return $yamlContent;
+        return Yaml::dump($settings, 4);
     }
 
     private function writeFile(string $realPath, string $content)

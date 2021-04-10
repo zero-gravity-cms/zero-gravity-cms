@@ -86,11 +86,9 @@ class CachingResolverTest extends BaseUnit
      */
     private function getWrappedResolver($method, callable $callback)
     {
-        $resolver = Stub::makeEmpty(MultiPathResolver::class, [
+        return Stub::makeEmpty(MultiPathResolver::class, [
             $method => $callback,
         ]);
-
-        return $resolver;
     }
 
     /**

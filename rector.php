@@ -47,7 +47,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 
     // Define what rule sets will be applied
     $parameters->set(Option::SETS, [
-        // SetList::DEAD_CODE,
+        SetList::DEAD_CODE,
         // SetList::PHP_52,
         // SetList::PHP_53,
         // SetList::PHP_54,
@@ -64,11 +64,11 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         // SetList::SYMFONY_32,
         // SetList::SYMFONY_33,
         // SetList::SYMFONY_34,
-        SetList::SYMFONY_40,
-        SetList::SYMFONY_41,
-        SetList::SYMFONY_42,
-        SetList::SYMFONY_43,
-        SetList::SYMFONY_44,
+        // SetList::SYMFONY_40,
+        // SetList::SYMFONY_41,
+        // SetList::SYMFONY_42,
+        // SetList::SYMFONY_43,
+        // SetList::SYMFONY_44,
         // SetList::TWIG_112,
         // SetList::TWIG_127,
         // SetList::TWIG_134,

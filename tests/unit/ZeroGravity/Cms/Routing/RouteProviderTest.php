@@ -111,8 +111,6 @@ class RouteProviderTest extends BaseUnit
      */
     private function createSimplePage($name, Page $parent = null)
     {
-        $page = new Page($name, ['slug' => $name], $parent);
-
-        return $page;
+        return new Page($name, ['slug' => $name], $parent);
     }
 }

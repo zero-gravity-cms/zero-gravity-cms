@@ -53,9 +53,7 @@ class ContentRepository
      */
     protected function loadFromParser()
     {
-        $pages = $this->mapper->parse();
-
-        return $pages;
+        return $this->mapper->parse();
     }
 
     /**

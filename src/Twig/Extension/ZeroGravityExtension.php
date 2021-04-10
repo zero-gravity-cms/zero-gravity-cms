@@ -99,9 +99,7 @@ class ZeroGravityExtension extends AbstractExtension
 
     public function filterPages(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
     {
-        $pageFinder = $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
-
-        return $pageFinder;
+        return $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
     }
 
     /**
