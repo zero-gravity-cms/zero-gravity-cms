@@ -30,23 +30,24 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
 
-        $this->assertSame([
+        static::assertSame([
             $page1,
             $page2,
         ], $repo->getPageTree());
 
-        $this->assertSame([
+        static::assertSame([
             '/page1' => $page1,
             '/page2' => $page2,
             '/page2/page3' => $page3,
         ], $repo->getAllPages());
 
-        $this->assertSame($page3, $repo->getPage('/page2/page3'));
-        $this->assertNull($repo->getPage('/does/not/exist'));
+        static::assertSame($page3, $repo->getPage('/page2/page3'));
+        static::assertNull($repo->getPage('/does/not/exist'));
     }
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function writablePageIsLoadedFromMapper()
     {
@@ -56,7 +57,7 @@ class ContentRepositoryTest extends BaseUnit
             ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
             ->getMock()
         ;
-        $mapper->expects($this->once())
+        $mapper->expects(static::once())
             ->method('getWritablePageInstance')
         ;
 
@@ -66,6 +67,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function newWritablePageIsLoadedFromMapper()
     {
@@ -75,7 +77,7 @@ class ContentRepositoryTest extends BaseUnit
             ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
             ->getMock()
         ;
-        $mapper->expects($this->once())
+        $mapper->expects(static::once())
             ->method('getNewWritablePage')
             ->with($page1)
         ;
@@ -86,6 +88,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function diffIsSavedThroughMapper()
     {
@@ -101,7 +104,7 @@ class ContentRepositoryTest extends BaseUnit
         $new = clone $old;
         $diff = new PageDiff($old, $new);
 
-        $mapper->expects($this->once())
+        $mapper->expects(static::once())
             ->method('saveChanges')
             ->with($diff)
         ;
@@ -133,7 +136,7 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo2 = new ContentRepository($emptyMapper, $cache, false);
 
-        $this->assertEquals([
+        static::assertEquals([
             '/page1' => $page1,
             '/page2' => $page2,
             '/page2/page3' => $page3,
@@ -141,7 +144,7 @@ class ContentRepositoryTest extends BaseUnit
 
         $repo3 = new ContentRepository($emptyMapper, $cache, false);
         $repo3->clearCache();
-        $this->assertEquals([], $repo3->getAllPages(), 'After clearing the cache the empty result is loaded.');
+        static::assertEquals([], $repo3->getAllPages(), 'After clearing the cache the empty result is loaded.');
     }
 
     /**
@@ -167,11 +170,12 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo2 = new ContentRepository($emptyMapper, $cache, true);
 
-        $this->assertEquals([], $repo2->getAllPages());
+        static::assertEquals([], $repo2->getAllPages());
     }
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function pagesAreLoadedIfCacheThrowsException()
     {

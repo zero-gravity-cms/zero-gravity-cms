@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
@@ -20,38 +21,36 @@ class PageResolverTest extends BaseUnit
         $resolver = $this->getPageResolver();
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        $this->assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        $this->assertSame($expectedPath, $file->getPathname());
+        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
+        static::assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths()
+    public function provideSingleFilePaths(): Iterator
     {
-        return [
-            [
-                '/yaml_only/file2.png',
-                null,
-                '/01.yaml_only/file2.png',
-            ],
-            [
-                'yaml_only/file2.png',
-                null,
-                '/01.yaml_only/file2.png',
-            ],
-            [
-                'with_children/_child1/child_file3.png',
-                null,
-                '/04.with_children/_child1/child_file3.png',
-            ],
-            [
-                '_child1/child_file3.png',
-                'with_children/',
-                '/04.with_children/_child1/child_file3.png',
-            ],
-            [
-                'with_children/03.empty/sub/dir/child_file7.png',
-                null,
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
+        yield [
+            '/yaml_only/file2.png',
+            null,
+            '/01.yaml_only/file2.png',
+        ];
+        yield [
+            'yaml_only/file2.png',
+            null,
+            '/01.yaml_only/file2.png',
+        ];
+        yield [
+            'with_children/_child1/child_file3.png',
+            null,
+            '/04.with_children/_child1/child_file3.png',
+        ];
+        yield [
+            '_child1/child_file3.png',
+            'with_children/',
+            '/04.with_children/_child1/child_file3.png',
+        ];
+        yield [
+            'with_children/03.empty/sub/dir/child_file7.png',
+            null,
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
         ];
     }
 
@@ -66,24 +65,22 @@ class PageResolverTest extends BaseUnit
         $resolver = $this->getPageResolver();
         $pageFile = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        $this->assertNull($pageFile);
+        static::assertNull($pageFile);
     }
 
-    public function provideNonExistingPagePaths()
+    public function provideNonExistingPagePaths(): Iterator
     {
-        return [
-            [
-                '01.yaml_only',
-                null,
-            ],
-            [
-                'yaml_only/file4.png',
-                null,
-            ],
-            [
-                '',
-                null,
-            ],
+        yield [
+            '01.yaml_only',
+            null,
+        ];
+        yield [
+            'yaml_only/file4.png',
+            null,
+        ];
+        yield [
+            '',
+            null,
         ];
     }
 

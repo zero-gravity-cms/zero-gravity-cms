@@ -20,7 +20,7 @@ class PageSettingsTest extends BaseUnit
         ], 'page');
         $nestedSettings = new PageSettings($settings->toArray(), 'page');
 
-        $this->assertSame($settings->toArray(), $nestedSettings->toArray());
+        static::assertSame($settings->toArray(), $nestedSettings->toArray());
     }
 
     /**
@@ -51,7 +51,7 @@ class PageSettingsTest extends BaseUnit
             'content_type' => 'page',
             'child_defaults' => [],
         ];
-        $this->assertEquals($expectedSettings, $settings->toArray());
+        static::assertEquals($expectedSettings, $settings->toArray());
     }
 
     /**
@@ -68,6 +68,6 @@ class PageSettingsTest extends BaseUnit
             'slug' => 'not-page',
             'menu_label' => 'custom label',
         ];
-        $this->assertEquals($expectedSettings, $settings->getNonDefaultValues());
+        static::assertEquals($expectedSettings, $settings->getNonDefaultValues());
     }
 }

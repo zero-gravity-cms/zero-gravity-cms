@@ -4,6 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\Slugify;
 use Codeception\Util\Stub;
+use Iterator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
@@ -45,38 +46,36 @@ class CachingResolverTest extends BaseUnit
         );
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
-        $this->assertSame($expectedReturnValue, $result);
-        $this->assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
+        static::assertSame($expectedReturnValue, $result);
+        static::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
         $called = false;
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
-        $this->assertSame($expectedReturnValue, $result);
-        $this->assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        static::assertSame($expectedReturnValue, $result);
+        static::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
 
         $result = $resolver->$method(new Path('b'), new Path('c'));
-        $this->assertSame($expectedReturnValue, $result);
-        $this->assertTrue($called, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
+        static::assertSame($expectedReturnValue, $result);
+        static::assertTrue($called, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
 
         // try without parent path
         $result = $resolver->$method(new Path('d'));
-        $this->assertSame($expectedReturnValue, $result);
-        $this->assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
+        static::assertSame($expectedReturnValue, $result);
+        static::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
         $called = false;
 
         $result = $resolver->$method(new Path('d'));
-        $this->assertSame($expectedReturnValue, $result);
-        $this->assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        static::assertSame($expectedReturnValue, $result);
+        static::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
     }
 
-    public function provideMethods()
+    public function provideMethods(): Iterator
     {
-        return [
-            'get' => ['get', 'file'],
-            'find' => ['find', []],
-            'findOne' => ['findOne', 'file', 'get'],
-        ];
+        yield 'get' => ['get', 'file'];
+        yield 'find' => ['find', []];
+        yield 'findOne' => ['findOne', 'file', 'get'];
     }
 
     /**
@@ -104,7 +103,7 @@ class CachingResolverTest extends BaseUnit
         );
 
         $result = $resolver->find(new Path('a'), new Path('b'));
-        $this->assertSame([], $result);
+        static::assertSame([], $result);
     }
 
     /**

@@ -77,7 +77,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
-        $this->assertCount(3, $page->getFiles());
+        static::assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -89,8 +89,8 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        $this->assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        $this->assertCount(3, $page->getFiles());
+        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        static::assertCount(3, $page->getFiles());
     }
 
     /**
@@ -101,7 +101,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
-        $this->assertCount(1, $page->getFiles());
+        static::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -113,9 +113,9 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        $this->assertSame("<p>This is the content of page 02.</p>\n<p>new <strong>raw</strong> content</p>", $page->getContent());
-        $this->assertSame('value-kept-after-content-update', $page->getExtra('keep-value'));
-        $this->assertCount(1, $page->getFiles());
+        static::assertSame("<p>This is the content of page 02.</p>\n<p>new <strong>raw</strong> content</p>", $page->getContent());
+        static::assertSame('value-kept-after-content-update', $page->getExtra('keep-value'));
+        static::assertCount(1, $page->getFiles());
     }
 
     /**
@@ -126,7 +126,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
-        $this->assertCount(4, $page->getFiles());
+        static::assertCount(4, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -138,8 +138,8 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
 
-        $this->assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        $this->assertCount(5, $page->getFiles());
+        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        static::assertCount(5, $page->getFiles());
     }
 
     /**
@@ -150,7 +150,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
-        $this->assertCount(1, $page->getFiles());
+        static::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -162,8 +162,8 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        $this->assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        $this->assertCount(2, $page->getFiles());
+        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        static::assertCount(2, $page->getFiles());
     }
 
     /**
@@ -174,7 +174,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
-        $this->assertCount(3, $page->getFiles());
+        static::assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -190,9 +190,9 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        $this->assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        $this->assertSame('new-value', $page->getExtra('new-key'));
-        $this->assertCount(3, $page->getFiles());
+        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        static::assertSame('new-value', $page->getExtra('new-key'));
+        static::assertCount(3, $page->getFiles());
     }
 
     /**
@@ -203,7 +203,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
-        $this->assertCount(1, $page->getFiles());
+        static::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -219,9 +219,9 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        $this->assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        $this->assertSame('new-value', $page->getExtra('new-key'));
-        $this->assertCount(1, $page->getFiles());
+        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        static::assertSame('new-value', $page->getExtra('new-key'));
+        static::assertCount(1, $page->getFiles());
     }
 
     /**
@@ -232,7 +232,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
-        $this->assertCount(1, $page->getFiles());
+        static::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -248,9 +248,9 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        $this->assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        $this->assertSame('new-value', $page->getExtra('new-key'));
-        $this->assertCount(2, $page->getFiles());
+        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        static::assertSame('new-value', $page->getExtra('new-key'));
+        static::assertCount(2, $page->getFiles());
     }
 
     /**
@@ -271,11 +271,11 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
 
-        $this->assertArrayNotHasKey('/with_children', $pages);
-        $this->assertArrayHasKey('/still_with_children', $pages);
+        static::assertArrayNotHasKey('/with_children', $pages);
+        static::assertArrayHasKey('/still_with_children', $pages);
 
         $page = $pages['/still_with_children'];
-        $this->assertCount(2, $page->getChildren());
+        static::assertCount(2, $page->getChildren());
     }
 
     /**
@@ -298,13 +298,13 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
 
-        $this->assertArrayNotHasKey('/with_children', $pages);
+        static::assertArrayNotHasKey('/with_children', $pages);
 
         $parent = $pages['/twig_only'];
-        $this->assertArrayHasKey('/twig_only/moved_but_still_with_children', $parent->getChildren()->toArray());
+        static::assertArrayHasKey('/twig_only/moved_but_still_with_children', $parent->getChildren()->toArray());
 
         $page = $parent->getChildren()->toArray()['/twig_only/moved_but_still_with_children'];
-        $this->assertCount(2, $page->getChildren());
+        static::assertCount(2, $page->getChildren());
     }
 
     /**
@@ -328,10 +328,10 @@ class FilesystemMapperWritingTest extends BaseUnit
 
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
-        $this->assertArrayHasKey('/totally_new', $pages);
+        static::assertArrayHasKey('/totally_new', $pages);
         $page = $pages['/totally_new'];
-        $this->assertSame('A totally new page!', $page->getTitle());
-        $this->assertSame('<p>totally <strong>new</strong> content!</p>', $page->getContent());
+        static::assertSame('A totally new page!', $page->getTitle());
+        static::assertSame('<p>totally <strong>new</strong> content!</p>', $page->getContent());
     }
 
     /**
@@ -358,8 +358,8 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
-        $this->assertCount(1, $page->getChildren());
-        $this->assertArrayHasKey('/yaml_only/totally_new', $page->getChildren()->toArray());
+        static::assertCount(1, $page->getChildren());
+        static::assertArrayHasKey('/yaml_only/totally_new', $page->getChildren()->toArray());
     }
 
     /**

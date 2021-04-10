@@ -13,10 +13,10 @@ class PathElementTest extends BaseUnit
     public function doubleColonElementIsRegardedAsParent()
     {
         $pathElement = new PathElement('foo');
-        $this->assertFalse($pathElement->isParentReference());
+        static::assertFalse($pathElement->isParentReference());
 
         $pathElement = new PathElement('..');
-        $this->assertTrue($pathElement->isParentReference());
+        static::assertTrue($pathElement->isParentReference());
     }
 
     /**
@@ -25,11 +25,11 @@ class PathElementTest extends BaseUnit
     public function regexElementIsNeverRecognizedAsGlob()
     {
         $pathElement = new PathElement('/foo.*', true);
-        $this->assertTrue($pathElement->isGlob());
-        $this->assertFalse($pathElement->isRegex());
+        static::assertTrue($pathElement->isGlob());
+        static::assertFalse($pathElement->isRegex());
 
         $pathElement = new PathElement('/foo.*/', true);
-        $this->assertFalse($pathElement->isGlob());
-        $this->assertTrue($pathElement->isRegex());
+        static::assertFalse($pathElement->isGlob());
+        static::assertTrue($pathElement->isRegex());
     }
 }

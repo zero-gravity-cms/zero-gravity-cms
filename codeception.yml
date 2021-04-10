@@ -16,5 +16,4 @@ coverage:
     include:
         - src/**/*.php
 
-settings:
-    bootstrap: _bootstrap.php
+#bootstrap: _bootstrap.php

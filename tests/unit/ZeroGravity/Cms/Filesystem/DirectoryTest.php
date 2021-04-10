@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Iterator;
 use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -28,7 +29,7 @@ class DirectoryTest extends BaseUnit
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        $this->assertSame('', $dir->getPath());
+        static::assertSame('', $dir->getPath());
     }
 
     /**
@@ -41,7 +42,7 @@ class DirectoryTest extends BaseUnit
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        $this->assertSame('some/path/01.yaml_only', $dir->getPath());
+        static::assertSame('some/path/01.yaml_only', $dir->getPath());
     }
 
     /**
@@ -57,13 +58,11 @@ class DirectoryTest extends BaseUnit
         $dir->validateFiles();
     }
 
-    public function provideInvalidDirectories()
+    public function provideInvalidDirectories(): Iterator
     {
-        return [
-            '2 markdown files' => ['invalid_pages/2_markdown_files'],
-            '2 yaml files' => ['invalid_pages/2_yaml_files'],
-            'yaml and markdown basenames do not match' => ['invalid_pages/basenames_dont_match__markdown'],
-        ];
+        yield '2 markdown files' => ['invalid_pages/2_markdown_files'];
+        yield '2 yaml files' => ['invalid_pages/2_yaml_files'];
+        yield 'yaml and markdown basenames do not match' => ['invalid_pages/basenames_dont_match__markdown'];
     }
 
     /**
@@ -72,7 +71,7 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameReturnsYamlBasenameIfPresent()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
-        $this->assertSame('page', $dir->getDefaultBasename());
+        static::assertSame('page', $dir->getDefaultBasename());
     }
 
     /**
@@ -81,7 +80,7 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameReturnsMarkdownBasenameIfPresent()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/02.markdown_only');
-        $this->assertSame('page', $dir->getDefaultBasename());
+        static::assertSame('page', $dir->getDefaultBasename());
     }
 
     /**
@@ -90,8 +89,8 @@ class DirectoryTest extends BaseUnit
     public function getDefaultBasenameTwigFileReturnsTwigFileIfMatchesDefaultBasename()
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
-        $this->assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
-        $this->assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
+        static::assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
+        static::assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
     }
 
     /**
@@ -105,36 +104,34 @@ class DirectoryTest extends BaseUnit
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().$path);
 
-        $this->assertSame($expectedStrategy, $dir->getContentStrategy());
+        static::assertSame($expectedStrategy, $dir->getContentStrategy());
     }
 
-    public function providePathsAndStrategies()
+    public function providePathsAndStrategies(): Iterator
     {
-        return [
-            '01.yaml_only' => [
-                '/01.yaml_only',
-                Directory::CONTENT_STRATEGY_YAML_ONLY,
-            ],
-            '02.markdown_only' => [
-                '/02.markdown_only',
-                Directory::CONTENT_STRATEGY_MARKDOWN_ONLY,
-            ],
-            '03.yaml_and_markdown_and_twig' => [
-                '/03.yaml_and_markdown_and_twig',
-                Directory::CONTENT_STRATEGY_YAML_AND_MARKDOWN,
-            ],
-            '05.twig_only' => [
-                '/05.twig_only',
-                Directory::CONTENT_STRATEGY_TWIG_ONLY,
-            ],
-            '06.yaml_and_twig' => [
-                '/06.yaml_and_twig',
-                Directory::CONTENT_STRATEGY_YAML_ONLY,
-            ],
-            'images' => [
-                '/images',
-                Directory::CONTENT_STRATEGY_NONE,
-            ],
+        yield '01.yaml_only' => [
+            '/01.yaml_only',
+            Directory::CONTENT_STRATEGY_YAML_ONLY,
+        ];
+        yield '02.markdown_only' => [
+            '/02.markdown_only',
+            Directory::CONTENT_STRATEGY_MARKDOWN_ONLY,
+        ];
+        yield '03.yaml_and_markdown_and_twig' => [
+            '/03.yaml_and_markdown_and_twig',
+            Directory::CONTENT_STRATEGY_YAML_AND_MARKDOWN,
+        ];
+        yield '05.twig_only' => [
+            '/05.twig_only',
+            Directory::CONTENT_STRATEGY_TWIG_ONLY,
+        ];
+        yield '06.yaml_and_twig' => [
+            '/06.yaml_and_twig',
+            Directory::CONTENT_STRATEGY_YAML_ONLY,
+        ];
+        yield 'images' => [
+            '/images',
+            Directory::CONTENT_STRATEGY_NONE,
         ];
     }
 

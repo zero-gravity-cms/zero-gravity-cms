@@ -20,14 +20,14 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function noMatchingIsDoneWithoutRequest()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->never())
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects(static::never())
             ->method('getExtra')
         ;
 
         $voter = new PageRouteVoter(new RequestStack());
 
-        $this->assertNull($voter->matchItem($item));
+        static::assertNull($voter->matchItem($item));
     }
 
     /**
@@ -35,8 +35,8 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function noMatchingIsDoneIfRequestDoesNotContainPage()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->never())
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects(static::never())
             ->method('getExtra')
         ;
 
@@ -44,7 +44,7 @@ class PageRouteVoterTest extends BaseUnit
         $stack->push(new Request());
         $voter = new PageRouteVoter($stack);
 
-        $this->assertNull($voter->matchItem($item));
+        static::assertNull($voter->matchItem($item));
     }
 
     /**
@@ -52,8 +52,8 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingIsDoneIfRequestContainsPage()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->atLeastOnce())
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects(static::atLeastOnce())
             ->method('getExtra')
         ;
 
@@ -66,7 +66,7 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        $this->assertNull($voter->matchItem($item));
+        static::assertNull($voter->matchItem($item));
     }
 
     /**
@@ -74,11 +74,11 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function invalidRouteConfigThrowsException()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->any())
+        $item = $this->createMock(ItemInterface::class);
+        $item
             ->method('getExtra')
             ->with('routes')
-            ->will($this->returnValue([['invalid' => 'array']]))
+            ->willReturn([['invalid' => 'array']])
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
@@ -99,11 +99,11 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingUsingSingleStringRoute()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->any())
+        $item = $this->createMock(ItemInterface::class);
+        $item
             ->method('getExtra')
             ->with('routes')
-            ->will($this->returnValue('/test'))
+            ->willReturn('/test')
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
@@ -115,7 +115,7 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        $this->assertTrue($voter->matchItem($item));
+        static::assertTrue($voter->matchItem($item));
     }
 
     /**
@@ -123,14 +123,14 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingUsingRouteArray()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->any())
+        $item = $this->createMock(ItemInterface::class);
+        $item
             ->method('getExtra')
             ->with('routes')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['route' => '/foo'],
                 ['route' => '/test'],
-            ]))
+            ])
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
@@ -142,7 +142,7 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        $this->assertTrue($voter->matchItem($item));
+        static::assertTrue($voter->matchItem($item));
     }
 
     /**
@@ -150,14 +150,14 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function notMatchingUsingRouteArray()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
-        $item->expects($this->any())
+        $item = $this->createMock(ItemInterface::class);
+        $item
             ->method('getExtra')
             ->with('routes')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['route' => '/foo'],
                 ['route' => '/test'],
-            ]))
+            ])
         ;
 
         $page = new Page('test', ['slug' => 'another-slug'], null);
@@ -169,6 +169,6 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        $this->assertNull($voter->matchItem($item));
+        static::assertNull($voter->matchItem($item));
     }
 }

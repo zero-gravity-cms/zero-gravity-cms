@@ -19,18 +19,18 @@ class FileTest extends BaseUnit
 
         $file = new File('/foo/bar/baz/photo.jpg', '/filesystem/path/', $metadata, 'image');
 
-        $this->assertSame($metadata, $file->getMetadata());
-        $this->assertSame('image', $file->getType());
-        $this->assertSame('photo.jpg', $file->getFilename());
-        $this->assertSame('photo.jpg', $file->getBasename());
-        $this->assertSame('photo', $file->getBasename('.jpg'));
-        $this->assertSame('photo', $file->getDefaultBasename());
-        $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
-        $this->assertSame('jpg', $file->getExtension());
-        $this->assertSame('/filesystem/path/foo/bar/baz/photo.jpg', $file->getFilesystemPathname());
+        static::assertSame($metadata, $file->getMetadata());
+        static::assertSame('image', $file->getType());
+        static::assertSame('photo.jpg', $file->getFilename());
+        static::assertSame('photo.jpg', $file->getBasename());
+        static::assertSame('photo', $file->getBasename('.jpg'));
+        static::assertSame('photo', $file->getDefaultBasename());
+        static::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
+        static::assertSame('jpg', $file->getExtension());
+        static::assertSame('/filesystem/path/foo/bar/baz/photo.jpg', $file->getFilesystemPathname());
 
         $file = new File('/foo/bar/baz/photo', '/filesystem/path/', $metadata, 'image');
-        $this->assertSame('photo', $file->getDefaultBasename());
+        static::assertSame('photo', $file->getDefaultBasename());
     }
 
     /**
@@ -39,7 +39,7 @@ class FileTest extends BaseUnit
     public function pathnameAlwaysStartsWithSlash()
     {
         $file = new File('foo/bar/baz/photo.jpg', '', new Metadata([]), 'image');
-        $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
+        static::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
     }
 
     /**
@@ -48,6 +48,6 @@ class FileTest extends BaseUnit
     public function toStringReturnsPathname()
     {
         $file = new File('/foo/bar/baz/photo.jpg', '/filesystem/path/', new Metadata([]), 'image');
-        $this->assertSame('/foo/bar/baz/photo.jpg', (string) $file);
+        static::assertSame('/foo/bar/baz/photo.jpg', (string) $file);
     }
 }

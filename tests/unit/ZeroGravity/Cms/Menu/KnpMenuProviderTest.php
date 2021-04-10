@@ -38,7 +38,7 @@ class KnpMenuProviderTest extends BaseUnit
     {
         $provider = $this->getProvider();
 
-        $this->assertFalse($provider->has('invalid-menu-name'));
+        static::assertFalse($provider->has('invalid-menu-name'));
 
         $this->expectException(InvalidMenuNameException::class);
         $provider->get('invalid-menu-name');
@@ -52,7 +52,7 @@ class KnpMenuProviderTest extends BaseUnit
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        $this->assertInstanceOf(ItemInterface::class, $rootItem);
+        static::assertInstanceOf(ItemInterface::class, $rootItem);
     }
 
     /**
@@ -63,7 +63,7 @@ class KnpMenuProviderTest extends BaseUnit
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        $this->assertCount(3, $rootItem->getChildren());
+        static::assertCount(3, $rootItem->getChildren());
     }
 
     /**
@@ -75,7 +75,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        $this->assertCount(2, $child->getChildren());
+        static::assertCount(2, $child->getChildren());
     }
 
     /**
@@ -87,7 +87,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        $this->assertSame('first-sibling', $child->getExtra('page_slug'));
+        static::assertSame('first-sibling', $child->getExtra('page_slug'));
     }
 
     /**
@@ -99,7 +99,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        $this->assertSame('custom second sibling label', $child->getLabel());
+        static::assertSame('custom second sibling label', $child->getLabel());
     }
 
     /**
@@ -111,7 +111,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        $this->assertSame('custom_value', $child->getExtra('custom_extra'));
+        static::assertSame('custom_value', $child->getExtra('custom_extra'));
     }
 
     /**
@@ -136,14 +136,14 @@ class KnpMenuProviderTest extends BaseUnit
 
         foreach ($expectedItemUris as $childName => $uri) {
             $child = $rootItem->getChild($childName);
-            $this->assertInstanceOf(ItemInterface::class, $child);
-            $this->assertSame($uri, $child->getUri());
+            static::assertInstanceOf(ItemInterface::class, $child);
+            static::assertSame($uri, $child->getUri());
 
             if (isset($expectedChildItemUris[$childName])) {
                 foreach ($expectedChildItemUris[$childName] as $subChildName => $subUri) {
                     $subChild = $child->getChild($subChildName);
-                    $this->assertInstanceOf(ItemInterface::class, $subChild);
-                    $this->assertSame($subUri, $subChild->getUri());
+                    static::assertInstanceOf(ItemInterface::class, $subChild);
+                    static::assertSame($subUri, $subChild->getUri());
                 }
             }
         }
@@ -151,217 +151,178 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
+     * @group now
      */
     public function eventsAreDispatchedDuringBuild()
     {
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
-        $run = 0;
+        $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $beforeBuildMenuCallback = function ($argument) {
-            if (!$argument instanceof BeforeBuildMenu) {
-                return false;
-            }
-            if ('zero-gravity' !== $argument->getMenuName()) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
+        $step = 0;
+        $callbackChain = function ($argument) use (&$step) {
+            ++$step;
 
-            return true;
-        };
+            $beforeBuildMenuCallback = function ($argument) {
+                if (!$argument instanceof BeforeBuildMenu) {
+                    return false;
+                }
+                if ('zero-gravity' !== $argument->getMenuName()) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
 
-        // menu start
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($beforeBuildMenuCallback))
-        ;
+                return true;
+            };
+            $beforeAddHomeItemCallback = function ($argument) {
+                if (!$argument instanceof BeforeAddItem) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
+                if ('Home' !== $argument->getItemToBeAdded()->getLabel()) {
+                    return false;
+                }
+                if ('root' !== $argument->getParentItem()->getName()) {
+                    return false;
+                }
 
-        $beforeAddHomeItemCallback = function ($argument) {
-            if (!$argument instanceof BeforeAddItem) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
-            if ('Home' !== $argument->getItemToBeAdded()->getLabel()) {
-                return false;
-            }
-            if ('root' !== $argument->getParentItem()->getName()) {
-                return false;
-            }
+                return true;
+            };
+            $beforeAddHomeChildrenCallback = function ($argument) {
+                if (!$argument instanceof BeforeAddChildrenToItem) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
+                if ('01.home' !== $argument->getItem()->getName()) {
+                    return false;
+                }
+                if ('Home' !== $argument->getItem()->getLabel()) {
+                    return false;
+                }
 
-            return true;
-        };
+                return true;
+            };
+            $afterAddHomeChildrenCallback = function ($argument) {
+                if (!$argument instanceof AfterAddChildrenToItem) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
+                if ('01.home' !== $argument->getItem()->getName()) {
+                    return false;
+                }
+                if ('Home' !== $argument->getItem()->getLabel()) {
+                    return false;
+                }
 
-        // first item
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($beforeAddHomeItemCallback))
-        ;
+                return true;
+            };
+            $afterAddSecondSubChildItemCallback = function ($argument) {
+                if (!$argument instanceof AfterAddItem) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
+                if ('Second Child' !== $argument->getAddedItem()->getLabel()) {
+                    return false;
+                }
+                if ('First Sibling' !== $argument->getParentItem()->getLabel()) {
+                    return false;
+                }
 
-        $beforeAddHomeChildrenCallback = function ($argument) {
-            if (!$argument instanceof BeforeAddChildrenToItem) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
-            if ('01.home' !== $argument->getItem()->getName()) {
-                return false;
-            }
-            if ('Home' !== $argument->getItem()->getLabel()) {
-                return false;
-            }
+                return true;
+            };
+            $afterAddSecondItemChildrenCallback = function ($argument) {
+                if (!$argument instanceof AfterAddChildrenToItem) {
+                    return false;
+                }
+                if ('root' !== $argument->getRootItem()->getName()) {
+                    return false;
+                }
+                if ('First Sibling' !== $argument->getItem()->getLabel()) {
+                    return false;
+                }
+                if (2 !== count($argument->getItem()->getChildren())) {
+                    return false;
+                }
 
-            return true;
-        };
+                return true;
+            };
 
-        // first item's children pre-event
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($beforeAddHomeChildrenCallback))
-        ;
+            switch ($step) {
+                case 1:
+                    return $beforeBuildMenuCallback($argument);
+                case 2:
+                    return $beforeAddHomeItemCallback($argument);
+                case 3:
+                    return $beforeAddHomeChildrenCallback($argument);
 
-        $afterAddHomeChildrenCallback = function ($argument) {
-            if (!$argument instanceof AfterAddChildrenToItem) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
-            if ('01.home' !== $argument->getItem()->getName()) {
-                return false;
-            }
-            if ('Home' !== $argument->getItem()->getLabel()) {
-                return false;
-            }
+                // first item's children post-event
+                case 4:
+                    return $afterAddHomeChildrenCallback($argument);
+                case 5:
+                    return $argument instanceof AfterAddItem;
 
-            return true;
-        };
+                // second item
+                case 6:
+                    return $argument instanceof BeforeAddItem;
+                case 7:
+                    return $argument instanceof BeforeAddChildrenToItem;
 
-        // first item's children post-event
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($afterAddHomeChildrenCallback))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddItem::class))
-        ;
+                // second item first child
+                case 8:
+                    return $argument instanceof BeforeAddItem;
+                case 9:
+                    return $argument instanceof BeforeAddChildrenToItem;
+                case 10:
+                    return $argument instanceof AfterAddChildrenToItem;
+                case 11:
+                    return $argument instanceof AfterAddItem;
 
-        // second item
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
-        ;
+                // second item second child
+                case 12:
+                    return $argument instanceof BeforeAddItem;
+                case 13:
+                    return $argument instanceof BeforeAddChildrenToItem;
+                case 14:
+                    return $argument instanceof AfterAddChildrenToItem;
+                case 15:
+                    return $afterAddSecondSubChildItemCallback($argument);
 
-        // second item first child
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddItem::class))
-        ;
+                // second item finished
+                case 16:
+                    return $afterAddSecondItemChildrenCallback($argument);
+                case 17:
+                    return $argument instanceof AfterAddItem;
 
-        $afterAddSecondSubChildItemCallback = function ($argument) {
-            if (!$argument instanceof AfterAddItem) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
-            if ('Second Child' !== $argument->getAddedItem()->getLabel()) {
-                return false;
-            }
-            if ('First Sibling' !== $argument->getParentItem()->getLabel()) {
-                return false;
-            }
+                // third item
+                case 18:
+                    return $argument instanceof BeforeAddItem;
+                case 19:
+                    return $argument instanceof BeforeAddChildrenToItem;
+                case 20:
+                    return $argument instanceof AfterAddChildrenToItem;
+                case 21:
+                    return $argument instanceof AfterAddItem;
 
-            return true;
-        };
-
-        // second item second child
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($afterAddSecondSubChildItemCallback))
-        ;
-
-        $afterAddSecondItemChildrenCallback = function ($argument) {
-            if (!$argument instanceof AfterAddChildrenToItem) {
-                return false;
-            }
-            if ('root' !== $argument->getRootItem()->getName()) {
-                return false;
-            }
-            if ('First Sibling' !== $argument->getItem()->getLabel()) {
-                return false;
-            }
-            if (2 !== count($argument->getItem()->getChildren())) {
-                return false;
+                // menu finished
+                case 22:
+                    return $argument instanceof AfterBuildMenu;
             }
 
             return true;
         };
 
-        // second item finished
-        $dispatcher->expects(self::at($run++))
+        $dispatcher->expects(self::atLeast(15))
             ->method('dispatch')
-            ->with(self::callback($afterAddSecondItemChildrenCallback))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddItem::class))
-        ;
-
-        // third item
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(BeforeAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddChildrenToItem::class))
-        ;
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterAddItem::class))
-        ;
-
-        // menu finished
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::isInstanceOf(AfterBuildMenu::class))
+            ->with(self::callback($callbackChain))
         ;
 
         $provider = $this->getProvider($dispatcher);
@@ -370,6 +331,7 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function itemsCanBeChangedThroughEvents()
     {
@@ -409,8 +371,8 @@ class KnpMenuProviderTest extends BaseUnit
 
     protected function getMockUrlGenerator(): UrlGeneratorInterface
     {
-        $generator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
-        $generator->expects($this->any())
+        $generator = $this->createMock(UrlGeneratorInterface::class);
+        $generator
             ->method('generate')
             ->willReturnArgument(0)
         ;

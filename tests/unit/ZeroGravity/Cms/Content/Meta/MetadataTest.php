@@ -21,7 +21,7 @@ class MetadataTest extends BaseUnit
         ];
         $meta = new Metadata($metaValues);
 
-        $this->assertSame($metaValues, $meta->getAll());
+        static::assertSame($metaValues, $meta->getAll());
     }
 
     /**
@@ -40,7 +40,7 @@ class MetadataTest extends BaseUnit
         ];
         $meta->setAll($metaValues);
 
-        $this->assertSame($metaValues, $meta->getAll());
+        static::assertSame($metaValues, $meta->getAll());
     }
 
     /**
@@ -49,7 +49,7 @@ class MetadataTest extends BaseUnit
     public function getValueAllowsDefault()
     {
         $meta = new Metadata([]);
-        $this->assertSame('aa', $meta->getValue('a', 'aa'));
+        static::assertSame('aa', $meta->getValue('a', 'aa'));
     }
 
     /**
@@ -63,12 +63,12 @@ class MetadataTest extends BaseUnit
         ];
         $meta = new Metadata($metaValues);
 
-        $this->assertSame('aa', $meta['a']);
+        static::assertSame('aa', $meta['a']);
         $meta['c'] = 'cc';
-        $this->assertSame('cc', $meta['c']);
-        $this->assertNull($meta['d']);
-        $this->assertTrue(isset($meta['a']));
+        static::assertSame('cc', $meta['c']);
+        static::assertNull($meta['d']);
+        static::assertArrayHasKey('a', $meta);
         unset($meta['a']);
-        $this->assertFalse(isset($meta['a']));
+        static::assertArrayNotHasKey('a', $meta);
     }
 }

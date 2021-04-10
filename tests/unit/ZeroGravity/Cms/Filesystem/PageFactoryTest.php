@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Iterator;
 use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -30,7 +31,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getPageFixtureDir().'/invalid_pages/no_data');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertNull($page);
+        static::assertNull($page);
     }
 
     /**
@@ -46,20 +47,18 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/'.$path);
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertInstanceOf(Page::class, $page);
+        static::assertInstanceOf(Page::class, $page);
     }
 
-    public function provideValidDirectories()
+    public function provideValidDirectories(): Iterator
     {
-        return [
-            ['01.yaml_only'],
-            ['02.markdown_only'],
-            ['03.yaml_and_markdown_and_twig'],
-            ['04.with_children'],
-            ['05.twig_only'],
-            ['06.yaml_and_twig'],
-            ['no_sorting_prefix'],
-        ];
+        yield ['01.yaml_only'];
+        yield ['02.markdown_only'];
+        yield ['03.yaml_and_markdown_and_twig'];
+        yield ['04.with_children'];
+        yield ['05.twig_only'];
+        yield ['06.yaml_and_twig'];
+        yield ['no_sorting_prefix'];
     }
 
     /**
@@ -72,7 +71,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertSame('testtitle', $page->getTitle());
+        static::assertSame('testtitle', $page->getTitle());
     }
 
     /**
@@ -88,8 +87,8 @@ class PageFactoryTest extends BaseUnit
             'menu_id' => 'defaultmenu',
         ], null);
 
-        $this->assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
-        $this->assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
+        static::assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
+        static::assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
     }
 
     /**
@@ -102,7 +101,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
         $page = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertEquals([
+        static::assertEquals([
             'page.yaml',
             '03.empty/child_file5.png',
             '03.empty/child_file6.png',
@@ -122,12 +121,12 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
         $parentPage = null;
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
-        $this->assertEquals('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
+        static::assertEquals('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/06.yaml_and_twig');
         $parentPage = new Page('');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
-        $this->assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
+        static::assertEquals('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
     }
 
     /**
@@ -141,7 +140,7 @@ class PageFactoryTest extends BaseUnit
         $page1 = $pageFactory->createPage($dir, false, [], null);
         $page2 = $pageFactory->createPage($dir, false, [], null);
 
-        $this->assertEquals($page1, $page2);
+        static::assertEquals($page1, $page2);
     }
 
     /**
@@ -161,42 +160,39 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
 
-        $this->assertEquals('some value', $page->getExtra('some key'));
-        $this->assertEquals('another_custom_value', $page->getExtra('custom'));
+        static::assertEquals('some value', $page->getExtra('some key'));
+        static::assertEquals('another_custom_value', $page->getExtra('custom'));
     }
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function eventsAreDispatchedDuringCreatePage()
     {
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
-        $run = 0;
+        $dispatcher = $this->createMock(EventDispatcher::class);
 
-        $beforeCreatePageCallback = function ($argument) {
-            if (!$argument instanceof BeforePageCreate) {
-                return false;
-            }
-            if ('01.yaml_only' !== $argument->getDirectory()->getName()) {
-                return false;
-            }
-            if ('yaml_only' !== $argument->getSettings()['slug']) {
-                return false;
-            }
-            if (null !== $argument->getParentPage()) {
-                return false;
+        $start = true;
+        $createPageCallbacks = function ($argument) use (&$start) {
+            if ($start) {
+                if (!$argument instanceof BeforePageCreate) {
+                    return false;
+                }
+                if ('01.yaml_only' !== $argument->getDirectory()->getName()) {
+                    return false;
+                }
+                if ('yaml_only' !== $argument->getSettings()['slug']) {
+                    return false;
+                }
+                if (null !== $argument->getParentPage()) {
+                    return false;
+                }
+
+                $start = false;
+
+                return true;
             }
 
-            return true;
-        };
-
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($beforeCreatePageCallback))
-            ->willReturnArgument(0)
-        ;
-
-        $afterCreatePageCallback = function ($argument) {
             if (!$argument instanceof AfterPageCreate) {
                 return false;
             }
@@ -207,9 +203,9 @@ class PageFactoryTest extends BaseUnit
             return true;
         };
 
-        $dispatcher->expects($this->at($run++))
+        $dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with($this->callback($afterCreatePageCallback))
+            ->with(self::callback($createPageCallbacks))
             ->willReturnArgument(0)
         ;
 
@@ -234,7 +230,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, []);
 
-        $this->assertSame('very custom value', $page->getExtra('very_custom_key'));
+        static::assertSame('very custom value', $page->getExtra('very_custom_key'));
     }
 
     /**

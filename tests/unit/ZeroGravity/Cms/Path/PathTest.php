@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
 
@@ -20,15 +21,13 @@ class PathTest extends BaseUnit
     {
         $path = new Path($pathString);
 
-        $this->assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
-        $this->assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
-        $this->assertSame($expectations['directory'], $path->isDirectory(),
-            'directory detection matches: '.$pathString
-        );
-        $this->assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
-        $this->assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
+        static::assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
+        static::assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
+        static::assertSame($expectations['directory'], $path->isDirectory(), 'directory detection matches: '.$pathString);
+        static::assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
+        static::assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
 
-        $this->assertSame($expectations['elements'] > 0, $path->hasElements());
+        static::assertSame($expectations['elements'] > 0, $path->hasElements());
     }
 
     /**
@@ -45,143 +44,141 @@ class PathTest extends BaseUnit
         }
 
         $path = new Path($pathString);
-        $this->assertSame($pathString, $path->toString(true));
+        static::assertSame($pathString, $path->toString(true));
     }
 
-    public function providePathData()
+    public function providePathData(): Iterator
     {
-        return [
+        yield [
+            '/foo/bar.txt',
             [
-                '/foo/bar.txt',
-                [
-                    'elements' => 2,
-                    'absolute' => true,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 2,
+                'absolute' => true,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'bar.txt',
             [
-                'bar.txt',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'foo/',
             [
-                'foo/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'foo*/',
             [
-                'foo*/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            '/foo*/',
             [
-                '/foo*/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '/foo**/',
             [
-                '/foo**/',
-                [
-                    'elements' => 1,
-                    'absolute' => true,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 1,
+                'absolute' => true,
+                'directory' => true,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            '/valid\/regex.*\/contains_slashes/',
             [
-                '/valid\/regex.*\/contains_slashes/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '#valid/regex.*/contains_slashes#',
             [
-                '#valid/regex.*/contains_slashes#',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '#invalid/regex.*/path',
             [
-                '#invalid/regex.*/path',
-                [
-                    'elements' => 3,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 3,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            'path//containing/./empty/elements/',
             [
-                'path//containing/./empty/elements/',
-                [
-                    'elements' => 4,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                    'cannotRebuild' => true,
-                ],
+                'elements' => 4,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
+                'cannotRebuild' => true,
             ],
+        ];
+        yield [
+            'path/../with/parent/../elements/',
             [
-                'path/../with/parent/../elements/',
-                [
-                    'elements' => 6,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 6,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'path/with/#inline#/regex',
             [
-                'path/with/#inline#/regex',
-                [
-                    'elements' => 4,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 4,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '././',
             [
-                '././',
-                [
-                    'elements' => 0,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                    'cannotRebuild' => true,
-                ],
+                'elements' => 0,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
+                'cannotRebuild' => true,
             ],
         ];
     }
@@ -193,14 +190,14 @@ class PathTest extends BaseUnit
     {
         $path = new Path('path/../with/parent');
         $path->normalize();
-        $this->assertSame('with/parent', $path->toString());
-        $this->assertSame('with/parent', (string) $path);
+        static::assertSame('with/parent', $path->toString());
+        static::assertSame('with/parent', (string) $path);
 
         $path = new Path('path/../../leaving/structure');
         $parent = new Path('parent/path');
         $path->normalize($parent);
-        $this->assertSame('leaving/structure', $path->toString());
-        $this->assertSame('parent', $parent->toString());
+        static::assertSame('leaving/structure', $path->toString());
+        static::assertSame('parent', $parent->toString());
     }
 
     /**
@@ -210,7 +207,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('#valid/regex/../stuff#');
         $path->normalize();
-        $this->assertSame('#valid/regex/../stuff#', $path->toString());
+        static::assertSame('#valid/regex/../stuff#', $path->toString());
     }
 
     /**
@@ -220,7 +217,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('/foo/../');
         $path->normalize();
-        $this->assertSame('/', $path->toString());
+        static::assertSame('/', $path->toString());
     }
 
     /**
@@ -238,67 +235,65 @@ class PathTest extends BaseUnit
 
         $newPath = $path->appendPath($child);
 
-        $this->assertSame($newString, $newPath->toString());
-        $this->assertNotSame($path, $newPath, 'appendPath returns new path instance');
+        static::assertSame($newString, $newPath->toString());
+        static::assertNotSame($path, $newPath, 'appendPath returns new path instance');
 
         $newPathStr = $newPath->toString();
-        $this->assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
-        $this->assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
-        $this->assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
-        $this->assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
-        $this->assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
+        static::assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
+        static::assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
+        static::assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
+        static::assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
+        static::assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
     }
 
-    public function provideAppendedPathData()
+    public function provideAppendedPathData(): Iterator
     {
-        return [
+        yield [
+            '/foo/bar',
+            'baz.txt',
+            '/foo/bar/baz.txt',
             [
-                '/foo/bar',
-                'baz.txt',
-                '/foo/bar/baz.txt',
-                [
-                    'elements' => 3,
-                    'absolute' => true,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 3,
+                'absolute' => true,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'bar.txt',
+            'baz/',
+            'bar.txt/baz/',
             [
-                'bar.txt',
-                'baz/',
-                'bar.txt/baz/',
-                [
-                    'elements' => 2,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 2,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '',
+            'baz/',
+            'baz/',
             [
-                '',
-                'baz/',
-                'baz/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '/',
+            'baz/',
+            '/baz/',
             [
-                '/',
-                'baz/',
-                '/baz/',
-                [
-                    'elements' => 1,
-                    'absolute' => true,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => true,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
         ];
     }
@@ -315,33 +310,31 @@ class PathTest extends BaseUnit
         $path = new Path($pathString);
         $directory = $path->getDirectory();
 
-        $this->assertSame($expectedDirectoryPath, $directory->toString());
-        $this->assertNotSame($path, $directory);
+        static::assertSame($expectedDirectoryPath, $directory->toString());
+        static::assertNotSame($path, $directory);
     }
 
-    public function provideDirectoryPathData()
+    public function provideDirectoryPathData(): Iterator
     {
-        return [
-            [
-                '/foo/bar',
-                '/foo/',
-            ],
-            [
-                '/foo/bar/',
-                '/foo/bar/',
-            ],
-            [
-                '/foo',
-                '/',
-            ],
-            [
-                'foo',
-                '/',
-            ],
-            [
-                '',
-                '/',
-            ],
+        yield [
+            '/foo/bar',
+            '/foo/',
+        ];
+        yield [
+            '/foo/bar/',
+            '/foo/bar/',
+        ];
+        yield [
+            '/foo',
+            '/',
+        ];
+        yield [
+            'foo',
+            '/',
+        ];
+        yield [
+            '',
+            '/',
         ];
     }
 
@@ -358,40 +351,38 @@ class PathTest extends BaseUnit
         $file = $path->getFile();
 
         if (null === $expectedFilePath) {
-            $this->assertNull($file);
+            static::assertNull($file);
         } else {
-            $this->assertSame($expectedFilePath, $file->toString());
+            static::assertSame($expectedFilePath, $file->toString());
         }
-        $this->assertNotSame($path, $file);
+        static::assertNotSame($path, $file);
     }
 
-    public function provideFilePathData()
+    public function provideFilePathData(): Iterator
     {
-        return [
-            [
-                '/foo/baz/bar',
-                'bar',
-            ],
-            [
-                '/foo/bar/',
-                null,
-            ],
-            [
-                '/foo',
-                'foo',
-            ],
-            [
-                'foo',
-                'foo',
-            ],
-            [
-                '',
-                null,
-            ],
-            [
-                'foo/bar.jpg',
-                'bar.jpg',
-            ],
+        yield [
+            '/foo/baz/bar',
+            'bar',
+        ];
+        yield [
+            '/foo/bar/',
+            null,
+        ];
+        yield [
+            '/foo',
+            'foo',
+        ];
+        yield [
+            'foo',
+            'foo',
+        ];
+        yield [
+            '',
+            null,
+        ];
+        yield [
+            'foo/bar.jpg',
+            'bar.jpg',
         ];
     }
 
@@ -401,7 +392,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsLastElement()
     {
         $path = new Path('sample/path/string');
-        $this->assertSame('string', $path->getLastElement()->getName());
+        static::assertSame('string', $path->getLastElement()->getName());
     }
 
     /**
@@ -410,7 +401,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsNullForEmptyPath()
     {
         $path = new Path('/');
-        $this->assertNull($path->getLastElement());
+        static::assertNull($path->getLastElement());
     }
 
     /**
@@ -420,7 +411,7 @@ class PathTest extends BaseUnit
     {
         $path = new Path('sample/path/string');
         $path->dropLastElement();
-        $this->assertSame('sample/path/', $path->toString());
-        $this->assertTrue($path->isDirectory());
+        static::assertSame('sample/path/', $path->toString());
+        static::assertTrue($path->isDirectory());
     }
 }

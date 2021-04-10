@@ -23,14 +23,14 @@ class RouteProviderTest extends BaseUnit
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
         $collection = $routeProvider->getRouteCollectionForRequest(new Request());
-        $this->assertSame(3, $collection->count());
+        static::assertSame(3, $collection->count());
 
         $routes = $collection->all();
-        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
+        static::assertContainsOnlyInstancesOf(Route::class, $routes);
         foreach ($routes as $route) {
             $page = $route->getDefault('_zg_page');
-            $this->assertInstanceOf(Page::class, $page);
-            $this->assertSame('default_controller', $route->getDefault('_controller'));
+            static::assertInstanceOf(Page::class, $page);
+            static::assertSame('default_controller', $route->getDefault('_controller'));
         }
     }
 
@@ -42,7 +42,7 @@ class RouteProviderTest extends BaseUnit
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
         $route = $routeProvider->getRouteByName('/page1');
-        $this->assertInstanceOf(Route::class, $route);
+        static::assertInstanceOf(Route::class, $route);
     }
 
     /**
@@ -64,8 +64,8 @@ class RouteProviderTest extends BaseUnit
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
         $routes = $routeProvider->getRoutesByNames(null);
-        $this->assertCount(3, $routes);
-        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
+        static::assertCount(3, $routes);
+        static::assertContainsOnlyInstancesOf(Route::class, $routes);
     }
 
     /**
@@ -80,8 +80,8 @@ class RouteProviderTest extends BaseUnit
             '/page2',
             '/invalid/page',
         ]);
-        $this->assertCount(2, $routes);
-        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
+        static::assertCount(2, $routes);
+        static::assertContainsOnlyInstancesOf(Route::class, $routes);
     }
 
     private function getContentRepository(): ContentRepository

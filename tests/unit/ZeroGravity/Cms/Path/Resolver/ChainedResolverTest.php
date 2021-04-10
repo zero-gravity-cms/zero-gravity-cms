@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
@@ -28,33 +29,31 @@ class ChainedResolverTest extends BaseUnit
 
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        self::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        self::assertSame($expectedPath, $file->getPathname());
+        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
+        static::assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths(): array
+    public function provideSingleFilePaths(): Iterator
     {
-        return [
-            [
-                '/yaml_only/file2.png',
-                null,
-                '/01.yaml_only/file2.png',
-            ],
-            [
-                'with_children/_child1/child_file3.png',
-                null,
-                '/04.with_children/_child1/child_file3.png',
-            ],
-            [
-                '/01.yaml_only/file3.png',
-                null,
-                '/01.yaml_only/file3.png',
-            ],
-            [
-                'sub/dir/child_file7.png',
-                '04.with_children/03.empty',
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
+        yield [
+            '/yaml_only/file2.png',
+            null,
+            '/01.yaml_only/file2.png',
+        ];
+        yield [
+            'with_children/_child1/child_file3.png',
+            null,
+            '/04.with_children/_child1/child_file3.png',
+        ];
+        yield [
+            '/01.yaml_only/file3.png',
+            null,
+            '/01.yaml_only/file3.png',
+        ];
+        yield [
+            'sub/dir/child_file7.png',
+            '04.with_children/03.empty',
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
         ];
     }
 

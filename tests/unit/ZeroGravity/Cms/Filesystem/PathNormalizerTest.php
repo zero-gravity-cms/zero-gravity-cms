@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Exception\UnsafePathException;
 use ZeroGravity\Cms\Path\Path;
@@ -21,20 +22,18 @@ class PathNormalizerTest extends BaseUnit
         $path = new Path($path);
         PathNormalizer::normalizePath($path);
 
-        $this->assertSame($resolvedPath, $path->toString());
+        static::assertSame($resolvedPath, $path->toString());
     }
 
-    public function provideValidPaths()
+    public function provideValidPaths(): Iterator
     {
-        return [
-            ['foo/bar/file.ext', 'foo/bar/file.ext'],
-            ['foo/bar///file.ext', 'foo/bar/file.ext'],
-            ['/foo/bar/../file.ext', '/foo/file.ext'],
-            ['foo/bar/../dir/../../file.ext', 'file.ext'],
-            ['/foo/bar/./dir/../../file.ext', '/foo/file.ext'],
-            ['foo/bar//dir/../../file.ext', 'foo/file.ext'],
-            ['', ''],
-        ];
+        yield ['foo/bar/file.ext', 'foo/bar/file.ext'];
+        yield ['foo/bar///file.ext', 'foo/bar/file.ext'];
+        yield ['/foo/bar/../file.ext', '/foo/file.ext'];
+        yield ['foo/bar/../dir/../../file.ext', 'file.ext'];
+        yield ['/foo/bar/./dir/../../file.ext', '/foo/file.ext'];
+        yield ['foo/bar//dir/../../file.ext', 'foo/file.ext'];
+        yield ['', ''];
     }
 
     /**
@@ -51,13 +50,11 @@ class PathNormalizerTest extends BaseUnit
         PathNormalizer::normalizePath($path);
     }
 
-    public function provideInvalidPaths()
+    public function provideInvalidPaths(): Iterator
     {
-        return [
-            ['../file.ext'],
-            ['foo/bar/../../../file.ext'],
-            ['foo/bar/../../../foo/bar/file.ext'],
-        ];
+        yield ['../file.ext'];
+        yield ['foo/bar/../../../file.ext'];
+        yield ['foo/bar/../../../foo/bar/file.ext'];
     }
 
     /**
@@ -70,37 +67,35 @@ class PathNormalizerTest extends BaseUnit
         $parentPath = new Path($parentPath);
         PathNormalizer::normalizePath($path, $parentPath);
 
-        $this->assertSame($resolvedPath, $path->toString());
-        $this->assertSame($resolvedParentPath, $parentPath->toString());
+        static::assertSame($resolvedPath, $path->toString());
+        static::assertSame($resolvedParentPath, $parentPath->toString());
     }
 
-    public function providePathsWithInPath()
+    public function providePathsWithInPath(): Iterator
     {
-        return [
-            [
-                'foo/bar/file.ext',
-                'baz',
-                'foo/bar/file.ext',
-                'baz',
-            ],
-            [
-                '../bar/file.ext',
-                'baz/dir',
-                'bar/file.ext',
-                'baz',
-            ],
-            [
-                '../bar/foo/../file.ext',
-                'baz/dir',
-                'bar/file.ext',
-                'baz',
-            ],
-            [
-                '../bar/../../foo/../file.ext',
-                'baz/dir',
-                'file.ext',
-                '',
-            ],
+        yield [
+            'foo/bar/file.ext',
+            'baz',
+            'foo/bar/file.ext',
+            'baz',
+        ];
+        yield [
+            '../bar/file.ext',
+            'baz/dir',
+            'bar/file.ext',
+            'baz',
+        ];
+        yield [
+            '../bar/foo/../file.ext',
+            'baz/dir',
+            'bar/file.ext',
+            'baz',
+        ];
+        yield [
+            '../bar/../../foo/../file.ext',
+            'baz/dir',
+            'file.ext',
+            '',
         ];
     }
 }
