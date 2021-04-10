@@ -13,8 +13,8 @@ require:
     liip/imagine-bundle: ^2.0
     mnapoli/front-yaml: ^1.5
     symfony-cmf/routing-bundle: ^2.0
-    symfony/finder: ^4.4
-    symfony/cache: ^4.4
+    symfony/finder: ^4.4|^5.0
+    symfony/cache: ^4.4|^5.0
     twig/twig: ^2.7
 require-dev:
     codeception/codeception: ^4.1
@@ -28,3 +28,9 @@ autoload:
 autoload-dev:
     psr-4:
         Tests\Unit\: tests/unit/
+
+extra:
+    symfony:
+        id: ''
+        allow-contrib: false
+        require: '^4.4'

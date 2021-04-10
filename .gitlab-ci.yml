@@ -32,13 +32,25 @@ before_script:
 #  | |  __/\__ \ |_
 #  |_|\___||___/\__|
 ####################################################################################################
-test:
+test_matrix:
+    parallel:
+        matrix:
+            - SYMFONY_VERSION:
+                - '~4.4.0'
+                - '~5.2.0'
+              PHP_VERSION:
+                - '7.4'
     stage: test
+    image: "c33s/php:$PHP_VERSION"
     script:
-        #- rm -rf $CI_PROJECT_DIR/.ci
+        - 'sed -i "s/\"require\": \"^4.4\"/\"require\": \"$SYMFONY_VERSION\"/" composer.json'
+        - tail composer.json -n 7
         - robo init
         - robo test
+
+    coverage: '/^\s*Lines:\s*\d+.\d+\%/'
     artifacts:
+        when: always
         paths:
             - tests/_output/
 
