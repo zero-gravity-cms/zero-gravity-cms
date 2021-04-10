@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Menu;
 
+use InvalidArgumentException;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Provider\MenuProviderInterface;
@@ -53,7 +54,7 @@ class KnpMenuProvider implements MenuProviderInterface
      *
      * @return ItemInterface
      *
-     * @throws \InvalidArgumentException if the menu does not exists
+     * @throws InvalidArgumentException if the menu does not exists
      */
     public function get($name, array $options = [])
     {

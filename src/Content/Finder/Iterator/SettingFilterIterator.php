@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use FilterIterator;
+use Iterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -9,7 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class SettingFilterIterator extends \FilterIterator
+class SettingFilterIterator extends FilterIterator
 {
     /**
      * @var array
@@ -22,9 +24,9 @@ class SettingFilterIterator extends \FilterIterator
     private $notSettings;
 
     /**
-     * @param \Iterator $iterator The Iterator to filter
+     * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(\Iterator $iterator, array $settings, array $notSettings)
+    public function __construct(Iterator $iterator, array $settings, array $notSettings)
     {
         $this->settings = $settings;
         $this->notSettings = $notSettings;

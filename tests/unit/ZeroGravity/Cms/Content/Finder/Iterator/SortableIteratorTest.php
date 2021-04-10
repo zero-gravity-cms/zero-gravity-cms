@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder\Iterator;
 
+use ArrayIterator;
+use InvalidArgumentException;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -208,8 +210,8 @@ class SortableIteratorTest extends BaseUnit
      */
     public function invalidSortMethodThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        new SortableIterator(new \ArrayIterator([]), 'invalid method');
+        $this->expectException(InvalidArgumentException::class);
+        new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
     /**

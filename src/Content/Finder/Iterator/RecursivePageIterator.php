@@ -2,13 +2,14 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use ArrayIterator;
 use RecursiveIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
  * @method Page current()
  */
-class RecursivePageIterator extends \ArrayIterator implements \RecursiveIterator
+class RecursivePageIterator extends ArrayIterator implements \RecursiveIterator
 {
     /**
      * Returns if an iterator can be created for the current pages children.

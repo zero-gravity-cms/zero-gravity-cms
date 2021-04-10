@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
 use Psr\Log\NullLogger;
+use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
@@ -25,7 +26,7 @@ class DirectoryTest extends BaseUnit
         $path = $this->getValidPagesDir().'/01.yaml_only';
         $parentPath = null;
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $dir = new Directory(new \SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
+        $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
         $this->assertSame('', $dir->getPath());
     }
@@ -38,7 +39,7 @@ class DirectoryTest extends BaseUnit
         $path = $this->getValidPagesDir().'/01.yaml_only';
         $parentPath = 'some/path';
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $dir = new Directory(new \SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
+        $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
         $this->assertSame('some/path/01.yaml_only', $dir->getPath());
     }
@@ -143,7 +144,7 @@ class DirectoryTest extends BaseUnit
     private function createParsedDirectoryFromPath(string $path)
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $directory = new Directory(new \SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher());
+        $directory = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher());
 
         return $directory;
     }

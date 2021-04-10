@@ -2,12 +2,17 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use ArrayIterator;
+use Closure;
+use InvalidArgumentException;
+use IteratorAggregate;
+use Traversable;
 use ZeroGravity\Cms\Content\Page;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
  */
-class SortableIterator implements \IteratorAggregate
+class SortableIterator implements IteratorAggregate
 {
     const SORT_BY_NAME = 'name';
     const SORT_BY_SLUG = 'slug';
@@ -22,15 +27,15 @@ class SortableIterator implements \IteratorAggregate
     private $sort;
 
     /**
-     * @param \Traversable    $iterator The Iterator to filter
-     * @param string|\Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP closure)
+     * @param Traversable    $iterator The Iterator to filter
+     * @param string|Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP closure)
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct(\Traversable $iterator, $sort)
+    public function __construct(Traversable $iterator, $sort)
     {
         $this->iterator = $iterator;
-        if ($sort instanceof \Closure) {
+        if ($sort instanceof Closure) {
             $this->sort = $sort;
 
             return;
@@ -47,7 +52,7 @@ class SortableIterator implements \IteratorAggregate
      * @param $sort
      * @param $parameter
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function configureSortFunction(string $sort, string $parameter = null): void
     {
@@ -70,7 +75,7 @@ class SortableIterator implements \IteratorAggregate
                 break;
 
             default:
-                throw new \InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
+                throw new InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.');
         }
     }
 
@@ -79,7 +84,7 @@ class SortableIterator implements \IteratorAggregate
         $array = iterator_to_array($this->iterator, true);
         uasort($array, $this->sort);
 
-        return new \ArrayIterator($array);
+        return new ArrayIterator($array);
     }
 
     private function sortByGetterOrPath(string $getter, $parameter = null): void

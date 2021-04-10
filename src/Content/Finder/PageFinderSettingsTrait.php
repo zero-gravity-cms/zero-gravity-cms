@@ -2,8 +2,15 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Iterator;
 use Symfony\Component\Finder\Comparator;
+use Symfony\Component\Finder\Comparator\DateComparator;
+use ZeroGravity\Cms\Content\Finder\Iterator\ContentTypeFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\DateRangeFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\SlugFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\TitleFilterIterator;
 
 trait PageFinderSettingsTrait
 {
@@ -39,7 +46,7 @@ trait PageFinderSettingsTrait
      */
     public function date($date)
     {
-        $this->dates[] = new Comparator\DateComparator($date);
+        $this->dates[] = new DateComparator($date);
 
         return $this;
     }
@@ -228,55 +235,55 @@ trait PageFinderSettingsTrait
         return $this;
     }
 
-    private function applySlugsIterator(\Iterator $iterator): \Iterator
+    private function applySlugsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->slugs) || !empty($this->notSlugs)) {
-            $iterator = new Iterator\SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
+            $iterator = new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
         return $iterator;
     }
 
-    private function applyTitlesIterator(\Iterator $iterator): \Iterator
+    private function applyTitlesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->titles) || !empty($this->notTitles)) {
-            $iterator = new Iterator\TitleFilterIterator($iterator, $this->titles, $this->notTitles);
+            $iterator = new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
         }
 
         return $iterator;
     }
 
-    private function applyExtrasIterator(\Iterator $iterator): \Iterator
+    private function applyExtrasIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->extras) || !empty($this->notExtras)) {
-            $iterator = new Iterator\ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
+            $iterator = new ExtraFilterIterator($iterator, $this->extras, $this->notExtras);
         }
 
         return $iterator;
     }
 
-    private function applySettingsIterator(\Iterator $iterator): \Iterator
+    private function applySettingsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->settings) || !empty($this->notSettings)) {
-            $iterator = new Iterator\SettingFilterIterator($iterator, $this->settings, $this->notSettings);
+            $iterator = new SettingFilterIterator($iterator, $this->settings, $this->notSettings);
         }
 
         return $iterator;
     }
 
-    private function applyContentTypesIterator(\Iterator $iterator): \Iterator
+    private function applyContentTypesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
-            $iterator = new Iterator\ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
+            $iterator = new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
         }
 
         return $iterator;
     }
 
-    private function applyDatesIterator(\Iterator $iterator): \Iterator
+    private function applyDatesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->dates)) {
-            $iterator = new Iterator\DateRangeFilterIterator($iterator, $this->dates);
+            $iterator = new DateRangeFilterIterator($iterator, $this->dates);
         }
 
         return $iterator;

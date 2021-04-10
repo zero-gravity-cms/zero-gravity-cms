@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use FilterIterator;
+use Iterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -9,7 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class PublishedFilterIterator extends \FilterIterator
+class PublishedFilterIterator extends FilterIterator
 {
     /**
      * @var bool
@@ -17,9 +19,9 @@ class PublishedFilterIterator extends \FilterIterator
     private $published;
 
     /**
-     * @param \Iterator $iterator The Iterator to filter
+     * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(\Iterator $iterator, bool $published)
+    public function __construct(Iterator $iterator, bool $published)
     {
         $this->published = $published;
 

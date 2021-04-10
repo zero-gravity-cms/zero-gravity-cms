@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
+use LogicException;
 use Mni\FrontYAML\Document;
 use Mni\FrontYAML\Parser as FrontYAMLParser;
 use Psr\Log\LoggerInterface;
@@ -505,7 +506,7 @@ $newYaml
 {$document->getContent()}
 FRONTMATTER;
         } else {
-            throw new \LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
+            throw new LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
         }
 
         $this->writeFile($file->getFilesystemPathname(), $newYaml);

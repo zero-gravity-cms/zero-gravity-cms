@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\SlugifyInterface;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
@@ -38,7 +39,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      *
      * @return File[]
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function find(Path $path, Path $parentPath = null): array
     {
@@ -59,7 +60,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
     /**
      * Resolve the given file name and path.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function get(Path $path, Path $parentPath = null): ? File
     {

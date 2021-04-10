@@ -228,7 +228,7 @@ trait TwigExtensionTestTrait
 
             if (false !== $exception) {
                 [$class] = explode(':', $exception);
-                $constraintClass = class_exists('PHPUnit\Framework\Constraint\Exception') ? 'PHPUnit\Framework\Constraint\Exception' : 'PHPUnit_Framework_Constraint_Exception';
+                $constraintClass = class_exists(\PHPUnit\Framework\Constraint\Exception::class) ? \PHPUnit\Framework\Constraint\Exception::class : 'PHPUnit_Framework_Constraint_Exception';
                 self::assertThat(null, new $constraintClass($class));
             }
 
@@ -251,7 +251,7 @@ trait TwigExtensionTestTrait
         $templates = [];
         preg_match_all('/--TEMPLATE(?:\((.*?)\))?--(.*?)(?=\-\-TEMPLATE|$)/s', $test, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $templates[($match[1] ? $match[1] : 'index.twig')] = $match[2];
+            $templates[($match[1] ?: 'index.twig')] = $match[2];
         }
 
         return $templates;

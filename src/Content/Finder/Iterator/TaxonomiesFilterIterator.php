@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use FilterIterator;
+use Iterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
@@ -10,7 +12,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class TaxonomiesFilterIterator extends \FilterIterator
+class TaxonomiesFilterIterator extends FilterIterator
 {
     /**
      * @var TaxonomyTester[]
@@ -23,11 +25,11 @@ class TaxonomiesFilterIterator extends \FilterIterator
     private $notTaxonomies;
 
     /**
-     * @param \Iterator        $iterator      The Iterator to filter
+     * @param Iterator         $iterator      The Iterator to filter
      * @param TaxonomyTester[] $taxonomies
      * @param TaxonomyTester[] $notTaxonomies
      */
-    public function __construct(\Iterator $iterator, array $taxonomies, array $notTaxonomies)
+    public function __construct(Iterator $iterator, array $taxonomies, array $notTaxonomies)
     {
         $this->taxonomies = $taxonomies;
         $this->notTaxonomies = $notTaxonomies;

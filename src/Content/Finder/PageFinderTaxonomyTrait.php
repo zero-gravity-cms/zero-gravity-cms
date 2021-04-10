@@ -2,6 +2,8 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Iterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\TaxonomiesFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
@@ -120,10 +122,10 @@ trait PageFinderTaxonomyTrait
         return $this->notTaxonomy(Page::TAXONOMY_AUTHOR, $values, $mode);
     }
 
-    private function applyTaxonomyIterator(\Iterator $iterator): \Iterator
+    private function applyTaxonomyIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->taxonomies) || !empty($this->notTaxonomies)) {
-            $iterator = new Iterator\TaxonomiesFilterIterator($iterator, $this->taxonomies, $this->notTaxonomies);
+            $iterator = new TaxonomiesFilterIterator($iterator, $this->taxonomies, $this->notTaxonomies);
         }
 
         return $iterator;

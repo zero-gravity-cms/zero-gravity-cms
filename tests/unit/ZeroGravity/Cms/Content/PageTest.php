@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
+use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\Finder\SplFileInfo;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
@@ -258,14 +260,14 @@ class PageTest extends BaseUnit
         $page = new Page('page');
         $this->assertNull($page->getPublishDate());
 
-        $page = new Page('page', ['publish_date' => new \DateTime()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
+        $page = new Page('page', ['publish_date' => new DateTime()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
-        $page = new Page('page', ['publish_date' => new \DateTimeImmutable()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
+        $page = new Page('page', ['publish_date' => new DateTimeImmutable()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getPublishDate());
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
     }
 
     /**
@@ -276,14 +278,14 @@ class PageTest extends BaseUnit
         $page = new Page('page');
         $this->assertNull($page->getUnpublishDate());
 
-        $page = new Page('page', ['unpublish_date' => new \DateTime()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+        $page = new Page('page', ['unpublish_date' => new DateTime()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
-        $page = new Page('page', ['unpublish_date' => new \DateTimeImmutable()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+        $page = new Page('page', ['unpublish_date' => new DateTimeImmutable()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getUnpublishDate());
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
     }
 
     /**
@@ -294,14 +296,14 @@ class PageTest extends BaseUnit
         $page = new Page('page');
         $this->assertNull($page->getDate());
 
-        $page = new Page('page', ['date' => new \DateTime()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+        $page = new Page('page', ['date' => new DateTime()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
-        $page = new Page('page', ['date' => new \DateTimeImmutable()]);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+        $page = new Page('page', ['date' => new DateTimeImmutable()]);
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
         $page = new Page('page', ['date' => '2017-01-01 12:00:00']);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $page->getDate());
+        $this->assertInstanceOf(DateTimeImmutable::class, $page->getDate());
     }
 
     /**
@@ -319,29 +321,29 @@ class PageTest extends BaseUnit
     public function publishingCanBeControlledByDates()
     {
         $page = new Page('page', [
-            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+            'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
         $this->assertTrue($page->isPublished());
 
         $page = new Page('page', [
-            'publish_date' => new \DateTimeImmutable('+10 seconds'),
+            'publish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
         $this->assertFalse($page->isPublished());
 
         $page = new Page('page', [
-            'publish_date' => new \DateTimeImmutable('-10 seconds'),
-            'unpublish_date' => new \DateTimeImmutable('+10 seconds'),
+            'publish_date' => new DateTimeImmutable('-10 seconds'),
+            'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
         $this->assertTrue($page->isPublished());
 
         $page = new Page('page', [
-            'publish_date' => new \DateTimeImmutable('-10 seconds'),
-            'unpublish_date' => new \DateTimeImmutable('-5 seconds'),
+            'publish_date' => new DateTimeImmutable('-10 seconds'),
+            'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
         $this->assertFalse($page->isPublished());
 
         $page = new Page('page', [
-            'unpublish_date' => new \DateTimeImmutable('-5 seconds'),
+            'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
         $this->assertFalse($page->isPublished());
     }
@@ -358,13 +360,13 @@ class PageTest extends BaseUnit
 
         $page = new Page('page', [
             'publish' => false,
-            'publish_date' => new \DateTimeImmutable('-10 seconds'),
+            'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
         $this->assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish' => false,
-            'unpublish_date' => new \DateTimeImmutable('+10 seconds'),
+            'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
         $this->assertFalse($page->isPublished());
     }

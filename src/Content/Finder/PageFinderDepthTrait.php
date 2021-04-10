@@ -2,7 +2,10 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Iterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Comparator;
+use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 
 trait PageFinderDepthTrait
@@ -29,12 +32,12 @@ trait PageFinderDepthTrait
      */
     public function depth($level)
     {
-        $this->depths[] = new Comparator\NumberComparator($level);
+        $this->depths[] = new NumberComparator($level);
 
         return $this;
     }
 
-    private function applyDepthsIterator(\RecursiveIteratorIterator $iterator): \Iterator
+    private function applyDepthsIterator(RecursiveIteratorIterator $iterator): Iterator
     {
         $minDepth = 0;
         $maxDepth = PHP_INT_MAX;

@@ -98,7 +98,7 @@ class ContentRepository
     }
 
     /**
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function refreshCache()
     {

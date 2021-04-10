@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
+use DateTime;
+use stdClass;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -22,7 +24,7 @@ class FilterRegistryTest extends BaseUnit
         $registry = new FilterRegistry();
 
         $this->expectException(FilterException::class);
-        $registry->addFilter('somename', new \DateTime());
+        $registry->addFilter('somename', new DateTime());
     }
 
     /**
@@ -62,7 +64,7 @@ class FilterRegistryTest extends BaseUnit
      */
     public function callableFilterWillBeApplied()
     {
-        $filter = $this->getMockBuilder('stdClass')
+        $filter = $this->getMockBuilder(stdClass::class)
             ->setMethods(['myMethod'])
             ->getMock()
         ;
