@@ -92,8 +92,6 @@ class PageResolverTest extends BaseUnit
      */
     private function getPageResolver()
     {
-        $resolver = new PageResolver($this->getDefaultContentRepository());
-
-        return $resolver;
+        return new PageResolver($this->getDefaultContentRepository());
     }
 }

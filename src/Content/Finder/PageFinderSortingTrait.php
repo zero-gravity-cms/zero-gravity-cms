@@ -8,22 +8,19 @@ use ZeroGravity\Cms\Content\Finder\Iterator\SortableIterator;
 
 trait PageFinderSortingTrait
 {
-    private $sort;
+    /**
+     * @var string|Closure
+     */
+    private $sortBy;
 
     /**
-     * Sorts pages by an anonymous function.
-     *
-     * The anonymous function receives two Page instances to compare.
-     *
-     * @param Closure $closure An anonymous function
-     *
-     * @return $this
+     * Sorts pages by an anonymous function. The function will receive two Page instances to compare.
      *
      * @see SortableIterator
      */
-    public function sort(Closure $closure)
+    public function sort(Closure $closure): self
     {
-        $this->sort = $closure;
+        $this->sortBy = $closure;
 
         return $this;
     }
@@ -31,27 +28,23 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by name.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByName()
+    public function sortByName(): self
     {
-        $this->sort = SortableIterator::SORT_BY_NAME;
+        $this->sortBy = SortableIterator::SORT_BY_NAME;
 
         return $this;
     }
 
     /**
-     * Sorts pages by name.
-     *
-     * @return $this
+     * Sorts pages by slug.
      *
      * @see SortableIterator
      */
-    public function sortBySlug()
+    public function sortBySlug(): self
     {
-        $this->sort = SortableIterator::SORT_BY_SLUG;
+        $this->sortBy = SortableIterator::SORT_BY_SLUG;
 
         return $this;
     }
@@ -59,13 +52,11 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by title.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByTitle()
+    public function sortByTitle(): self
     {
-        $this->sort = SortableIterator::SORT_BY_TITLE;
+        $this->sortBy = SortableIterator::SORT_BY_TITLE;
 
         return $this;
     }
@@ -73,13 +64,11 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by date.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByDate()
+    public function sortByDate(): self
     {
-        $this->sort = SortableIterator::SORT_BY_DATE;
+        $this->sortBy = SortableIterator::SORT_BY_DATE;
 
         return $this;
     }
@@ -87,13 +76,11 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by publish date.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByPublishDate()
+    public function sortByPublishDate(): self
     {
-        $this->sort = SortableIterator::SORT_BY_PUBLISH_DATE;
+        $this->sortBy = SortableIterator::SORT_BY_PUBLISH_DATE;
 
         return $this;
     }
@@ -101,13 +88,11 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by path.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByPath()
+    public function sortByPath(): self
     {
-        $this->sort = SortableIterator::SORT_BY_PATH;
+        $this->sortBy = SortableIterator::SORT_BY_PATH;
 
         return $this;
     }
@@ -115,13 +100,11 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by filesystem path.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByFilesystemPath()
+    public function sortByFilesystemPath(): self
     {
-        $this->sort = SortableIterator::SORT_BY_FILESYSTEM_PATH;
+        $this->sortBy = SortableIterator::SORT_BY_FILESYSTEM_PATH;
 
         return $this;
     }
@@ -129,24 +112,22 @@ trait PageFinderSortingTrait
     /**
      * Sorts pages by extra value.
      *
-     * @return $this
-     *
      * @see SortableIterator
      */
-    public function sortByExtra($name)
+    public function sortByExtra(string $name): self
     {
-        $this->sort = [SortableIterator::SORT_BY_EXTRA_VALUE, $name];
+        $this->sortBy = [SortableIterator::SORT_BY_EXTRA_VALUE, $name];
 
         return $this;
     }
 
     private function applySortIterator(Iterator $iterator): Iterator
     {
-        if (null !== $this->sort) {
-            $iteratorAggregate = new SortableIterator($iterator, $this->sort);
-            $iterator = $iteratorAggregate->getIterator();
+        if (null === $this->sortBy) {
+            return $iterator;
         }
+        $iteratorAggregate = new SortableIterator($iterator, $this->sortBy);
 
-        return $iterator;
+        return $iteratorAggregate->getIterator();
     }
 }

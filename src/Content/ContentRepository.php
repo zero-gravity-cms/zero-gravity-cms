@@ -6,27 +6,26 @@ use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Throwable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
 
-class ContentRepository
+final class ContentRepository implements ReadablePageRepository, WritablePageRepository, CacheablePageRepository
 {
-    const ALL_PAGES_CACHE_KEY = 'all_pages';
-
-    /**
-     * @var ReadablePage[]
-     */
-    protected ?array $pages = null;
-
-    /**
-     * @var ReadablePage[]
-     */
-    protected ?array $pagesByPath = null;
-
-    private AdapterInterface $cache;
-
-    private bool $skipCache;
+    private const ALL_PAGES_CACHE_KEY = 'all_pages';
 
     private StructureMapper $mapper;
+    private AdapterInterface $cache;
+    private bool $skipCache;
+
+    /**
+     * @var ReadablePage[]
+     */
+    private ?array $pages = null;
+
+    /**
+     * @var ReadablePage[]
+     */
+    private ?array $pagesByPath = null;
 
     /**
      * This is the main repository handling page loading and caching.
@@ -41,7 +40,7 @@ class ContentRepository
     /**
      * Clear the complete page cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cache->clear();
     }
@@ -51,17 +50,15 @@ class ContentRepository
      *
      * @return ReadablePage[]
      */
-    protected function loadFromParser()
+    private function loadFromParser(): array
     {
-        $pages = $this->mapper->parse();
-
-        return $pages;
+        return $this->mapper->parse();
     }
 
     /**
      * Fetch pages if not already loaded.
      */
-    protected function fetchPages()
+    private function fetchPages(): void
     {
         if (null === $this->pages && !$this->loadPagesFromCache()) {
             $this->pages = $this->loadFromParser();
@@ -73,7 +70,7 @@ class ContentRepository
     /**
      * Load pages from cache if applicable and actual cached pages exist.
      */
-    protected function loadPagesFromCache(): bool
+    private function loadPagesFromCache(): bool
     {
         if ($this->skipCache) {
             return false;
@@ -93,7 +90,7 @@ class ContentRepository
         }
     }
 
-    protected function refreshCache(): void
+    private function refreshCache(): void
     {
         try {
             $item = $this->cache->getItem(self::ALL_PAGES_CACHE_KEY);
@@ -107,7 +104,7 @@ class ContentRepository
     /**
      * @param ReadablePage[] $pages
      */
-    protected function flattenPages(array $pages)
+    private function flattenPages(array $pages): void
     {
         $this->pagesByPath = [];
         $this->doFlattenPages($pages);
@@ -116,7 +113,7 @@ class ContentRepository
     /**
      * @param ReadablePage[] $pages
      */
-    protected function doFlattenPages(array $pages)
+    private function doFlattenPages(array $pages): void
     {
         foreach ($pages as $page) {
             $this->pagesByPath[$page->getPath()->toString()] = $page;
@@ -129,7 +126,7 @@ class ContentRepository
      *
      * @return ReadablePage[]
      */
-    public function getPageTree()
+    public function getPageTree(): array
     {
         $this->fetchPages();
 
@@ -141,7 +138,7 @@ class ContentRepository
      *
      * @return ReadablePage[]
      */
-    public function getAllPages()
+    public function getAllPages(): array
     {
         $this->fetchPages();
 
@@ -151,19 +148,14 @@ class ContentRepository
     public function getPage(string $path): ?ReadablePage
     {
         $this->fetchPages();
-        if (isset($this->pagesByPath[$path])) {
-            return $this->pagesByPath[$path];
-        }
 
-        return null;
+        return $this->pagesByPath[$path] ?? null;
     }
 
     /**
      * Get a PageFinder instance covering the full page tree, excluding unpublished pages by default.
-     *
-     * @return PageFinder
      */
-    public function getPageFinder()
+    public function getPageFinder(): PageFinder
     {
         return PageFinder::create()->inPageList($this->getPageTree());
     }
@@ -187,9 +179,9 @@ class ContentRepository
     /**
      * Store changes of the given page diff.
      *
-     * @throws ZeroGravityException
+     * @throws StructureException|ZeroGravityException
      */
-    public function saveChanges(PageDiff $diff)
+    public function saveChanges(PageDiff $diff): void
     {
         $this->mapper->saveChanges($diff);
     }

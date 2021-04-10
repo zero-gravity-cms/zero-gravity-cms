@@ -17,14 +17,14 @@ class MediaRepositoryTest extends BaseUnit
      *
      * @param $pathString
      */
-    public function validPathReturnsFile($pathString)
+    public function validPathReturnsFile($pathString): void
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
         $this->assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
     }
 
-    public function provideValidMediaPaths()
+    public function provideValidMediaPaths(): array
     {
         return [
             ['01.yaml_only/file1.png'],
@@ -38,14 +38,14 @@ class MediaRepositoryTest extends BaseUnit
      *
      * @param $pathString
      */
-    public function invalidPathReturnsNull($pathString)
+    public function invalidPathReturnsNull($pathString): void
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
         $this->assertNull($mediaRepository->getFile($pathString));
     }
 
-    public function provideInvalidMediaPaths()
+    public function provideInvalidMediaPaths(): array
     {
         return [
             ['01.yaml_only/file1.png.meta.yaml'],

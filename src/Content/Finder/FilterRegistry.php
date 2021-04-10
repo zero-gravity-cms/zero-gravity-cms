@@ -11,7 +11,7 @@ final class FilterRegistry
      */
     private ?array $filters = null;
 
-    public function addFilters(PageFinderFilters $filters)
+    public function addFilters(PageFinderFilters $filters): void
     {
         foreach ($filters->getFilters() as $filterName => $filter) {
             $this->addFilter($filterName, $filter);
@@ -19,10 +19,9 @@ final class FilterRegistry
     }
 
     /**
-     * @param string                    $filterName
      * @param callable|PageFinderFilter $filter
      */
-    public function addFilter($filterName, $filter)
+    public function addFilter(string $filterName, $filter): void
     {
         if (isset($this->filters[$filterName])) {
             throw FilterException::filterAlreadyExists($filterName);
@@ -35,7 +34,7 @@ final class FilterRegistry
     }
 
     /**
-     * @param $filter
+     * @param callable|PageFinderFilter|mixed $filter
      */
     private function isValidFilter($filter): bool
     {

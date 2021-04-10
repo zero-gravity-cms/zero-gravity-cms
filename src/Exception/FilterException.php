@@ -6,32 +6,17 @@ use RuntimeException;
 
 class FilterException extends RuntimeException implements ZeroGravityException
 {
-    /**
-     * @param string $name
-     *
-     * @return static
-     */
-    public static function filterAlreadyExists($name)
+    public static function filterAlreadyExists(string $name): self
     {
         return new static(sprintf('Another filter called %s already exists', $name));
     }
 
-    /**
-     * @param string $name
-     *
-     * @return static
-     */
-    public static function filterDoesNotExist($name)
+    public static function filterDoesNotExist(string $name): self
     {
         return new static(sprintf('There is no page finder filter called %s', $name));
     }
 
-    /**
-     * @param string $name
-     *
-     * @return static
-     */
-    public static function notAValidFilter($name, $filter)
+    public static function notAValidFilter(string $name, $filter): self
     {
         $type = is_object($filter) ? get_class($filter) : gettype($filter);
 

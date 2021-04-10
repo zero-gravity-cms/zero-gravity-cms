@@ -4,105 +4,23 @@ namespace ZeroGravity\Cms\Path;
 
 use Webmozart\Assert\Assert;
 
-class Path
+final class Path
 {
-    public const ELEMENT_CLASS = PathElement::class;
-
-    protected ?string $pathString = null;
-
-    protected bool $isAbsolute = false;
-
-    protected bool $isDirectory = false;
-
-    protected bool $isRegex = false;
+    private ?string $pathString = null;
+    private bool $isAbsolute = false;
+    private bool $isDirectory = false;
 
     /**
      * @var PathElement[]
      */
-    protected array $elements = [];
-
-    /**
-     * Checks whether the string is a regex.
-     *
-     * @return bool True if the element contains a valid regular expression
-     *
-     * @see https://stackoverflow.com/a/12941133/22592
-     */
-    public static function stringContainsRegex(string $pathString): bool
-    {
-        if (false === @preg_match($pathString, null)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Simple check if the given string contains glob characters.
-     */
-    public static function stringContainsGlob(string $pathString): bool
-    {
-        if (static::stringContainsRegex($pathString)) {
-            return false;
-        }
-
-        return
-            false !== strpos($pathString, '*')
-            || false !== strpos($pathString, '?')
-            || preg_match('/\{.*\}/', $pathString);
-    }
+    private array $elements = [];
 
     /**
      * Create a new Path object using the path string.
      */
     public function __construct(string $pathString)
     {
-        $this->init($pathString);
-    }
-
-    protected function init(string $pathString)
-    {
         $this->parsePathString($pathString);
-    }
-
-    /**
-     * Parse the configured path string.
-     */
-    protected function parsePathString(string $pathString): void
-    {
-        $this->pathString = $pathString;
-
-        if (static::stringContainsRegex($pathString)) {
-            $this->initAsRegex($pathString);
-        } else {
-            $this->initDefault($pathString);
-        }
-    }
-
-    /**
-     * @param $pathString
-     */
-    protected function initAsRegex($pathString): void
-    {
-        $this->isAbsolute = false;
-        $this->isDirectory = false;
-
-        $this->elements = [
-            $this->createRegexElement($pathString),
-        ];
-    }
-
-    /**
-     * @param $pathString
-     */
-    protected function initDefault($pathString): void
-    {
-        $this->isAbsolute = (0 === strpos($pathString, '/'));
-        $this->isDirectory = (strlen($pathString) - 1 === strrpos($pathString, '/'));
-
-        $parts = array_filter(explode('/', $pathString), fn ($part) => !empty($part) && '.' !== $part);
-
-        $this->elements = array_map(fn ($part) => $this->createElement($part), $parts);
     }
 
     /**
@@ -117,26 +35,6 @@ class Path
         }
 
         PathNormalizer::normalizePath($this, $parentPath);
-    }
-
-    /**
-     * Create a new PathElement instance.
-     */
-    protected function createElement(string $part): PathElement
-    {
-        $class = static::ELEMENT_CLASS;
-
-        return new $class($part);
-    }
-
-    /**
-     * Create a new PathElement instance that is allowed to contain regex.
-     */
-    protected function createRegexElement(string $part): PathElement
-    {
-        $class = static::ELEMENT_CLASS;
-
-        return new $class($part, true);
     }
 
     public function isAbsolute(): bool
@@ -190,21 +88,6 @@ class Path
         }
 
         return $this->pathString;
-    }
-
-    /**
-     * Rebuild path string from elements and settings.
-     */
-    protected function rebuildString(): void
-    {
-        $path = $this->isAbsolute() ? '/' : '';
-        $path .= implode('/', $this->getElements());
-        $path .= $this->isDirectory() ? '/' : '';
-        if ('//' === $path) {
-            $path = '/';
-        }
-
-        $this->pathString = $path;
     }
 
     public function __toString(): string
@@ -261,10 +144,8 @@ class Path
      * Get a new Path instance holding the bottommost directory of the given Path.
      * If the path already is a directory, the new Path will be the same. If it
      * is not, the new Path will contain everything but the last element.
-     *
-     * @return Path
      */
-    public function getDirectory()
+    public function getDirectory(): self
     {
         $directory = clone $this;
         if ($directory->isDirectory()) {
@@ -294,11 +175,16 @@ class Path
      */
     public function getFile(): ?self
     {
-        if ($this->isDirectory() || !$this->hasElements()) {
+        if ($this->isDirectory()) {
             return null;
         }
 
-        return new static($this->getLastElement()->getName());
+        $lastElement = $this->getLastElement();
+        if (null === $lastElement) {
+            return null;
+        }
+
+        return new self($lastElement->getName());
     }
 
     /**
@@ -322,5 +208,72 @@ class Path
         array_pop($this->elements);
         $this->isDirectory = true;
         $this->rebuildString();
+    }
+
+    /**
+     * Parse the configured path string.
+     */
+    private function parsePathString(string $pathString): void
+    {
+        $this->pathString = $pathString;
+
+        if (StringPatternUtil::stringContainsRegex($pathString)) {
+            $this->initAsRegex($pathString);
+
+            return;
+        }
+
+        $this->initDefault($pathString);
+    }
+
+    private function initAsRegex(string $pathString): void
+    {
+        $this->isAbsolute = false;
+        $this->isDirectory = false;
+
+        $this->elements = [
+            $this->createRegexElement($pathString),
+        ];
+    }
+
+    private function initDefault(string $pathString): void
+    {
+        $this->isAbsolute = (0 === strpos($pathString, '/'));
+        $this->isDirectory = (strlen($pathString) - 1 === strrpos($pathString, '/'));
+
+        $parts = array_filter(explode('/', $pathString), fn ($part) => !empty($part) && '.' !== $part);
+
+        $this->elements = array_map(fn ($part) => $this->createElement($part), $parts);
+    }
+
+    /**
+     * Create a new PathElement instance.
+     */
+    private function createElement(string $part): PathElement
+    {
+        return new PathElement($part);
+    }
+
+    /**
+     * Create a new PathElement instance that is allowed to contain regex.
+     */
+    private function createRegexElement(string $part): PathElement
+    {
+        return new PathElement($part, true);
+    }
+
+    /**
+     * Rebuild path string from elements and settings.
+     */
+    private function rebuildString(): void
+    {
+        $path = $this->isAbsolute() ? '/' : '';
+        $path .= implode('/', $this->getElements());
+        $path .= $this->isDirectory() ? '/' : '';
+        if ('//' === $path) {
+            $path = '/';
+        }
+
+        $this->pathString = $path;
     }
 }

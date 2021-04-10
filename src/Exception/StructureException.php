@@ -9,30 +9,21 @@ use ZeroGravity\Cms\Content\PageDiff;
 
 class StructureException extends RuntimeException implements ZeroGravityException
 {
-    /**
-     * @return StructureException
-     */
-    public static function moreThanOneYamlFile(SplFileInfo $directory, array $files)
+    public static function moreThanOneYamlFile(SplFileInfo $directory, array $files): self
     {
         return static::moreThanOneFileOfType($directory, $files, 'YAML');
     }
 
-    /**
-     * @return StructureException
-     */
-    public static function moreThanOneMarkdownFile(SplFileInfo $directory, array $files)
+    public static function moreThanOneMarkdownFile(SplFileInfo $directory, array $files): self
     {
         return static::moreThanOneFileOfType($directory, $files, 'markdown');
     }
 
-    /**
-     * @return StructureException
-     */
     public static function yamlAndMarkdownFilesMismatch(
         SplFileInfo $directory,
         File $yamlFile,
         File $markdownFile
-    ) {
+    ): self {
         return new static(sprintf(
             'Directory %s contains a YAML and a markdown file, but the basenames do not match: %s vs %s',
             $directory->getRealPath(),
@@ -41,10 +32,7 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
         ));
     }
 
-    /**
-     * @return StructureException
-     */
-    public static function newPageNameAlreadyExists(PageDiff $diff)
+    public static function newPageNameAlreadyExists(PageDiff $diff): self
     {
         return new static(sprintf(
             'Cannot rename page "%s" to "%s" because a page with the same name already exists.',
@@ -55,10 +43,8 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
 
     /**
      * @param File[] $files
-     *
-     * @return static
      */
-    protected static function moreThanOneFileOfType(SplFileInfo $directory, array $files, string $type)
+    protected static function moreThanOneFileOfType(SplFileInfo $directory, array $files, string $type): self
     {
         $files = array_map(fn (File $file) => $file->getFilename(), $files);
 

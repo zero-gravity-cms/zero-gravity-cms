@@ -5,13 +5,12 @@ namespace ZeroGravity\Cms\Content\Finder;
 use Iterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use ZeroGravity\Cms\Content\Finder\Iterator\FileCountFilterIterator;
-use ZeroGravity\Cms\Content\Page;
 
 trait PageFinderFilesTrait
 {
-    private $numFiles = [];
-    private $numImages = [];
-    private $numDocuments = [];
+    private array $numFiles = [];
+    private array $numImages = [];
+    private array $numDocuments = [];
 
     /**
      * Adds tests for files count.
@@ -24,11 +23,9 @@ trait PageFinderFilesTrait
      *
      * @param string|int $numFiles The file count expression
      *
-     * @return $this
-     *
      * @see NumberComparator
      */
-    public function numFiles($numFiles)
+    public function numFiles($numFiles): self
     {
         $this->numFiles[] = new NumberComparator($numFiles);
 
@@ -46,11 +43,9 @@ trait PageFinderFilesTrait
      *
      * @param string|int $numImages The image count expression
      *
-     * @return $this
-     *
      * @see NumberComparator
      */
-    public function numImages($numImages)
+    public function numImages($numImages): self
     {
         $this->numImages[] = new NumberComparator($numImages);
 
@@ -68,11 +63,9 @@ trait PageFinderFilesTrait
      *
      * @param string|int $numDocuments The document count expression
      *
-     * @return $this
-     *
      * @see NumberComparator
      */
-    public function numDocuments($numDocuments)
+    public function numDocuments($numDocuments): self
     {
         $this->numDocuments[] = new NumberComparator($numDocuments);
 

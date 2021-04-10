@@ -13,11 +13,11 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class FileCountFilterIterator extends FilterIterator
+final class FileCountFilterIterator extends FilterIterator
 {
-    const MODE_FILES = 'files';
-    const MODE_IMAGES = 'images';
-    const MODE_DOCUMENTS = 'documents';
+    public const MODE_FILES = 'files';
+    public const MODE_IMAGES = 'images';
+    public const MODE_DOCUMENTS = 'documents';
 
     private array $comparators = [];
 
@@ -41,7 +41,7 @@ class FileCountFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         switch ($this->mode) {
             case self::MODE_FILES:

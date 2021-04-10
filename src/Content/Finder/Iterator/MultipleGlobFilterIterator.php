@@ -23,7 +23,7 @@ abstract class MultipleGlobFilterIterator extends MultiplePcreFilterIterator
      *
      * @return string regexp corresponding to a given glob or regexp
      */
-    protected function toRegex($str)
+    protected function toRegex($str): string
     {
         return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }

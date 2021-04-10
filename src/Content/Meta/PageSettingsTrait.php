@@ -3,11 +3,10 @@
 namespace ZeroGravity\Cms\Content\Meta;
 
 use DateTimeImmutable;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
- * This trait contains all settings related methods (mostly getters) of the Page class.
+ * This trait contains settings related methods (mostly getters) of the Page class.
  * This helps separating native properties from validated settings/options.
  */
 trait PageSettingsTrait
@@ -49,44 +48,6 @@ trait PageSettingsTrait
         return $this->getSetting('content_type');
     }
 
-    /**
-     * Get all defined taxonomy keys and values.
-     */
-    public function getTaxonomies(): array
-    {
-        return $this->getSetting('taxonomy');
-    }
-
-    /**
-     * Get values for a single taxonomy key.
-     *
-     * @param string $name
-     */
-    public function getTaxonomy($name): array
-    {
-        $taxonomy = $this->getSetting('taxonomy');
-        if (isset($taxonomy[$name])) {
-            return (array) $taxonomy[$name];
-        }
-
-        return [];
-    }
-
-    public function getTags(): array
-    {
-        return $this->getTaxonomy(Page::TAXONOMY_TAG);
-    }
-
-    public function getCategories(): array
-    {
-        return $this->getTaxonomy(Page::TAXONOMY_CATEGORY);
-    }
-
-    public function getAuthors(): array
-    {
-        return $this->getTaxonomy(Page::TAXONOMY_AUTHOR);
-    }
-
     public function getSettings(): array
     {
         return $this->settings->toArray();
@@ -103,8 +64,11 @@ trait PageSettingsTrait
             return $settings;
         }
 
-        foreach ($this->getParent()->getChildDefaults() as $key => $defaultValue) {
-            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+        foreach ($this->getParent()->getChildDefaults() as $key => $childDefault) {
+            if (!array_key_exists($key, $settings)) {
+                continue;
+            }
+            if ($settings[$key] === $childDefault) {
                 unset($settings[$key]);
             }
         }
@@ -148,7 +112,8 @@ trait PageSettingsTrait
     }
 
     /**
-     * Page is considered a modular page, not a content page.
+     * Page is considered a modular page, not a content page, e.g. for holding addressable sub content.
+     * Modular pages will be hidden from menus.
      */
     public function isModular(): bool
     {
@@ -157,6 +122,7 @@ trait PageSettingsTrait
 
     /**
      * Page is considered a modular snippet, not a standalone page.
+     * This is usually achieved by prefixing the directory with an underscore.
      */
     public function isModule(): bool
     {
@@ -208,70 +174,5 @@ trait PageSettingsTrait
     public function getDate(): ?DateTimeImmutable
     {
         return $this->getSetting('date');
-    }
-
-    /**
-     * Get optional publishing date of this page.
-     *
-     * @return DateTimeImmutable
-     */
-    public function getPublishDate(): ?DateTimeImmutable
-    {
-        return $this->getSetting('publish_date');
-    }
-
-    /**
-     * Get optional un-publishing date of this page.
-     *
-     * @return DateTimeImmutable
-     */
-    public function getUnpublishDate(): ?DateTimeImmutable
-    {
-        return $this->getSetting('unpublish_date');
-    }
-
-    public function isPublished(): bool
-    {
-        if (!$this->getSetting('publish')) {
-            return false;
-        }
-
-        return $this->isCurrentDateWithinPublishDates();
-    }
-
-    public function isCurrentDateWithinPublishDates(): bool
-    {
-        if ($this->publishDateIsInFuture()) {
-            return false;
-        }
-        if ($this->unpublishDateIsInPast()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function publishDateIsInFuture(): bool
-    {
-        if (null === $this->getPublishDate()) {
-            return false;
-        }
-        if ($this->getPublishDate()->format('U') > time()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function unpublishDateIsInPast(): bool
-    {
-        if (null === $this->getUnpublishDate()) {
-            return false;
-        }
-        if ($this->getUnpublishDate()->format('U') < time()) {
-            return true;
-        }
-
-        return false;
     }
 }

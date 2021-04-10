@@ -7,8 +7,9 @@ use LogicException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
-use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilter;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
 /**
@@ -479,7 +480,7 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(1, $finder, 'Multiple tags');
 
         $finder = $this->getFinder()
-            ->tag(['tag1', 'tag2'], PageFinder::TAXONOMY_OR)
+            ->tag(['tag1', 'tag2'], TaxonomyTester::OPERATOR_OR)
         ;
         $this->assertCount(4, $finder, 'Multiple tags, OR');
 
@@ -494,7 +495,7 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(11, $finder, 'Multiple tags, negated');
 
         $finder = $this->getFinder()
-            ->notTag(['tag1', 'tag2'], PageFinder::TAXONOMY_OR)
+            ->notTag(['tag1', 'tag2'], TaxonomyTester::OPERATOR_OR)
         ;
         $this->assertCount(8, $finder, 'Multiple tags, OR, negated');
     }
@@ -531,7 +532,7 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(1, $finder, 'Multiple authors');
 
         $finder = $this->getFinder()
-            ->notAuthor(['john', 'mary'], PageFinder::TAXONOMY_OR)
+            ->notAuthor(['john', 'mary'], TaxonomyTester::OPERATOR_OR)
         ;
         $this->assertCount(9, $finder, 'Multiple authors, OR, negated');
     }
@@ -600,12 +601,12 @@ class PageFinderTest extends BaseUnit
         $this->assertCount(4, $finder, 'String comparison of date value, comparator');
 
         $finder = $this->getFinder()
-            ->extra('my_custom_date', '> 2016-01-01', ExtraFilterIterator::COMPARATOR_DATE)
+            ->extra('my_custom_date', '> 2016-01-01', ExtraFilter::COMPARATOR_DATE)
         ;
         $this->assertCount(2, $finder, 'Date comparison of date value');
 
         $finder = $this->getFinder()
-            ->extra('my_custom_date', '> 1449769188', ExtraFilterIterator::COMPARATOR_NUMERIC)
+            ->extra('my_custom_date', '> 1449769188', ExtraFilter::COMPARATOR_NUMERIC)
         ;
         $this->assertCount(1, $finder, 'Numeric comparison of date value');
     }

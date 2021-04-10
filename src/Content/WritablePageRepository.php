@@ -5,17 +5,16 @@ namespace ZeroGravity\Cms\Content;
 use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
 
-interface StructureMapper
+interface WritablePageRepository
 {
     /**
-     * Parse any content source for all Page data and return Page tree as array containing base nodes.
-     *
-     * @return Page[]
+     * Get writable instance of an existing page.
      */
-    public function parse(): array;
-
     public function getWritablePageInstance(ReadablePage $page): WritablePage;
 
+    /**
+     * Get new writable page instance.
+     */
     public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage;
 
     /**

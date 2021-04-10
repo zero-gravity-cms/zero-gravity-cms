@@ -3,16 +3,17 @@
 namespace ZeroGravity\Cms\Content\Finder;
 
 use Iterator;
+use Symfony\Cmf\Bundle\RoutingBundle\Tests\Fixtures\App\Document\Content;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\NameFilterIterator;
 use ZeroGravity\Cms\Content\Page;
 
 trait PageFinderContentTrait
 {
-    private $names = [];
-    private $notNames = [];
-    private $contains = [];
-    private $notContains = [];
+    private array $names = [];
+    private array $notNames = [];
+    private array $contains = [];
+    private array $notContains = [];
 
     /**
      * Adds rules that pages must match.
@@ -25,11 +26,9 @@ trait PageFinderContentTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see NameFilterIterator
      */
-    public function name($pattern)
+    public function name(string $pattern): self
     {
         $this->names[] = $pattern;
 
@@ -41,11 +40,9 @@ trait PageFinderContentTrait
      *
      * @param string $pattern A pattern (a regexp, a glob, or a string)
      *
-     * @return $this
-     *
      * @see NameFilterIterator
      */
-    public function notName($pattern)
+    public function notName(string $pattern): self
     {
         $this->notNames[] = $pattern;
 
@@ -63,11 +60,9 @@ trait PageFinderContentTrait
      *
      * @param string $pattern A pattern (string or regexp)
      *
-     * @return $this
-     *
-     * @see FilecontentFilterIterator
+     * @see ContentFilterIterator
      */
-    public function contains($pattern)
+    public function contains(string $pattern): self
     {
         $this->contains[] = $pattern;
 
@@ -85,11 +80,9 @@ trait PageFinderContentTrait
      *
      * @param string $pattern A pattern (string or regexp)
      *
-     * @return $this
-     *
-     * @see FilecontentFilterIterator
+     * @see ContentFilterIterator
      */
-    public function notContains($pattern)
+    public function notContains(string $pattern): self
     {
         $this->notContains[] = $pattern;
 

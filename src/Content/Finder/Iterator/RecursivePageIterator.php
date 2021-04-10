@@ -9,14 +9,14 @@ use ZeroGravity\Cms\Content\Page;
 /**
  * @method Page current()
  */
-class RecursivePageIterator extends ArrayIterator implements \RecursiveIterator
+final class RecursivePageIterator extends ArrayIterator implements \RecursiveIterator
 {
     /**
      * Returns if an iterator can be created for the current pages children.
      *
      * @return bool true if the current entry can be iterated over, otherwise returns false
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return $this->current()->hasChildren();
     }
@@ -26,7 +26,7 @@ class RecursivePageIterator extends ArrayIterator implements \RecursiveIterator
      *
      * @return RecursiveIterator an iterator for the current entry
      */
-    public function getChildren()
+    public function getChildren(): RecursiveIterator
     {
         return new static($this->current()->getChildren()->toArray());
     }

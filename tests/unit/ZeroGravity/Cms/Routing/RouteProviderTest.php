@@ -18,7 +18,7 @@ class RouteProviderTest extends BaseUnit
     /**
      * @test
      */
-    public function getRouteCollectionReturnsRouteForEachPage()
+    public function getRouteCollectionReturnsRouteForEachPage(): void
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
@@ -28,7 +28,7 @@ class RouteProviderTest extends BaseUnit
         $routes = $collection->all();
         $this->assertContainsOnlyInstancesOf(Route::class, $routes);
         foreach ($routes as $route) {
-            $page = $route->getDefault('page');
+            $page = $route->getDefault('_zg_page');
             $this->assertInstanceOf(Page::class, $page);
             $this->assertSame('default_controller', $route->getDefault('_controller'));
         }
@@ -37,7 +37,7 @@ class RouteProviderTest extends BaseUnit
     /**
      * @test
      */
-    public function getRouteByNameReturnsRoute()
+    public function getRouteByNameReturnsRoute(): void
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
@@ -48,7 +48,7 @@ class RouteProviderTest extends BaseUnit
     /**
      * @test
      */
-    public function getRouteByNameThrowsExceptionIfNotFound()
+    public function getRouteByNameThrowsExceptionIfNotFound(): void
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
@@ -59,7 +59,7 @@ class RouteProviderTest extends BaseUnit
     /**
      * @test
      */
-    public function getRoutesByNameReturnsAllRoutesForNull()
+    public function getRoutesByNameReturnsAllRoutesForNull(): void
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
@@ -71,7 +71,7 @@ class RouteProviderTest extends BaseUnit
     /**
      * @test
      */
-    public function getRoutesByNameReturnsMatchingForArray()
+    public function getRoutesByNameReturnsMatchingForArray(): void
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
@@ -84,10 +84,7 @@ class RouteProviderTest extends BaseUnit
         $this->assertContainsOnlyInstancesOf(Route::class, $routes);
     }
 
-    /**
-     * @return ContentRepository
-     */
-    private function getContentRepository()
+    private function getContentRepository(): ContentRepository
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
@@ -104,15 +101,8 @@ class RouteProviderTest extends BaseUnit
         return new ContentRepository($mapper, $cache, false);
     }
 
-    /**
-     * @param $name
-     *
-     * @return Page
-     */
-    private function createSimplePage($name, Page $parent = null)
+    private function createSimplePage(string $name, Page $parent = null): Page
     {
-        $page = new Page($name, ['slug' => $name], $parent);
-
-        return $page;
+        return new Page($name, ['slug' => $name], $parent);
     }
 }

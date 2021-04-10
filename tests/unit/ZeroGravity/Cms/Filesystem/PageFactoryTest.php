@@ -243,8 +243,7 @@ class PageFactoryTest extends BaseUnit
     private function createParsedDirectoryFromPath(string $path)
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
-        $directory = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher());
 
-        return $directory;
+        return new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher());
     }
 }

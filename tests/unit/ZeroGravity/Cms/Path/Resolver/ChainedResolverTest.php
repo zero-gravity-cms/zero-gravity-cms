@@ -5,14 +5,14 @@ namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
-use ZeroGravity\Cms\Path\Resolver\CombinedResolver;
+use ZeroGravity\Cms\Path\Resolver\ChainedResolver;
 use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 use ZeroGravity\Cms\Path\Resolver\PageResolver;
 
 /**
  * @group resolver
  */
-class CombinedResolverTest extends BaseUnit
+class ChainedResolverTest extends BaseUnit
 {
     /**
      * @test
@@ -20,19 +20,19 @@ class CombinedResolverTest extends BaseUnit
      *
      * @param string $inPath
      */
-    public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath)
+    public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath): void
     {
         $pageResolver = $this->getPageResolver();
         $filesystemResolver = new FilesystemResolver($this->getDefaultFileFactory());
-        $resolver = new CombinedResolver($filesystemResolver, $pageResolver);
+        $resolver = new ChainedResolver([$filesystemResolver, $pageResolver]);
 
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        $this->assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        $this->assertSame($expectedPath, $file->getPathname());
+        self::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
+        self::assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths()
+    public function provideSingleFilePaths(): array
     {
         return [
             [
@@ -58,13 +58,8 @@ class CombinedResolverTest extends BaseUnit
         ];
     }
 
-    /**
-     * @return PageResolver
-     */
-    private function getPageResolver()
+    private function getPageResolver(): PageResolver
     {
-        $resolver = new PageResolver($this->getDefaultContentRepository());
-
-        return $resolver;
+        return new PageResolver($this->getDefaultContentRepository());
     }
 }

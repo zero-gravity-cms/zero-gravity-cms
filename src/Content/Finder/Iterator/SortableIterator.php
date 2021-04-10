@@ -5,6 +5,7 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 use ArrayIterator;
 use Closure;
 use InvalidArgumentException;
+use Iterator;
 use IteratorAggregate;
 use Traversable;
 use ZeroGravity\Cms\Content\Page;
@@ -12,63 +13,66 @@ use ZeroGravity\Cms\Content\Page;
 /**
  * SortableIterator applies a sort on a given Iterator.
  */
-class SortableIterator implements IteratorAggregate
+final class SortableIterator implements IteratorAggregate
 {
-    const SORT_BY_NAME = 'name';
-    const SORT_BY_SLUG = 'slug';
-    const SORT_BY_TITLE = 'title';
-    const SORT_BY_DATE = 'date';
-    const SORT_BY_PUBLISH_DATE = 'publishDate';
-    const SORT_BY_PATH = 'path';
-    const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
-    const SORT_BY_EXTRA_VALUE = 'extra';
+    public const SORT_BY_NAME = 'name';
+    public const SORT_BY_SLUG = 'slug';
+    public const SORT_BY_TITLE = 'title';
+    public const SORT_BY_DATE = 'date';
+    public const SORT_BY_PUBLISH_DATE = 'publishDate';
+    public const SORT_BY_PATH = 'path';
+    public const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
+    public const SORT_BY_EXTRA_VALUE = 'extra';
 
     private Traversable $iterator;
-    private $sort;
+    /**
+     * @var callable
+     */
+    private $sortBy;
 
     /**
-     * @param Traversable    $iterator The Iterator to filter
-     * @param string|Closure $sort     The sort type (SORT_BY_NAME, SORT_BY_TYPE, or a PHP closure)
+     * @param Traversable             $iterator The Iterator to filter
+     * @param string|Closure|callable $sortBy   The sort type (on of the SORT_BY_* constants, or a PHP closure)
      *
      * @throws InvalidArgumentException
      */
-    public function __construct(Traversable $iterator, $sort)
+    public function __construct(Traversable $iterator, $sortBy)
     {
         $this->iterator = $iterator;
-        if ($sort instanceof Closure) {
-            $this->sort = $sort;
+        if ($sortBy instanceof Closure) {
+            $this->sortBy = $sortBy;
 
             return;
         }
         $parameter = null;
-        if (is_array($sort) && 2 === count($sort)) {
-            [$sort, $parameter] = $sort;
+        if (is_array($sortBy) && 2 === count($sortBy)) {
+            [$sortBy, $parameter] = $sortBy;
         }
 
-        $this->configureSortFunction($sort, $parameter);
+        $this->configureSortFunction((string) $sortBy, (string) $parameter);
     }
 
     /**
      * @throws InvalidArgumentException
      */
-    private function configureSortFunction(string $sort, string $parameter = null): void
+    private function configureSortFunction(string $sortBy, string $parameter = null): void
     {
-        switch ($sort) {
+        switch ($sortBy) {
             case self::SORT_BY_NAME:
             case self::SORT_BY_SLUG:
             case self::SORT_BY_TITLE:
             case self::SORT_BY_EXTRA_VALUE:
-                $this->sortByGetterOrPath('get'.ucfirst($sort), $parameter);
+                $this->sortByGetterOrPath('get'.ucfirst($sortBy), $parameter);
                 break;
 
             case self::SORT_BY_DATE:
             case self::SORT_BY_PUBLISH_DATE:
-                $this->sortByDateOrPath('get'.ucfirst($sort));
+                $this->sortByDateOrPath('get'.ucfirst($sortBy));
                 break;
 
             case self::SORT_BY_PATH:
             case self::SORT_BY_FILESYSTEM_PATH:
-                $this->sortByGetter('get'.ucfirst($sort));
+                $this->sortByGetter('get'.ucfirst($sortBy));
                 break;
 
             default:
@@ -76,17 +80,17 @@ class SortableIterator implements IteratorAggregate
         }
     }
 
-    public function getIterator()
+    public function getIterator(): Iterator
     {
         $array = iterator_to_array($this->iterator, true);
-        uasort($array, $this->sort);
+        uasort($array, $this->sortBy);
 
         return new ArrayIterator($array);
     }
 
     private function sortByGetterOrPath(string $getter, $parameter = null): void
     {
-        $this->sort = function (Page $pageA, Page $pageB) use ($getter, $parameter) {
+        $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter, $parameter) {
             $valueA = $pageA->$getter($parameter);
             $valueB = $pageB->$getter($parameter);
             if (mb_strtolower($valueA) === mb_strtolower($valueB)) {
@@ -102,7 +106,7 @@ class SortableIterator implements IteratorAggregate
      */
     private function sortByDateOrPath($getter): void
     {
-        $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
+        $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter) {
             $valueA = $pageA->$getter();
             $valueB = $pageB->$getter();
             if (null !== $valueA && null === $valueB) {
@@ -111,6 +115,7 @@ class SortableIterator implements IteratorAggregate
             if (null === $valueA && null !== $valueB) {
                 return -1;
             }
+            /* @noinspection TypeUnsafeComparisonInspection */
             if ($valueA == $valueB) {
                 return strcasecmp($pageA->getPath(), $pageB->getPath());
             }
@@ -124,6 +129,6 @@ class SortableIterator implements IteratorAggregate
      */
     private function sortByGetter($getter): void
     {
-        $this->sort = fn (Page $pageA, Page $pageB) => strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
+        $this->sortBy = static fn (Page $pageA, Page $pageB) => strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
     }
 }

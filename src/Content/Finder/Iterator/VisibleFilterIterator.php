@@ -11,7 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class VisibleFilterIterator extends FilterIterator
+final class VisibleFilterIterator extends FilterIterator
 {
     private bool $visible;
 
@@ -30,7 +30,7 @@ class VisibleFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         return $this->current()->isVisible() === $this->visible;
     }

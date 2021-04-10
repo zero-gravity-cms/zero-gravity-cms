@@ -16,12 +16,10 @@ use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Routing\RouterPageSelector;
 
-class ZeroGravityExtension extends AbstractExtension
+final class ZeroGravityExtension extends AbstractExtension
 {
     private ContentRepository $contentRepository;
-
     private RouterPageSelector $pageSelector;
-
     private FilterRegistry $filterRegistry;
 
     public function __construct(ContentRepository $contentRepository, RouterPageSelector $pageSelector, FilterRegistry $filterRegistry)
@@ -31,7 +29,7 @@ class ZeroGravityExtension extends AbstractExtension
         $this->filterRegistry = $filterRegistry;
     }
 
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter('zg_filter', [$this, 'filterPages']),
@@ -54,7 +52,7 @@ class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('zg_page', [$this, 'getPage']),
@@ -79,7 +77,7 @@ class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
-    public function getPage(string $path): ?Page
+    public function getPage(string $path): ?ReadablePage
     {
         if (0 === strpos($path, './')) {
             $currentPage = $this->pageSelector->getCurrentPage();
@@ -99,15 +97,13 @@ class ZeroGravityExtension extends AbstractExtension
 
     public function filterPages(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
     {
-        $pageFinder = $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
-
-        return $pageFinder;
+        return $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
     }
 
     /**
-     * @param ReadablePage $page
+     * This can be used to generate an ID attribute-safe representation of a page path.
      */
-    public function getPageHash(ReadablePage $page = null): string
+    public function getPageHash(?ReadablePage $page = null): string
     {
         if (null === $page) {
             return 'page_'.md5('');
@@ -139,10 +135,7 @@ class ZeroGravityExtension extends AbstractExtension
         return $page->getContent();
     }
 
-    /**
-     * @return string|null
-     */
-    public function renderPageContent(Page $page)
+    public function renderPageContent(Page $page): ?string
     {
         return $page->getContent();
     }

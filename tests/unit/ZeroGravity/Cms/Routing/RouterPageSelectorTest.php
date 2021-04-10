@@ -43,7 +43,7 @@ class RouterPageSelectorTest extends Unit
         $stack = new RequestStack();
         $stack->push(new Request([], [], [
             '_route_params' => [
-                'page' => 'not-a-page',
+                '_zg_page' => 'not-a-page',
             ],
         ]));
         $selector = new RouterPageSelector($stack);
@@ -59,7 +59,7 @@ class RouterPageSelectorTest extends Unit
         $stack = new RequestStack();
         $stack->push(new Request([], [], [
             '_route_params' => [
-                'page' => new Page('page'),
+                '_zg_page' => new Page('page'),
             ],
         ]));
         $selector = new RouterPageSelector($stack);

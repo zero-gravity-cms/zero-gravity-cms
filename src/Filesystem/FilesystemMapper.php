@@ -19,25 +19,16 @@ use ZeroGravity\Cms\Filesystem\Event\AfterPageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
-class FilesystemMapper implements StructureMapper
+final class FilesystemMapper implements StructureMapper
 {
     private FileFactory $fileFactory;
-
     private string $path;
-
     private bool $convertMarkdown;
-
     private array $defaultPageSettings;
-
     private LoggerInterface $logger;
-
     private EventDispatcherInterface $eventDispatcher;
-
     private PageFactory $pageFactory;
 
-    /**
-     * FilesystemMapper constructor.
-     */
     public function __construct(
         FileFactory $fileFactory,
         string $path,
@@ -52,7 +43,6 @@ class FilesystemMapper implements StructureMapper
         $this->defaultPageSettings = $defaultPageSettings;
         $this->logger = $logger;
         $this->eventDispatcher = $eventDispatcher;
-
         $this->pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
     }
 
@@ -63,9 +53,9 @@ class FilesystemMapper implements StructureMapper
      *
      * @throws ZeroGravityException|FilesystemException
      */
-    public function parse()
+    public function parse(): array
     {
-        $this->checkPath();
+        $this->checkPathExists();
 
         $this->logger->info('Parsing filesystem for page content, starting at {path}', ['path' => $this->path]);
         $directory = $this->createDirectory($this->path);
@@ -87,7 +77,7 @@ class FilesystemMapper implements StructureMapper
      *
      * @throws FilesystemException|ZeroGravityException
      */
-    private function checkPath()
+    private function checkPathExists(): void
     {
         if (!is_dir($this->path)) {
             $this->logAndThrow(FilesystemException::contentDirectoryDoesNotExist($this->path));
@@ -118,9 +108,7 @@ class FilesystemMapper implements StructureMapper
     public function saveChanges(PageDiff $diff): void
     {
         $this->eventDispatcher->dispatch(new BeforePageSaveValidate($diff));
-
         $this->validateDiff($diff);
-
         $this->eventDispatcher->dispatch(new BeforePageSave($diff));
 
         /* @var $directory Directory */
@@ -152,7 +140,10 @@ class FilesystemMapper implements StructureMapper
         if (!$diff->containsInstancesOf(WritableFilesystemPage::class)) {
             $this->logAndThrow(FilesystemException::unsupportedWritablePageClass($diff));
         }
-        if ($diff->filesystemPathHasChanged() && $this->newFilesystemPathAlreadyExists($diff)) {
+        if (!$diff->filesystemPathHasChanged()) {
+            return;
+        }
+        if ($this->newFilesystemPathAlreadyExists($diff)) {
             $this->logAndThrow(StructureException::newPageNameAlreadyExists($diff));
         }
     }
@@ -165,7 +156,7 @@ class FilesystemMapper implements StructureMapper
     /**
      * @throws ZeroGravityException
      */
-    private function logAndThrow(ZeroGravityException $exception)
+    private function logAndThrow(ZeroGravityException $exception): void
     {
         $this->logger->error($exception->getMessage());
 
@@ -179,9 +170,8 @@ class FilesystemMapper implements StructureMapper
 
         $fs = new Filesystem();
         $fs->mkdir($realPath);
-        $directory = $this->createDirectory($realPath, $parentPath);
 
-        return $directory;
+        return $this->createDirectory($realPath, $parentPath);
     }
 
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
@@ -192,7 +182,10 @@ class FilesystemMapper implements StructureMapper
         }
 
         foreach ($this->defaultPageSettings as $key => $defaultValue) {
-            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+            if (!array_key_exists($key, $settings)) {
+                continue;
+            }
+            if ($settings[$key] === $defaultValue) {
                 unset($settings[$key]);
             }
         }
@@ -202,14 +195,12 @@ class FilesystemMapper implements StructureMapper
 
     private function createDirectory(string $path, string $parentPath = null): Directory
     {
-        $directory = new Directory(
+        return new Directory(
             new SplFileInfo($path),
             $this->fileFactory,
             $this->logger,
             $this->eventDispatcher,
             $parentPath
         );
-
-        return $directory;
     }
 }

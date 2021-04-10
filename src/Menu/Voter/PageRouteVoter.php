@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ZeroGravity\Cms\Content\Page;
 
-class PageRouteVoter implements VoterInterface
+final class PageRouteVoter implements VoterInterface
 {
-    private ?Request $request = null;
+    private ?Request $request;
 
     public function __construct(RequestStack $requestStack)
     {
@@ -23,10 +23,8 @@ class PageRouteVoter implements VoterInterface
      *
      * If the voter is not able to determine a result,
      * it should return null to let other voters do the job.
-     *
-     * @return bool|null
      */
-    public function matchItem(ItemInterface $item)
+    public function matchItem(ItemInterface $item): ?bool
     {
         if (null === $this->request) {
             return null;
@@ -41,10 +39,7 @@ class PageRouteVoter implements VoterInterface
         return $this->matchRoutes($routes, $page->getPath()->toString());
     }
 
-    /**
-     * @return bool|null
-     */
-    private function matchRoutes(array $routes, string $pagePath)
+    private function matchRoutes(array $routes, string $pagePath): ?bool
     {
         foreach ($routes as $route) {
             if (is_string($route)) {

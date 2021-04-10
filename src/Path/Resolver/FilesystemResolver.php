@@ -10,14 +10,12 @@ use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\PathElement;
 
-class FilesystemResolver extends AbstractResolver implements MultiPathResolver
+final class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 {
     use MultiPathFindOneTrait;
 
-    protected string $basePath;
-
-    protected Filesystem $filesystem;
-
+    private string $basePath;
+    private Filesystem $filesystem;
     private FileFactory $fileFactory;
 
     public function __construct(FileFactory $fileFactory)
@@ -43,19 +41,17 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
             ->files()
         ;
 
-        if (($path->isSingleElement() || $path->isGlob()) && !$path->isRegex()) {
+        if (!$path->isRegex() && ($path->isSingleElement() || $path->isGlob())) {
             $finder->name($path->toString());
         } else {
             $finder->path($path->toString());
         }
         $finder->in($this->buildBaseDir($parentPath));
 
+        /* @noinspection NullPointerExceptionInspection */
         return $this->doFind($finder, $parentPath);
     }
 
-    /**
-     * @param Path $parentPath
-     */
     private function preparePaths(Path &$path, Path &$parentPath = null): void
     {
         if (null === $parentPath) {
@@ -66,12 +62,20 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
         if ($path->isAbsolute() && !$path->isRegex()) {
             $path = $this->toRegexMatchStart($path);
         }
-        if (!$path->isAbsolute() && $path->isGlob()) {
-            // try moving pattern parts into inPath because globs don't work with paths
-            $this->moveNonGlobsToParent($path, $parentPath);
+
+        if ($path->isAbsolute()) {
+            return;
         }
+        if (!$path->isGlob()) {
+            return;
+        }
+
+        $this->moveNonGlobsToParent($path, $parentPath);
     }
 
+    /**
+     * @return File[]
+     */
     private function doFind(Finder $finder, Path $parentPath): array
     {
         $found = [];
@@ -92,7 +96,8 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
                 );
             }
 
-            $found[$file->getRelativePathname()] = $this->fileFactory->createFile($file->getRelativePathname());
+            $pathname = $file->getRelativePathname();
+            $found[$pathname] = $this->fileFactory->createFile($pathname);
         }
 
         return $found;
@@ -113,18 +118,16 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
         if ('.meta.yaml' === substr($trimmedPath, -10)) {
             return null;
         }
+
         $testPath = $this->buildBaseDir().'/'.$trimmedPath;
-        if ($this->filesystem->exists($testPath) && is_file($testPath)) {
-            return $this->fileFactory->createFile('/'.$trimmedPath);
+        if (!is_file($testPath)) {
+            return null;
         }
 
-        return null;
+        return $this->fileFactory->createFile('/'.$trimmedPath);
     }
 
-    /**
-     * @param Path $parentPath
-     */
-    protected function buildBaseDir(Path $parentPath = null): string
+    private function buildBaseDir(?Path $parentPath = null): string
     {
         if (null === $parentPath) {
             return $this->basePath;

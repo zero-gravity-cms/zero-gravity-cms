@@ -3,18 +3,17 @@
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use ArrayIterator;
+use Iterator;
 use IteratorAggregate;
 use Traversable;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
  */
-class LimitAndOffsetIterator implements IteratorAggregate
+final class LimitAndOffsetIterator implements IteratorAggregate
 {
     private Traversable $iterator;
-
-    private ?int $limit = null;
-
+    private ?int $limit;
     private int $offset;
 
     /**
@@ -29,7 +28,7 @@ class LimitAndOffsetIterator implements IteratorAggregate
         $this->offset = (int) $offset;
     }
 
-    public function getIterator()
+    public function getIterator(): Iterator
     {
         $array = iterator_to_array($this->iterator, true);
         $slice = array_slice($array, $this->offset, $this->limit, true);

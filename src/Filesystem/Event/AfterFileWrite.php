@@ -2,6 +2,6 @@
 
 namespace ZeroGravity\Cms\Filesystem\Event;
 
-class AfterFileWrite extends FileEvent
+final class AfterFileWrite extends FileEvent
 {
 }

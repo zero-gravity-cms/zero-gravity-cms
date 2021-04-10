@@ -6,15 +6,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
 
-class BeforePageCreate extends Event
+final class BeforePageCreate extends Event
 {
     private Directory $directory;
 
     private array $settings;
 
-    private ?Page $parentPage = null;
+    private ?Page $parentPage;
 
-    public function __construct(Directory $directory, array $settings, Page $parentPage = null)
+    public function __construct(Directory $directory, array $settings, ?Page $parentPage = null)
     {
         $this->directory = $directory;
         $this->settings = $settings;

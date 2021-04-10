@@ -2,6 +2,6 @@
 
 namespace ZeroGravity\Cms\Menu\Event;
 
-class AfterBuildMenu extends MenuEvent
+final class AfterBuildMenu extends MenuEvent
 {
 }

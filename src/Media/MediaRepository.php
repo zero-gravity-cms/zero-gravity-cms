@@ -6,7 +6,7 @@ use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
-class MediaRepository
+final class MediaRepository
 {
     private SinglePathResolver $pathResolver;
 

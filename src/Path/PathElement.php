@@ -2,13 +2,11 @@
 
 namespace ZeroGravity\Cms\Path;
 
-class PathElement
+final class PathElement
 {
-    protected string $name;
-
-    protected bool $isRegex = false;
-
-    protected bool $isGlob = false;
+    private string $name;
+    private bool $isRegex = false;
+    private bool $isGlob = false;
 
     /**
      * Create a new PathElement.
@@ -21,16 +19,11 @@ class PathElement
         $this->init($name, $allowRegex);
     }
 
-    /**
-     * Initialize settings for this element.
-     *
-     * @param $name
-     */
-    protected function init($name, bool $allowRegex = false): void
+    private function init(string $name, bool $allowRegex = false): void
     {
         $this->name = $name;
-        $this->isRegex = $allowRegex && !$this->isParentReference() && Path::stringContainsRegex($name);
-        $this->isGlob = !$this->isRegex && Path::stringContainsGlob($name);
+        $this->isRegex = $allowRegex && !$this->isParentReference() && StringPatternUtil::stringContainsRegex($name);
+        $this->isGlob = !$this->isRegex && StringPatternUtil::stringContainsGlob($name);
     }
 
     public function isParentReference(): bool

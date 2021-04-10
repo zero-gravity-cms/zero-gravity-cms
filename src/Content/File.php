@@ -7,15 +7,12 @@ use ZeroGravity\Cms\Content\Meta\Metadata;
 /**
  * This class represents a file relative to a content base dir.
  */
-class File
+final class File
 {
     private string $pathName;
-
-    private Metadata $metadata;
-
-    private string $type;
-
     private string $baseDir;
+    private Metadata $metadata;
+    private string $type;
 
     public function __construct(string $pathName, string $baseDir, Metadata $metadata, string $type)
     {

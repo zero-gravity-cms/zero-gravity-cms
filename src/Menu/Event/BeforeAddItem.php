@@ -4,10 +4,9 @@ namespace ZeroGravity\Cms\Menu\Event;
 
 use Knp\Menu\ItemInterface;
 
-class BeforeAddItem extends MenuEvent
+final class BeforeAddItem extends MenuEvent
 {
     private ItemInterface $parentItem;
-
     private ItemInterface $itemToBeAdded;
 
     public function __construct(string $menuName, ItemInterface $parentItem, ItemInterface $addedItem)

@@ -4,7 +4,7 @@ namespace ZeroGravity\Cms\Menu\Event;
 
 use Knp\Menu\ItemInterface;
 
-class AfterAddChildrenToItem extends MenuEvent
+final class AfterAddChildrenToItem extends MenuEvent
 {
     private ItemInterface $item;
 

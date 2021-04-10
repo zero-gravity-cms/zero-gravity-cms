@@ -5,7 +5,7 @@ namespace ZeroGravity\Cms\Filesystem\Event;
 use Symfony\Contracts\EventDispatcher\Event;
 use ZeroGravity\Cms\Content\Page;
 
-class AfterPageCreate extends Event
+final class AfterPageCreate extends Event
 {
     private Page $page;
 

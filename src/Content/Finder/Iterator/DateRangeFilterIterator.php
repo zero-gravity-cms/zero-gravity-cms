@@ -12,9 +12,9 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class DateRangeFilterIterator extends FilterIterator
+final class DateRangeFilterIterator extends FilterIterator
 {
-    private array $comparators = [];
+    private array $comparators;
 
     /**
      * @param Iterator         $iterator    The Iterator to filter
@@ -32,7 +32,7 @@ class DateRangeFilterIterator extends FilterIterator
      *
      * @return bool true if the value should be kept, false otherwise
      */
-    public function accept()
+    public function accept(): bool
     {
         $date = $this->current()->getDate();
         if (null === $date) {
