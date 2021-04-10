@@ -8,10 +8,7 @@ use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
 class MediaRepository
 {
-    /**
-     * @var SinglePathResolver
-     */
-    private $pathResolver;
+    private SinglePathResolver $pathResolver;
 
     public function __construct(SinglePathResolver $pathResolver)
     {
@@ -21,7 +18,7 @@ class MediaRepository
     /**
      * @param string|Path $relativePath
      */
-    public function getFile($relativePath): ? File
+    public function getFile($relativePath): ?File
     {
         if (!$relativePath instanceof Path) {
             $relativePath = new Path((string) $relativePath);

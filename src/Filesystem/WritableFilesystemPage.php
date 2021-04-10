@@ -11,10 +11,7 @@ class WritableFilesystemPage extends Page implements WritablePage
 {
     use BasicWritablePageTrait;
 
-    /**
-     * @var Directory|null
-     */
-    private $directory;
+    private ?Directory $directory = null;
 
     public function __construct(ReadablePage $page, Directory $directory = null)
     {
@@ -29,7 +26,7 @@ class WritableFilesystemPage extends Page implements WritablePage
     /**
      * @return Directory
      */
-    public function getDirectory(): ? Directory
+    public function getDirectory(): ?Directory
     {
         return $this->directory;
     }

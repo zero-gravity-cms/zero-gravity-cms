@@ -19,7 +19,7 @@ class FileTypeDetector
     const TYPE_DOCUMENT = 'document';
     const TYPE_UNKNOWN = 'unknown';
 
-    protected $extensionMap = [];
+    protected array $extensionMap = [];
 
     public function __construct()
     {

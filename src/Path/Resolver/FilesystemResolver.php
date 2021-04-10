@@ -14,20 +14,11 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
 {
     use MultiPathFindOneTrait;
 
-    /**
-     * @var string
-     */
-    protected $basePath;
+    protected string $basePath;
 
-    /**
-     * @var Filesystem
-     */
-    protected $filesystem;
+    protected Filesystem $filesystem;
 
-    /**
-     * @var FileFactory
-     */
-    private $fileFactory;
+    private FileFactory $fileFactory;
 
     public function __construct(FileFactory $fileFactory)
     {
@@ -110,7 +101,7 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         if (null === $parentPath) {
             $parentPath = new Path('');

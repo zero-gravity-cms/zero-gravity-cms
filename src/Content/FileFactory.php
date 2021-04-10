@@ -8,20 +8,11 @@ use ZeroGravity\Cms\Exception\FilesystemException;
 
 class FileFactory
 {
-    /**
-     * @var FileTypeDetector
-     */
-    private $fileTypeDetector;
+    private FileTypeDetector $fileTypeDetector;
 
-    /**
-     * @var MetadataLoader
-     */
-    private $metadataLoader;
+    private MetadataLoader $metadataLoader;
 
-    /**
-     * @var string
-     */
-    private $basePath;
+    private string $basePath;
 
     /**
      * FileFactory constructor.

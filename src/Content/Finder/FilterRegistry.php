@@ -9,7 +9,7 @@ final class FilterRegistry
     /**
      * @var PageFinderFilter[]|callable[]
      */
-    private $filters;
+    private ?array $filters = null;
 
     public function addFilters(PageFinderFilters $filters)
     {

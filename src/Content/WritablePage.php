@@ -14,7 +14,7 @@ interface WritablePage extends ReadablePage
     /**
      * Get raw (un-processed) markdown content.
      */
-    public function getContentRaw(): ? string;
+    public function getContentRaw(): ?string;
 
     /**
      * Set raw (un-processed) markdown content.

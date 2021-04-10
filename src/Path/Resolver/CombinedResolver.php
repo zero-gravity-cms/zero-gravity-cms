@@ -7,15 +7,9 @@ use ZeroGravity\Cms\Path\Path;
 
 class CombinedResolver extends AbstractResolver
 {
-    /**
-     * @var FilesystemResolver
-     */
-    private $filesystemResolver;
+    private FilesystemResolver $filesystemResolver;
 
-    /**
-     * @var PageResolver
-     */
-    private $pageResolver;
+    private PageResolver $pageResolver;
 
     public function __construct(FilesystemResolver $filesystemResolver, PageResolver $pageResolver)
     {
@@ -26,7 +20,7 @@ class CombinedResolver extends AbstractResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $found = $this->filesystemResolver->get($path, $parentPath);
         if (null !== $found) {

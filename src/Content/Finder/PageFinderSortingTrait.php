@@ -2,6 +2,10 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Closure;
+use Iterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\SortableIterator;
+
 trait PageFinderSortingTrait
 {
     private $sort;
@@ -11,13 +15,13 @@ trait PageFinderSortingTrait
      *
      * The anonymous function receives two Page instances to compare.
      *
-     * @param \Closure $closure An anonymous function
+     * @param Closure $closure An anonymous function
      *
      * @return $this
      *
      * @see SortableIterator
      */
-    public function sort(\Closure $closure)
+    public function sort(Closure $closure)
     {
         $this->sort = $closure;
 
@@ -33,7 +37,7 @@ trait PageFinderSortingTrait
      */
     public function sortByName()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_NAME;
+        $this->sort = SortableIterator::SORT_BY_NAME;
 
         return $this;
     }
@@ -47,7 +51,7 @@ trait PageFinderSortingTrait
      */
     public function sortBySlug()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_SLUG;
+        $this->sort = SortableIterator::SORT_BY_SLUG;
 
         return $this;
     }
@@ -61,7 +65,7 @@ trait PageFinderSortingTrait
      */
     public function sortByTitle()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_TITLE;
+        $this->sort = SortableIterator::SORT_BY_TITLE;
 
         return $this;
     }
@@ -75,7 +79,7 @@ trait PageFinderSortingTrait
      */
     public function sortByDate()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_DATE;
+        $this->sort = SortableIterator::SORT_BY_DATE;
 
         return $this;
     }
@@ -89,7 +93,7 @@ trait PageFinderSortingTrait
      */
     public function sortByPublishDate()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_PUBLISH_DATE;
+        $this->sort = SortableIterator::SORT_BY_PUBLISH_DATE;
 
         return $this;
     }
@@ -103,7 +107,7 @@ trait PageFinderSortingTrait
      */
     public function sortByPath()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_PATH;
+        $this->sort = SortableIterator::SORT_BY_PATH;
 
         return $this;
     }
@@ -117,7 +121,7 @@ trait PageFinderSortingTrait
      */
     public function sortByFilesystemPath()
     {
-        $this->sort = Iterator\SortableIterator::SORT_BY_FILESYSTEM_PATH;
+        $this->sort = SortableIterator::SORT_BY_FILESYSTEM_PATH;
 
         return $this;
     }
@@ -131,15 +135,15 @@ trait PageFinderSortingTrait
      */
     public function sortByExtra($name)
     {
-        $this->sort = [Iterator\SortableIterator::SORT_BY_EXTRA_VALUE, $name];
+        $this->sort = [SortableIterator::SORT_BY_EXTRA_VALUE, $name];
 
         return $this;
     }
 
-    private function applySortIterator(\Iterator $iterator): \Iterator
+    private function applySortIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->sort) {
-            $iteratorAggregate = new Iterator\SortableIterator($iterator, $this->sort);
+            $iteratorAggregate = new SortableIterator($iterator, $this->sort);
             $iterator = $iteratorAggregate->getIterator();
         }
 

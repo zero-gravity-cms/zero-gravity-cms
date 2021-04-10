@@ -2,15 +2,25 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use AppendIterator;
+use ArrayIterator;
+use Closure;
+use Countable;
+use InvalidArgumentException;
+use Iterator;
+use IteratorAggregate;
+use LogicException;
+use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
+use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\Page;
 
 /**
  * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some of its code.
  */
-class PageFinder implements \IteratorAggregate, \Countable
+class PageFinder implements IteratorAggregate, Countable
 {
     use PageFinderContentTrait;
     use PageFinderDepthTrait;
@@ -24,30 +34,24 @@ class PageFinder implements \IteratorAggregate, \Countable
     const TAXONOMY_AND = 'AND';
     const TAXONOMY_OR = 'OR';
 
-    /**
-     * @var int|null
-     */
-    private $limit;
+    private ?int $limit = null;
 
-    /**
-     * @var int|null
-     */
-    private $offset;
+    private ?int $offset = null;
 
     /**
      * @var Page[][]
      */
-    private $pageLists = [];
+    private array $pageLists = [];
 
     /**
      * @var callable[]
      */
-    private $filters = [];
+    private array $filters = [];
 
     /**
-     * @var \Iterator[]
+     * @var Iterator[]
      */
-    private $iterators = [];
+    private array $iterators = [];
 
     /**
      * Creates a new PageFinder for fluent interfaces.
@@ -114,13 +118,13 @@ class PageFinder implements \IteratorAggregate, \Countable
      * The anonymous function receives a Page and must return false
      * to remove pages.
      *
-     * @param \Closure $closure An anonymous function
+     * @param Closure $closure An anonymous function
      *
      * @return $this
      *
      * @see CustomFilterIterator
      */
-    public function filter(\Closure $closure)
+    public function filter(Closure $closure)
     {
         $this->filters[] = $closure;
 
@@ -142,9 +146,9 @@ class PageFinder implements \IteratorAggregate, \Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return \Iterator|Page[] An iterator
+     * @return Iterator|Page[] An iterator
      *
-     * @throws \LogicException if the in() method has not been called
+     * @throws LogicException if the in() method has not been called
      */
     public function getIterator()
     {
@@ -164,20 +168,20 @@ class PageFinder implements \IteratorAggregate, \Countable
      *
      * @return $this
      *
-     * @throws \InvalidArgumentException when the given argument is not iterable
+     * @throws InvalidArgumentException when the given argument is not iterable
      */
     public function append($iterator)
     {
-        if ($iterator instanceof \IteratorAggregate) {
+        if ($iterator instanceof IteratorAggregate) {
             $this->iterators[] = $iterator->getIterator();
-        } elseif ($iterator instanceof \Iterator) {
+        } elseif ($iterator instanceof Iterator) {
             $this->iterators[] = $iterator;
-        } elseif ($iterator instanceof \Traversable || is_array($iterator)) {
+        } elseif (is_iterable($iterator)) {
             $this->iterators[] = $this->appendPageArrayIterator($iterator);
         } elseif ($iterator instanceof Page) {
-            $this->iterators[] = new \ArrayIterator([$iterator->getPath()->toString() => $iterator]);
+            $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);
         } else {
-            throw new \InvalidArgumentException('PageFinder::append() method wrong argument type.');
+            throw new InvalidArgumentException('PageFinder::append() method wrong argument type.');
         }
 
         return $this;
@@ -186,7 +190,7 @@ class PageFinder implements \IteratorAggregate, \Countable
     /**
      * @param $iterator
      */
-    private function appendPageArrayIterator($iterator): \Iterator
+    private function appendPageArrayIterator($iterator): Iterator
     {
         $pages = [];
         foreach ($iterator as $page) {
@@ -195,7 +199,7 @@ class PageFinder implements \IteratorAggregate, \Countable
             $pages[$page->getPath()->toString()] = $page;
         }
 
-        return new \ArrayIterator($pages);
+        return new ArrayIterator($pages);
     }
 
     /**
@@ -204,13 +208,13 @@ class PageFinder implements \IteratorAggregate, \Countable
     private function validatePageListsAndIterators(): void
     {
         if (0 === count($this->pageLists) && 0 === count($this->iterators)) {
-            throw new \LogicException('You must call one of inPageList() or append() methods before iterating over a PageFinder.');
+            throw new LogicException('You must call one of inPageList() or append() methods before iterating over a PageFinder.');
         }
     }
 
-    private function buildIteratorFromPageListsAndIterators(): \Iterator
+    private function buildIteratorFromPageListsAndIterators(): Iterator
     {
-        $iterator = new \AppendIterator();
+        $iterator = new AppendIterator();
         foreach ($this->pageLists as $pageList) {
             $iterator->append($this->buildIteratorFromSinglePageList($pageList));
         }
@@ -222,10 +226,10 @@ class PageFinder implements \IteratorAggregate, \Countable
         return $iterator;
     }
 
-    private function buildIteratorFromSinglePageList(array $pageList): \Iterator
+    private function buildIteratorFromSinglePageList(array $pageList): Iterator
     {
-        $mode = \RecursiveIteratorIterator::SELF_FIRST;
-        $iterator = new \RecursiveIteratorIterator(new RecursivePageIterator($pageList), $mode);
+        $mode = RecursiveIteratorIterator::SELF_FIRST;
+        $iterator = new RecursiveIteratorIterator(new RecursivePageIterator($pageList), $mode);
 
         $iterator = $this->applyDepthsIterator($iterator);
         $iterator = $this->applyPublishedIterator($iterator);
@@ -254,7 +258,7 @@ class PageFinder implements \IteratorAggregate, \Countable
     /**
      * @param $iterator
      */
-    private function applyCustomFiltersIterator(\Iterator $iterator): \Iterator
+    private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->filters)) {
             $iterator = new CustomFilterIterator($iterator, $this->filters);
@@ -266,10 +270,10 @@ class PageFinder implements \IteratorAggregate, \Countable
     /**
      * @param $iterator
      */
-    private function applyOffsetAndLimitIterator(\Iterator $iterator): \Iterator
+    private function applyOffsetAndLimitIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->limit || null !== $this->offset) {
-            $aggregate = new Iterator\LimitAndOffsetIterator($iterator, $this->limit, $this->offset);
+            $aggregate = new LimitAndOffsetIterator($iterator, $this->limit, $this->offset);
             $iterator = $aggregate->getIterator();
         }
 

@@ -8,20 +8,11 @@ use ZeroGravity\Cms\Filesystem\Directory;
 
 class BeforePageCreate extends Event
 {
-    /**
-     * @var Directory
-     */
-    private $directory;
+    private Directory $directory;
 
-    /**
-     * @var array
-     */
-    private $settings;
+    private array $settings;
 
-    /**
-     * @var Page|null
-     */
-    private $parentPage;
+    private ?Page $parentPage = null;
 
     public function __construct(Directory $directory, array $settings, Page $parentPage = null)
     {

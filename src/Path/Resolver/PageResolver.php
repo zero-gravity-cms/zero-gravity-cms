@@ -8,10 +8,7 @@ use ZeroGravity\Cms\Path\Path;
 
 class PageResolver extends AbstractResolver
 {
-    /**
-     * @var ContentRepository
-     */
-    private $contentRepository;
+    private ContentRepository $contentRepository;
 
     public function __construct(ContentRepository $contentRepository)
     {
@@ -21,7 +18,7 @@ class PageResolver extends AbstractResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $pagePath = $path->getDirectory();
         $filePath = $path->getFile();

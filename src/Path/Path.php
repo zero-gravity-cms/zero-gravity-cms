@@ -8,30 +8,18 @@ class Path
 {
     public const ELEMENT_CLASS = PathElement::class;
 
-    /**
-     * @var string
-     */
-    protected $pathString;
+    protected ?string $pathString = null;
 
-    /**
-     * @var bool
-     */
-    protected $isAbsolute = false;
+    protected bool $isAbsolute = false;
 
-    /**
-     * @var bool
-     */
-    protected $isDirectory = false;
+    protected bool $isDirectory = false;
 
-    /**
-     * @var bool
-     */
-    protected $isRegex = false;
+    protected bool $isRegex = false;
 
     /**
      * @var PathElement[]
      */
-    protected $elements = [];
+    protected array $elements = [];
 
     /**
      * Checks whether the string is a regex.
@@ -112,13 +100,9 @@ class Path
         $this->isAbsolute = (0 === strpos($pathString, '/'));
         $this->isDirectory = (strlen($pathString) - 1 === strrpos($pathString, '/'));
 
-        $parts = array_filter(explode('/', $pathString), function ($part) {
-            return !empty($part) && '.' !== $part;
-        });
+        $parts = array_filter(explode('/', $pathString), fn ($part) => !empty($part) && '.' !== $part);
 
-        $this->elements = array_map(function ($part) {
-            return $this->createElement($part);
-        }, $parts);
+        $this->elements = array_map(fn ($part) => $this->createElement($part), $parts);
     }
 
     /**
@@ -308,7 +292,7 @@ class Path
      *
      * @return Path|null
      */
-    public function getFile(): ? self
+    public function getFile(): ?self
     {
         if ($this->isDirectory() || !$this->hasElements()) {
             return null;
@@ -321,7 +305,7 @@ class Path
      * Get the last PathElement of this path.
      * Returns null if Path is empty.
      */
-    public function getLastElement(): ? PathElement
+    public function getLastElement(): ?PathElement
     {
         if ($this->hasElements()) {
             return array_values(array_slice($this->elements, -1))[0];

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder\Iterator;
 
+use ArrayIterator;
+use InvalidArgumentException;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -14,10 +16,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class SortableIteratorTest extends BaseUnit
 {
-    /**
-     * @var PageFinder
-     */
-    private $finderPrototype;
+    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -40,7 +39,7 @@ class SortableIteratorTest extends BaseUnit
             $sortMethod = 'sortBy'.ucfirst($method);
             $finder->$sortMethod();
         } elseif (is_array($method)) {
-            list($method, $parameter) = $method;
+            [$method, $parameter] = $method;
             $sortMethod = 'sortBy'.ucfirst($method);
             $finder->$sortMethod($parameter);
         } elseif (is_callable($method)) {
@@ -186,9 +185,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => 'invalid date value',
         ];
 
-        $customFunction = function (Page $a, Page $b) {
-            return strcmp($a->getTitle(), $b->getTitle());
-        };
+        $customFunction = fn (Page $a, Page $b) => strcmp($a->getTitle(), $b->getTitle());
 
         return [
             SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName],
@@ -208,8 +205,8 @@ class SortableIteratorTest extends BaseUnit
      */
     public function invalidSortMethodThrowsException()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        new SortableIterator(new \ArrayIterator([]), 'invalid method');
+        $this->expectException(InvalidArgumentException::class);
+        new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
     /**

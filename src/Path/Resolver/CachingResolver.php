@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\SlugifyInterface;
 use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
@@ -11,20 +12,11 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
 {
     use MultiPathFindOneTrait;
 
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
+    protected CacheInterface $cache;
 
-    /**
-     * @var SinglePathResolver
-     */
-    protected $wrappedResolver;
+    protected SinglePathResolver $wrappedResolver;
 
-    /**
-     * @var SlugifyInterface
-     */
-    protected $slugify;
+    protected SlugifyInterface $slugify;
 
     public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
     {
@@ -38,7 +30,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      *
      * @return File[]
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function find(Path $path, Path $parentPath = null): array
     {
@@ -59,9 +51,9 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
     /**
      * Resolve the given file name and path.
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
         if ($this->cache->has($key)) {

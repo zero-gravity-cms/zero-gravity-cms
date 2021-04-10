@@ -2,7 +2,9 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
-use Symfony\Component\Finder\Comparator;
+use Iterator;
+use Symfony\Component\Finder\Comparator\NumberComparator;
+use ZeroGravity\Cms\Content\Finder\Iterator\FileCountFilterIterator;
 use ZeroGravity\Cms\Content\Page;
 
 trait PageFinderFilesTrait
@@ -28,7 +30,7 @@ trait PageFinderFilesTrait
      */
     public function numFiles($numFiles)
     {
-        $this->numFiles[] = new Comparator\NumberComparator($numFiles);
+        $this->numFiles[] = new NumberComparator($numFiles);
 
         return $this;
     }
@@ -50,7 +52,7 @@ trait PageFinderFilesTrait
      */
     public function numImages($numImages)
     {
-        $this->numImages[] = new Comparator\NumberComparator($numImages);
+        $this->numImages[] = new NumberComparator($numImages);
 
         return $this;
     }
@@ -72,44 +74,44 @@ trait PageFinderFilesTrait
      */
     public function numDocuments($numDocuments)
     {
-        $this->numDocuments[] = new Comparator\NumberComparator($numDocuments);
+        $this->numDocuments[] = new NumberComparator($numDocuments);
 
         return $this;
     }
 
-    private function applyNumberOfFilesIterator(\Iterator $iterator): \Iterator
+    private function applyNumberOfFilesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numFiles)) {
-            $iterator = new Iterator\FileCountFilterIterator(
+            $iterator = new FileCountFilterIterator(
                 $iterator,
                 $this->numFiles,
-                Iterator\FileCountFilterIterator::MODE_FILES
+                FileCountFilterIterator::MODE_FILES
             );
         }
 
         return $iterator;
     }
 
-    private function applyNumberOfImagesIterator(\Iterator $iterator): \Iterator
+    private function applyNumberOfImagesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numImages)) {
-            $iterator = new Iterator\FileCountFilterIterator(
+            $iterator = new FileCountFilterIterator(
                 $iterator,
                 $this->numImages,
-                Iterator\FileCountFilterIterator::MODE_IMAGES
+                FileCountFilterIterator::MODE_IMAGES
             );
         }
 
         return $iterator;
     }
 
-    private function applyNumberOfDocumentsIterator(\Iterator $iterator): \Iterator
+    private function applyNumberOfDocumentsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numDocuments)) {
-            $iterator = new Iterator\FileCountFilterIterator(
+            $iterator = new FileCountFilterIterator(
                 $iterator,
                 $this->numDocuments,
-                Iterator\FileCountFilterIterator::MODE_DOCUMENTS
+                FileCountFilterIterator::MODE_DOCUMENTS
             );
         }
 

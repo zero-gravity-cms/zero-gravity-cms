@@ -2,6 +2,12 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Iterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\ModularFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\ModuleFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\PublishedFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\VisibleFilterIterator;
+
 trait PageFinderFlagsTrait
 {
     private $published;
@@ -65,27 +71,27 @@ trait PageFinderFlagsTrait
         return $this;
     }
 
-    private function applyFlagsIterator(\Iterator $iterator): \Iterator
+    private function applyFlagsIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->modular) {
-            $iterator = new Iterator\ModularFilterIterator($iterator, $this->modular);
+            $iterator = new ModularFilterIterator($iterator, $this->modular);
         }
 
         if (null !== $this->module) {
-            $iterator = new Iterator\ModuleFilterIterator($iterator, $this->module);
+            $iterator = new ModuleFilterIterator($iterator, $this->module);
         }
 
         if (null !== $this->visible) {
-            $iterator = new Iterator\VisibleFilterIterator($iterator, $this->visible);
+            $iterator = new VisibleFilterIterator($iterator, $this->visible);
         }
 
         return $iterator;
     }
 
-    private function applyPublishedIterator(\Iterator $iterator): \Iterator
+    private function applyPublishedIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->published) {
-            $iterator = new Iterator\PublishedFilterIterator($iterator, $this->published);
+            $iterator = new PublishedFilterIterator($iterator, $this->published);
         }
 
         return $iterator;

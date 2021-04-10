@@ -7,23 +7,15 @@ use ZeroGravity\Cms\Content\Page;
 
 class TaxonomyTester
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var array
-     */
-    private $values;
+    private array $values;
 
-    /**
-     * @var string
-     */
-    private $mode;
+    private string $mode;
 
-    public function __construct($name, array $values, $mode)
+    public function __construct($name, array $values, ?string $mode)
     {
+        $mode ??= PageFinder::TAXONOMY_AND;
         $this->name = $name;
         $this->values = $values;
         $this->mode = $mode;

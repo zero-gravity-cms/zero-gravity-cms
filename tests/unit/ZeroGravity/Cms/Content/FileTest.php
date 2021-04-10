@@ -38,7 +38,7 @@ class FileTest extends BaseUnit
      */
     public function pathnameAlwaysStartsWithSlash()
     {
-        $file = new File('foo/bar/baz/photo.jpg', '', new \ZeroGravity\Cms\Content\Meta\Metadata([]), 'image');
+        $file = new File('foo/bar/baz/photo.jpg', '', new Metadata([]), 'image');
         $this->assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
     }
 

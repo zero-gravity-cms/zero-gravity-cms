@@ -19,5 +19,5 @@ interface MultiPathResolver extends SinglePathResolver
      *
      * @param bool $strict Accept only 1 found file, throw ResolverException if more than 1
      */
-    public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ? File;
+    public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ?File;
 }

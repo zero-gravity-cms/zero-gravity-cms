@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
+use InvalidArgumentException;
+use LogicException;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -14,10 +16,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PageFinderTest extends BaseUnit
 {
-    /**
-     * @var PageFinder
-     */
-    private $finderPrototype;
+    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -33,7 +32,7 @@ class PageFinderTest extends BaseUnit
     public function cannotIterateOverEmptyPageFinder()
     {
         $finder = new PageFinder();
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         count($finder);
     }
 
@@ -438,9 +437,7 @@ class PageFinderTest extends BaseUnit
     public function pagesCanBeFilteredByCustomCallback()
     {
         $finder = $this->getFinder()
-            ->filter(function (Page $page) {
-                return 'yaml_and_twig' === $page->getSlug();
-            })
+            ->filter(fn (Page $page) => 'yaml_and_twig' === $page->getSlug())
         ;
         $this->assertCount(1, $finder);
     }
@@ -621,7 +618,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->extra('custom', '')
         ;
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $finder->count();
     }
 
@@ -633,7 +630,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->extra('custom', 'somevalue', 'this-is-not-a-comparator')
         ;
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $finder->count();
     }
 
@@ -708,7 +705,7 @@ class PageFinderTest extends BaseUnit
         $finder->append($this->getFinder()->getIterator());
         $this->assertCount(24, $finder);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $finder->append('string');
     }
 

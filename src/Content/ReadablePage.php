@@ -8,20 +8,20 @@ use ZeroGravity\Cms\Path\Path;
 
 interface ReadablePage
 {
-    public function getContent(): ? string;
+    public function getContent(): ?string;
 
     /**
      * @return File[]
      */
     public function getFiles(): array;
 
-    public function getFile(string $filename): ? File;
+    public function getFile(string $filename): ?File;
 
     public function getPath(): Path;
 
     public function getName(): string;
 
-    public function getParent(): ? self;
+    public function getParent(): ?ReadablePage;
 
     public function getFilesystemPath(): Path;
 
@@ -90,17 +90,17 @@ interface ReadablePage
     /**
      * Get custom template to embed this page in.
      */
-    public function getLayoutTemplate(): ? string;
+    public function getLayoutTemplate(): ?string;
 
     /**
      * Get custom template for rendering the page content.
      */
-    public function getContentTemplate(): ? string;
+    public function getContentTemplate(): ?string;
 
     /**
      * Get custom controller name to use for this page.
      */
-    public function getController(): ? string;
+    public function getController(): ?string;
 
     /**
      * @param mixed|null $default
@@ -112,21 +112,21 @@ interface ReadablePage
      *
      * @return DateTimeImmutable
      */
-    public function getDate(): ? DateTimeImmutable;
+    public function getDate(): ?DateTimeImmutable;
 
     /**
      * Get optional publishing date of this page.
      *
      * @return DateTimeImmutable
      */
-    public function getPublishDate(): ? DateTimeImmutable;
+    public function getPublishDate(): ?DateTimeImmutable;
 
     /**
      * Get optional un-publishing date of this page.
      *
      * @return DateTimeImmutable
      */
-    public function getUnpublishDate(): ? DateTimeImmutable;
+    public function getUnpublishDate(): ?DateTimeImmutable;
 
     public function isPublished(): bool;
 }

@@ -6,10 +6,7 @@ use ZeroGravity\Cms\Content\Meta\PageSettings;
 
 trait BasicWritablePageTrait
 {
-    /**
-     * @var string
-     */
-    private $contentRaw;
+    private ?string $contentRaw = null;
 
     /**
      * Set page name.
@@ -29,7 +26,7 @@ trait BasicWritablePageTrait
     /**
      * Get raw (un-processed) markdown content.
      */
-    public function getContentRaw(): ? string
+    public function getContentRaw(): ?string
     {
         return $this->contentRaw;
     }

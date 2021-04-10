@@ -4,20 +4,11 @@ namespace ZeroGravity\Cms\Path;
 
 class PathElement
 {
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
-    /**
-     * @var bool
-     */
-    protected $isRegex = false;
+    protected bool $isRegex = false;
 
-    /**
-     * @var bool
-     */
-    protected $isGlob = false;
+    protected bool $isGlob = false;
 
     /**
      * Create a new PathElement.

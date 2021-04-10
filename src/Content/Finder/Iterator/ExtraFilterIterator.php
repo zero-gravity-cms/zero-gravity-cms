@@ -2,7 +2,11 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use DateTime;
+use Exception;
+use FilterIterator;
 use InvalidArgumentException;
+use Iterator;
 use Symfony\Component\Finder\Comparator\Comparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
@@ -14,26 +18,20 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class ExtraFilterIterator extends \FilterIterator
+class ExtraFilterIterator extends FilterIterator
 {
     const COMPARATOR_STRING = 'string';
     const COMPARATOR_DATE = 'date';
     const COMPARATOR_NUMERIC = 'number';
 
-    /**
-     * @var array
-     */
-    private $extras;
+    private array $extras;
+
+    private array $notExtras;
 
     /**
-     * @var array
+     * @param Iterator $iterator The Iterator to filter
      */
-    private $notExtras;
-
-    /**
-     * @param \Iterator $iterator The Iterator to filter
-     */
-    public function __construct(\Iterator $iterator, array $extras, array $notExtras)
+    public function __construct(Iterator $iterator, array $extras, array $notExtras)
     {
         $this->extras = $extras;
         $this->notExtras = $notExtras;
@@ -91,8 +89,8 @@ class ExtraFilterIterator extends \FilterIterator
                 }
 
                 try {
-                    return (new \DateTime($value))->format('U');
-                } catch (\Exception $e) {
+                    return (new DateTime($value))->format('U');
+                } catch (Exception $e) {
                     return null;
                 }
         }

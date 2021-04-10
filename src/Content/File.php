@@ -9,25 +9,13 @@ use ZeroGravity\Cms\Content\Meta\Metadata;
  */
 class File
 {
-    /**
-     * @var string
-     */
-    private $pathName;
+    private string $pathName;
 
-    /**
-     * @var Metadata
-     */
-    private $metadata;
+    private Metadata $metadata;
 
-    /**
-     * @var string
-     */
-    private $type;
+    private string $type;
 
-    /**
-     * @var string
-     */
-    private $baseDir;
+    private string $baseDir;
 
     public function __construct(string $pathName, string $baseDir, Metadata $metadata, string $type)
     {

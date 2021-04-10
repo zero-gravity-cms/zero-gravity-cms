@@ -2,6 +2,9 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use FilterIterator;
+use InvalidArgumentException;
+use Iterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use ZeroGravity\Cms\Content\Page;
 
@@ -10,25 +13,22 @@ use ZeroGravity\Cms\Content\Page;
  *
  * @method Page current()
  */
-class FileCountFilterIterator extends \FilterIterator
+class FileCountFilterIterator extends FilterIterator
 {
     const MODE_FILES = 'files';
     const MODE_IMAGES = 'images';
     const MODE_DOCUMENTS = 'documents';
 
-    private $comparators = [];
+    private array $comparators = [];
+
+    private string $mode;
 
     /**
-     * @var string
-     */
-    private $mode;
-
-    /**
-     * @param \Iterator          $iterator    The Iterator to filter
+     * @param Iterator           $iterator    The Iterator to filter
      * @param NumberComparator[] $comparators An array of DateComparator instances
      * @param string             $mode
      */
-    public function __construct(\Iterator $iterator, array $comparators, $mode = self::MODE_FILES)
+    public function __construct(Iterator $iterator, array $comparators, $mode = self::MODE_FILES)
     {
         $this->comparators = $comparators;
         $this->mode = $mode;
@@ -54,7 +54,7 @@ class FileCountFilterIterator extends \FilterIterator
                 $count = count($this->current()->getDocuments());
                 break;
             default:
-                throw new \InvalidArgumentException('Unknown file count mode: '.$this->mode);
+                throw new InvalidArgumentException('Unknown file count mode: '.$this->mode);
         }
 
         foreach ($this->comparators as $compare) {

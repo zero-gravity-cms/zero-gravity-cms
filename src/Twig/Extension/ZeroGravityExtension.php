@@ -18,20 +18,11 @@ use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 class ZeroGravityExtension extends AbstractExtension
 {
-    /**
-     * @var ContentRepository
-     */
-    private $contentRepository;
+    private ContentRepository $contentRepository;
 
-    /**
-     * @var RouterPageSelector
-     */
-    private $pageSelector;
+    private RouterPageSelector $pageSelector;
 
-    /**
-     * @var FilterRegistry
-     */
-    private $filterRegistry;
+    private FilterRegistry $filterRegistry;
 
     public function __construct(ContentRepository $contentRepository, RouterPageSelector $pageSelector, FilterRegistry $filterRegistry)
     {
@@ -88,7 +79,7 @@ class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
-    public function getPage(string $path): ? Page
+    public function getPage(string $path): ?Page
     {
         if (0 === strpos($path, './')) {
             $currentPage = $this->pageSelector->getCurrentPage();
@@ -101,7 +92,7 @@ class ZeroGravityExtension extends AbstractExtension
         return $this->contentRepository->getPage($path);
     }
 
-    public function getCurrentPage(): ? Page
+    public function getCurrentPage(): ?Page
     {
         return $this->pageSelector->getCurrentPage();
     }

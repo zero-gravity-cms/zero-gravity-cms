@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Filesystem;
 
+use LogicException;
 use Mni\FrontYAML\Document;
 use Mni\FrontYAML\Parser as FrontYAMLParser;
 use Psr\Log\LoggerInterface;
@@ -50,40 +51,25 @@ class Directory
      */
     const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
 
-    /**
-     * @var SplFileInfo
-     */
-    private $directoryInfo;
+    private SplFileInfo $directoryInfo;
 
-    /**
-     * @var FileFactory
-     */
-    private $fileFactory;
+    private FileFactory $fileFactory;
 
-    /**
-     * @var string|null
-     */
-    private $parentPath;
+    private ?string $parentPath = null;
 
     /**
      * @var File[]
      */
-    private $files;
+    private ?array $files = null;
 
     /**
      * @var Directory[]
      */
-    private $directories;
+    private ?array $directories = null;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
         SplFileInfo $directoryInfo,
@@ -190,9 +176,7 @@ class Directory
      */
     public function getFilesByType(string $type)
     {
-        return array_filter($this->getFiles(), function (File $file) use ($type) {
-            return $file->getType() === $type;
-        });
+        return array_filter($this->getFiles(), fn (File $file) => $file->getType() === $type);
     }
 
     public function hasSortingPrefix(): bool
@@ -250,7 +234,7 @@ class Directory
         ;
     }
 
-    public function getYamlFile(): ? File
+    public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
 
@@ -262,7 +246,7 @@ class Directory
         return null !== $this->getYamlFile();
     }
 
-    public function getMarkdownFile(): ? File
+    public function getMarkdownFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
 
@@ -289,7 +273,7 @@ class Directory
         return $this->getSlug();
     }
 
-    public function getDefaultBasenameTwigFile(): ? File
+    public function getDefaultBasenameTwigFile(): ?File
     {
         foreach ($this->getTwigFiles() as $twigFile) {
             if ($twigFile->getBasename('.html.'.$twigFile->getExtension()) === $this->getDefaultBasename()) {
@@ -505,7 +489,7 @@ $newYaml
 {$document->getContent()}
 FRONTMATTER;
         } else {
-            throw new \LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
+            throw new LogicException('Cannot update YAML when there is neither a YAML nor a markdown file');
         }
 
         $this->writeFile($file->getFilesystemPathname(), $newYaml);

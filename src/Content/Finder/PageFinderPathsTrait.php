@@ -2,6 +2,10 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Iterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\FilesystemPathFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\PathFilterIterator;
+
 trait PageFinderPathsTrait
 {
     private $paths = [];
@@ -97,19 +101,19 @@ trait PageFinderPathsTrait
         return $this;
     }
 
-    private function applyPathsIterator(\Iterator $iterator): \Iterator
+    private function applyPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->paths) || !empty($this->notPaths)) {
-            $iterator = new Iterator\PathFilterIterator($iterator, $this->paths, $this->notPaths);
+            $iterator = new PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
         return $iterator;
     }
 
-    private function applyFilesystemPathsIterator(\Iterator $iterator): \Iterator
+    private function applyFilesystemPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->filesystemPaths) || !empty($this->notFilesystemPaths)) {
-            $iterator = new Iterator\FilesystemPathFilterIterator(
+            $iterator = new FilesystemPathFilterIterator(
                 $iterator,
                 $this->filesystemPaths,
                 $this->notFilesystemPaths

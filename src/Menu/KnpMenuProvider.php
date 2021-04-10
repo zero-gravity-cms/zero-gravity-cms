@@ -2,6 +2,7 @@
 
 namespace ZeroGravity\Cms\Menu;
 
+use InvalidArgumentException;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Provider\MenuProviderInterface;
@@ -18,20 +19,11 @@ use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 
 class KnpMenuProvider implements MenuProviderInterface
 {
-    /**
-     * @var ContentRepository
-     */
-    protected $contentRepository;
+    protected ContentRepository $contentRepository;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var FactoryInterface
-     */
-    protected $factory;
+    protected FactoryInterface $factory;
 
     /**
      * KnpMenuBuilder constructor.
@@ -53,7 +45,7 @@ class KnpMenuProvider implements MenuProviderInterface
      *
      * @return ItemInterface
      *
-     * @throws \InvalidArgumentException if the menu does not exists
+     * @throws InvalidArgumentException if the menu does not exists
      */
     public function get($name, array $options = [])
     {
@@ -116,11 +108,11 @@ class KnpMenuProvider implements MenuProviderInterface
             $pageItemSettings
         );
         $itemOptions['extras'] = array_merge(
-            isset($defaultOptions['extras']) ? $defaultOptions['extras'] : [],
+            $defaultOptions['extras'] ?? [],
             [
                 'page_slug' => $page->getSlug(),
             ],
-            isset($pageItemSettings['extras']) ? $pageItemSettings['extras'] : []
+            $pageItemSettings['extras'] ?? []
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 

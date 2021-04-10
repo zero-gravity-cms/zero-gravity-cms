@@ -11,7 +11,7 @@ class PageFiles
     /**
      * @var File[]
      */
-    private $files;
+    private array $files;
 
     public function __construct(array $files, array $fileAliases = [])
     {
@@ -55,9 +55,7 @@ class PageFiles
      */
     private function getFilesByType(string $type): array
     {
-        return array_filter($this->files, function (File $file) use ($type) {
-            return $file->getType() === $type;
-        });
+        return array_filter($this->files, fn (File $file) => $file->getType() === $type);
     }
 
     /**
@@ -83,7 +81,7 @@ class PageFiles
     /**
      * Get path to single markdown file if available.
      */
-    public function getMarkdownFile(): ? File
+    public function getMarkdownFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
         if (count($files) > 0) {
@@ -96,7 +94,7 @@ class PageFiles
     /**
      * Get path to single YAML file if available.
      */
-    public function getYamlFile(): ? File
+    public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
         if (count($files) > 0) {
@@ -109,7 +107,7 @@ class PageFiles
     /**
      * Get path to single Twig file if available.
      */
-    public function getTwigFile(): ? File
+    public function getTwigFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_TWIG);
         if (count($files) > 0) {

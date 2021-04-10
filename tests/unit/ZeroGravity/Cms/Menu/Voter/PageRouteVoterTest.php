@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Menu\Voter;
 
+use InvalidArgumentException;
 use Knp\Menu\ItemInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -89,7 +90,7 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $voter->matchItem($item);
     }
 
