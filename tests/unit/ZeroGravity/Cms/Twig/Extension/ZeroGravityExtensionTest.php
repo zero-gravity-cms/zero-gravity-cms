@@ -38,18 +38,14 @@ class ZeroGravityExtensionTest extends BaseUnit
         $routePageSelector = new RouterPageSelector($requestStack);
 
         $filterRegistry = new FilterRegistry();
-        $filterRegistry->addFilter('filter-custom-children', function (PageFinder $pageFinder, array $filterOptions) {
-            return $pageFinder
-                ->contentType('custom-child')
-            ;
-        });
-        $filterRegistry->addFilter('sort-path-desc', function (PageFinder $pageFinder, array $filterOptions) {
-            return $pageFinder
-                ->sort(function (Page $a, Page $b) {
-                    return $b->getPath() <=> $a->getPath();
-                })
-            ;
-        });
+        $filterRegistry->addFilter(
+            'filter-custom-children',
+            fn (PageFinder $pageFinder, array $filterOptions) => $pageFinder->contentType('custom-child')
+        );
+        $filterRegistry->addFilter(
+            'sort-path-desc',
+            fn (PageFinder $pageFinder, array $filterOptions) => $pageFinder->sort(fn (Page $a, Page $b) => $b->getPath() <=> $a->getPath())
+        );
 
         return [
             new ZeroGravityExtension($repository, $routePageSelector, $filterRegistry),

@@ -6,10 +6,7 @@ use ZeroGravity\Cms\Content\Meta\PageSettings;
 
 trait BasicWritablePageTrait
 {
-    /**
-     * @var string
-     */
-    private $contentRaw;
+    private ?string $contentRaw = null;
 
     /**
      * Set page name.

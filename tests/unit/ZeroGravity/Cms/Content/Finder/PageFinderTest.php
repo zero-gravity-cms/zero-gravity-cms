@@ -16,10 +16,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PageFinderTest extends BaseUnit
 {
-    /**
-     * @var PageFinder
-     */
-    private $finderPrototype;
+    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -440,9 +437,7 @@ class PageFinderTest extends BaseUnit
     public function pagesCanBeFilteredByCustomCallback()
     {
         $finder = $this->getFinder()
-            ->filter(function (Page $page) {
-                return 'yaml_and_twig' === $page->getSlug();
-            })
+            ->filter(fn (Page $page) => 'yaml_and_twig' === $page->getSlug())
         ;
         $this->assertCount(1, $finder);
     }

@@ -34,30 +34,24 @@ class PageFinder implements IteratorAggregate, Countable
     const TAXONOMY_AND = 'AND';
     const TAXONOMY_OR = 'OR';
 
-    /**
-     * @var int|null
-     */
-    private $limit;
+    private ?int $limit = null;
 
-    /**
-     * @var int|null
-     */
-    private $offset;
+    private ?int $offset = null;
 
     /**
      * @var Page[][]
      */
-    private $pageLists = [];
+    private array $pageLists = [];
 
     /**
      * @var callable[]
      */
-    private $filters = [];
+    private array $filters = [];
 
     /**
      * @var Iterator[]
      */
-    private $iterators = [];
+    private array $iterators = [];
 
     /**
      * Creates a new PageFinder for fluent interfaces.

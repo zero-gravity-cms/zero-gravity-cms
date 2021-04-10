@@ -21,7 +21,7 @@ interface ReadablePage
 
     public function getName(): string;
 
-    public function getParent(): ? self;
+    public function getParent(): ? ReadablePage;
 
     public function getFilesystemPath(): Path;
 

@@ -16,10 +16,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class SortableIteratorTest extends BaseUnit
 {
-    /**
-     * @var PageFinder
-     */
-    private $finderPrototype;
+    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -188,9 +185,7 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => 'invalid date value',
         ];
 
-        $customFunction = function (Page $a, Page $b) {
-            return strcmp($a->getTitle(), $b->getTitle());
-        };
+        $customFunction = fn (Page $a, Page $b) => strcmp($a->getTitle(), $b->getTitle());
 
         return [
             SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName],

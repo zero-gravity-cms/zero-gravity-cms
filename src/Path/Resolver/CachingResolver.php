@@ -12,20 +12,11 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
 {
     use MultiPathFindOneTrait;
 
-    /**
-     * @var CacheInterface
-     */
-    protected $cache;
+    protected CacheInterface $cache;
 
-    /**
-     * @var SinglePathResolver
-     */
-    protected $wrappedResolver;
+    protected SinglePathResolver $wrappedResolver;
 
-    /**
-     * @var SlugifyInterface
-     */
-    protected $slugify;
+    protected SlugifyInterface $slugify;
 
     public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
     {

@@ -18,20 +18,11 @@ use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 class ZeroGravityExtension extends AbstractExtension
 {
-    /**
-     * @var ContentRepository
-     */
-    private $contentRepository;
+    private ContentRepository $contentRepository;
 
-    /**
-     * @var RouterPageSelector
-     */
-    private $pageSelector;
+    private RouterPageSelector $pageSelector;
 
-    /**
-     * @var FilterRegistry
-     */
-    private $filterRegistry;
+    private FilterRegistry $filterRegistry;
 
     public function __construct(ContentRepository $contentRepository, RouterPageSelector $pageSelector, FilterRegistry $filterRegistry)
     {

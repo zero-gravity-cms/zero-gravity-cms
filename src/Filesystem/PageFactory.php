@@ -11,20 +11,14 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
 class PageFactory
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var Directory[]
      */
-    private $directories = [];
+    private array $directories = [];
 
     public function __construct(
         LoggerInterface $logger,

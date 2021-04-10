@@ -13,10 +13,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class ModularFilterIterator extends FilterIterator
 {
-    /**
-     * @var bool
-     */
-    private $modular;
+    private bool $modular;
 
     /**
      * @param Iterator $iterator The Iterator to filter

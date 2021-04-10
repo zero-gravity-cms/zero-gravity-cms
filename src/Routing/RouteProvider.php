@@ -12,15 +12,9 @@ use ZeroGravity\Cms\Content\Page;
 
 class RouteProvider implements RouteProviderInterface
 {
-    /**
-     * @var ContentRepository
-     */
-    private $repository;
+    private ContentRepository $repository;
 
-    /**
-     * @var string
-     */
-    private $defaultController;
+    private string $defaultController;
 
     public function __construct(ContentRepository $repository, string $defaultController)
     {

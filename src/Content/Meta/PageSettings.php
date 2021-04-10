@@ -10,15 +10,9 @@ use ZeroGravity\Cms\Content\Page;
 
 class PageSettings
 {
-    /**
-     * @var array
-     */
-    private $values;
+    private ?array $values = null;
 
-    /**
-     * @var string
-     */
-    private $pageName;
+    private string $pageName;
 
     public function __construct(array $values, string $pageName)
     {

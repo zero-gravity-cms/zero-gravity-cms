@@ -17,12 +17,12 @@ class TaxonomiesFilterIterator extends FilterIterator
     /**
      * @var TaxonomyTester[]
      */
-    private $taxonomies;
+    private array $taxonomies;
 
     /**
      * @var TaxonomyTester[]
      */
-    private $notTaxonomies;
+    private array $notTaxonomies;
 
     /**
      * @param Iterator         $iterator      The Iterator to filter

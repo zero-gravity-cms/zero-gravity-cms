@@ -19,12 +19,9 @@ class FileCountFilterIterator extends FilterIterator
     const MODE_IMAGES = 'images';
     const MODE_DOCUMENTS = 'documents';
 
-    private $comparators = [];
+    private array $comparators = [];
 
-    /**
-     * @var string
-     */
-    private $mode;
+    private string $mode;
 
     /**
      * @param Iterator           $iterator    The Iterator to filter

@@ -11,20 +11,11 @@ use Traversable;
  */
 class LimitAndOffsetIterator implements IteratorAggregate
 {
-    /**
-     * @var Traversable
-     */
-    private $iterator;
+    private Traversable $iterator;
 
-    /**
-     * @var int|null
-     */
-    private $limit;
+    private ?int $limit = null;
 
-    /**
-     * @var int|null
-     */
-    private $offset;
+    private int $offset;
 
     /**
      * @param Traversable $iterator The Iterator to filter

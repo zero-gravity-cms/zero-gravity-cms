@@ -7,14 +7,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class MenuEvent extends Event
 {
-    /**
-     * @var string
-     */
-    protected $menuName;
-    /**
-     * @var ItemInterface
-     */
-    protected $rootItem;
+    protected string $menuName;
+    protected ItemInterface $rootItem;
 
     public function __construct(string $menuName, ItemInterface $rootItem)
     {

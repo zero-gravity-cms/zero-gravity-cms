@@ -23,7 +23,7 @@ class SortableIterator implements IteratorAggregate
     const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
     const SORT_BY_EXTRA_VALUE = 'extra';
 
-    private $iterator;
+    private Traversable $iterator;
     private $sort;
 
     /**
@@ -124,8 +124,6 @@ class SortableIterator implements IteratorAggregate
      */
     private function sortByGetter($getter): void
     {
-        $this->sort = function (Page $pageA, Page $pageB) use ($getter) {
-            return strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
-        };
+        $this->sort = fn (Page $pageA, Page $pageB) => strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());
     }
 }

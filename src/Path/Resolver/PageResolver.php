@@ -8,10 +8,7 @@ use ZeroGravity\Cms\Path\Path;
 
 class PageResolver extends AbstractResolver
 {
-    /**
-     * @var ContentRepository
-     */
-    private $contentRepository;
+    private ContentRepository $contentRepository;
 
     public function __construct(ContentRepository $contentRepository)
     {

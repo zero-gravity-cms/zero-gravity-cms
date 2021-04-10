@@ -9,15 +9,12 @@ use ZeroGravity\Cms\Content\ReadablePage;
 /**
  * This trait contains all settings related methods (mostly getters) of the Page class.
  * This helps separating native properties from validated settings/options.
- *
- * @method ReadablePage getParent()
  */
 trait PageSettingsTrait
 {
-    /**
-     * @var PageSettings
-     */
-    protected $settings;
+    protected PageSettings $settings;
+
+    abstract public function getParent(): ?ReadablePage;
 
     private function initSettings(array $settings, string $name)
     {

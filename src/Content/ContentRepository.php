@@ -14,27 +14,18 @@ class ContentRepository
     /**
      * @var ReadablePage[]
      */
-    protected $pages;
+    protected ?array $pages = null;
 
     /**
      * @var ReadablePage[]
      */
-    protected $pagesByPath;
+    protected ?array $pagesByPath = null;
 
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
+    private CacheInterface $cache;
 
-    /**
-     * @var bool
-     */
-    private $skipCache;
+    private bool $skipCache;
 
-    /**
-     * @var StructureMapper
-     */
-    private $mapper;
+    private StructureMapper $mapper;
 
     /**
      * This is the main repository handling page loading and caching.

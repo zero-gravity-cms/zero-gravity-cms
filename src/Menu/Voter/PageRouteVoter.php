@@ -11,10 +11,7 @@ use ZeroGravity\Cms\Content\Page;
 
 class PageRouteVoter implements VoterInterface
 {
-    /**
-     * @var Request
-     */
-    private $request;
+    private ?Request $request = null;
 
     public function __construct(RequestStack $requestStack)
     {

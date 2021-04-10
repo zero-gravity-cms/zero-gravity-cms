@@ -19,20 +19,11 @@ use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 
 class KnpMenuProvider implements MenuProviderInterface
 {
-    /**
-     * @var ContentRepository
-     */
-    protected $contentRepository;
+    protected ContentRepository $contentRepository;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    protected EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var FactoryInterface
-     */
-    protected $factory;
+    protected FactoryInterface $factory;
 
     /**
      * KnpMenuBuilder constructor.

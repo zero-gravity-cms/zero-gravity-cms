@@ -13,15 +13,9 @@ use ZeroGravity\Cms\Content\Page;
  */
 class SettingFilterIterator extends FilterIterator
 {
-    /**
-     * @var array
-     */
-    private $settings;
+    private array $settings;
 
-    /**
-     * @var array
-     */
-    private $notSettings;
+    private array $notSettings;
 
     /**
      * @param Iterator $iterator The Iterator to filter

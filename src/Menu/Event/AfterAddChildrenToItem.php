@@ -6,10 +6,7 @@ use Knp\Menu\ItemInterface;
 
 class AfterAddChildrenToItem extends MenuEvent
 {
-    /**
-     * @var ItemInterface
-     */
-    private $item;
+    private ItemInterface $item;
 
     public function __construct(string $menuName, ItemInterface $item)
     {

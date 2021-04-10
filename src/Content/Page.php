@@ -16,35 +16,20 @@ class Page implements ReadablePage
     const TAXONOMY_CATEGORY = 'category';
     const TAXONOMY_AUTHOR = 'author';
 
-    /**
-     * @var string
-     */
-    protected $name;
+    protected string $name;
 
-    /**
-     * @var Page
-     */
-    private $parent;
+    private ?ReadablePage $parent = null;
 
-    /**
-     * @var string
-     */
-    private $content;
+    private ?string $content = null;
 
     /**
      * @var Page[]
      */
-    private $children = [];
+    private array $children = [];
 
-    /**
-     * @var Path
-     */
-    private $path;
+    private ?Path $path = null;
 
-    /**
-     * @var Path
-     */
-    private $filesystemPath;
+    private ?Path $filesystemPath = null;
 
     /**
      * Create a new page object.

@@ -6,15 +6,9 @@ use Knp\Menu\ItemInterface;
 
 class BeforeAddItem extends MenuEvent
 {
-    /**
-     * @var ItemInterface
-     */
-    private $parentItem;
+    private ItemInterface $parentItem;
 
-    /**
-     * @var ItemInterface
-     */
-    private $itemToBeAdded;
+    private ItemInterface $itemToBeAdded;
 
     public function __construct(string $menuName, ItemInterface $parentItem, ItemInterface $addedItem)
     {

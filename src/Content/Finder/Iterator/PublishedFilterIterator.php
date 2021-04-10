@@ -13,10 +13,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PublishedFilterIterator extends FilterIterator
 {
-    /**
-     * @var bool
-     */
-    private $published;
+    private bool $published;
 
     /**
      * @param Iterator $iterator The Iterator to filter

@@ -11,7 +11,7 @@ class PageFiles
     /**
      * @var File[]
      */
-    private $files;
+    private array $files;
 
     public function __construct(array $files, array $fileAliases = [])
     {
@@ -55,9 +55,7 @@ class PageFiles
      */
     private function getFilesByType(string $type): array
     {
-        return array_filter($this->files, function (File $file) use ($type) {
-            return $file->getType() === $type;
-        });
+        return array_filter($this->files, fn (File $file) => $file->getType() === $type);
     }
 
     /**

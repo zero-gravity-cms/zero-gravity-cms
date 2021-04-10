@@ -8,10 +8,7 @@ use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
 class MediaRepository
 {
-    /**
-     * @var SinglePathResolver
-     */
-    private $pathResolver;
+    private SinglePathResolver $pathResolver;
 
     public function __construct(SinglePathResolver $pathResolver)
     {

@@ -124,9 +124,7 @@ class FilterRegistryTest extends BaseUnit
      */
     public function pageFinderFiltersObjectCanBeRegisteredAndApplied()
     {
-        $filter = function (PageFinder $finder) {
-            return $finder;
-        };
+        $filter = fn (PageFinder $finder) => $finder;
 
         $filters = $this->getMockBuilder(PageFinderFilters::class)
             ->setMethods(['getFilters'])

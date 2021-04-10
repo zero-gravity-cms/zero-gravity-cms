@@ -6,7 +6,7 @@ use ZeroGravity\Cms\Content\Meta\PageFiles;
 
 trait PageFilesTrait
 {
-    private ?PageFiles $files;
+    private ?PageFiles $files = null;
 
     /**
      * @param File[] $files

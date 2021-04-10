@@ -60,9 +60,7 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
      */
     protected static function moreThanOneFileOfType(SplFileInfo $directory, array $files, string $type)
     {
-        $files = array_map(function (File $file) {
-            return $file->getFilename();
-        }, $files);
+        $files = array_map(fn (File $file) => $file->getFilename(), $files);
 
         return new static(sprintf('There are %d %s files in directory %s: %s. Only 1 file per directory is supported',
             count($files),

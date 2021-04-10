@@ -24,15 +24,9 @@ class ExtraFilterIterator extends FilterIterator
     const COMPARATOR_DATE = 'date';
     const COMPARATOR_NUMERIC = 'number';
 
-    /**
-     * @var array
-     */
-    private $extras;
+    private array $extras;
 
-    /**
-     * @var array
-     */
-    private $notExtras;
+    private array $notExtras;
 
     /**
      * @param Iterator $iterator The Iterator to filter

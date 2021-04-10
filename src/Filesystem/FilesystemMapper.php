@@ -21,40 +21,19 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
 class FilesystemMapper implements StructureMapper
 {
-    /**
-     * @var FileFactory
-     */
-    private $fileFactory;
+    private FileFactory $fileFactory;
 
-    /**
-     * @var string
-     */
-    private $path;
+    private string $path;
 
-    /**
-     * @var bool
-     */
-    private $convertMarkdown;
+    private bool $convertMarkdown;
 
-    /**
-     * @var array
-     */
-    private $defaultPageSettings;
+    private array $defaultPageSettings;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
+    private PageFactory $pageFactory;
 
     /**
      * FilesystemMapper constructor.

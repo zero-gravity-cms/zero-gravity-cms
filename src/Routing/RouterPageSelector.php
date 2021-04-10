@@ -11,10 +11,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class RouterPageSelector
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    private RequestStack $requestStack;
 
     /**
      * RouterPageSelector constructor.

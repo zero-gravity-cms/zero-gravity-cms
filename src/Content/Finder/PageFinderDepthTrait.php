@@ -13,7 +13,7 @@ trait PageFinderDepthTrait
     /**
      * @var Comparator\NumberComparator[]
      */
-    private $depths = [];
+    private array $depths = [];
 
     /**
      * Adds tests for the directory depth.
