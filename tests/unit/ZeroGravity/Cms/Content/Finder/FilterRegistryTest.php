@@ -29,16 +29,18 @@ class FilterRegistryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function allowsPageFinderFilterToBeAdded()
     {
         $registry = new FilterRegistry();
-        $filter = $this->getMockBuilder(PageFinderFilter::class)->getMock();
+        $filter = $this->createMock(PageFinderFilter::class);
         $registry->addFilter('somename', $filter);
     }
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function allowsCallableToBeAdded()
     {

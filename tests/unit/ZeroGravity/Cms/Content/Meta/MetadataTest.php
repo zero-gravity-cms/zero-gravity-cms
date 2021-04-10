@@ -67,8 +67,8 @@ class MetadataTest extends BaseUnit
         $meta['c'] = 'cc';
         $this->assertSame('cc', $meta['c']);
         $this->assertNull($meta['d']);
-        $this->assertTrue(isset($meta['a']));
+        $this->assertArrayHasKey('a', $meta);
         unset($meta['a']);
-        $this->assertFalse(isset($meta['a']));
+        $this->assertArrayNotHasKey('a', $meta);
     }
 }

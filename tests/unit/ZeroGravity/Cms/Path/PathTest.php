@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
 
@@ -48,140 +49,138 @@ class PathTest extends BaseUnit
         $this->assertSame($pathString, $path->toString(true));
     }
 
-    public function providePathData()
+    public function providePathData(): Iterator
     {
-        return [
+        yield [
+            '/foo/bar.txt',
             [
-                '/foo/bar.txt',
-                [
-                    'elements' => 2,
-                    'absolute' => true,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 2,
+                'absolute' => true,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'bar.txt',
             [
-                'bar.txt',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'foo/',
             [
-                'foo/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'foo*/',
             [
-                'foo*/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            '/foo*/',
             [
-                '/foo*/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '/foo**/',
             [
-                '/foo**/',
-                [
-                    'elements' => 1,
-                    'absolute' => true,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 1,
+                'absolute' => true,
+                'directory' => true,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            '/valid\/regex.*\/contains_slashes/',
             [
-                '/valid\/regex.*\/contains_slashes/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '#valid/regex.*/contains_slashes#',
             [
-                '#valid/regex.*/contains_slashes#',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => true,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => true,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '#invalid/regex.*/path',
             [
-                '#invalid/regex.*/path',
-                [
-                    'elements' => 3,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => true,
-                ],
+                'elements' => 3,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => true,
             ],
+        ];
+        yield [
+            'path//containing/./empty/elements/',
             [
-                'path//containing/./empty/elements/',
-                [
-                    'elements' => 4,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                    'cannotRebuild' => true,
-                ],
+                'elements' => 4,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
+                'cannotRebuild' => true,
             ],
+        ];
+        yield [
+            'path/../with/parent/../elements/',
             [
-                'path/../with/parent/../elements/',
-                [
-                    'elements' => 6,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 6,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'path/with/#inline#/regex',
             [
-                'path/with/#inline#/regex',
-                [
-                    'elements' => 4,
-                    'absolute' => false,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 4,
+                'absolute' => false,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '././',
             [
-                '././',
-                [
-                    'elements' => 0,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                    'cannotRebuild' => true,
-                ],
+                'elements' => 0,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
+                'cannotRebuild' => true,
             ],
         ];
     }
@@ -249,56 +248,54 @@ class PathTest extends BaseUnit
         $this->assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
     }
 
-    public function provideAppendedPathData()
+    public function provideAppendedPathData(): Iterator
     {
-        return [
+        yield [
+            '/foo/bar',
+            'baz.txt',
+            '/foo/bar/baz.txt',
             [
-                '/foo/bar',
-                'baz.txt',
-                '/foo/bar/baz.txt',
-                [
-                    'elements' => 3,
-                    'absolute' => true,
-                    'directory' => false,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 3,
+                'absolute' => true,
+                'directory' => false,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            'bar.txt',
+            'baz/',
+            'bar.txt/baz/',
             [
-                'bar.txt',
-                'baz/',
-                'bar.txt/baz/',
-                [
-                    'elements' => 2,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 2,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '',
+            'baz/',
+            'baz/',
             [
-                '',
-                'baz/',
-                'baz/',
-                [
-                    'elements' => 1,
-                    'absolute' => false,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => false,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
+        ];
+        yield [
+            '/',
+            'baz/',
+            '/baz/',
             [
-                '/',
-                'baz/',
-                '/baz/',
-                [
-                    'elements' => 1,
-                    'absolute' => true,
-                    'directory' => true,
-                    'regex' => false,
-                    'glob' => false,
-                ],
+                'elements' => 1,
+                'absolute' => true,
+                'directory' => true,
+                'regex' => false,
+                'glob' => false,
             ],
         ];
     }
@@ -319,29 +316,27 @@ class PathTest extends BaseUnit
         $this->assertNotSame($path, $directory);
     }
 
-    public function provideDirectoryPathData()
+    public function provideDirectoryPathData(): Iterator
     {
-        return [
-            [
-                '/foo/bar',
-                '/foo/',
-            ],
-            [
-                '/foo/bar/',
-                '/foo/bar/',
-            ],
-            [
-                '/foo',
-                '/',
-            ],
-            [
-                'foo',
-                '/',
-            ],
-            [
-                '',
-                '/',
-            ],
+        yield [
+            '/foo/bar',
+            '/foo/',
+        ];
+        yield [
+            '/foo/bar/',
+            '/foo/bar/',
+        ];
+        yield [
+            '/foo',
+            '/',
+        ];
+        yield [
+            'foo',
+            '/',
+        ];
+        yield [
+            '',
+            '/',
         ];
     }
 
@@ -365,33 +360,31 @@ class PathTest extends BaseUnit
         $this->assertNotSame($path, $file);
     }
 
-    public function provideFilePathData()
+    public function provideFilePathData(): Iterator
     {
-        return [
-            [
-                '/foo/baz/bar',
-                'bar',
-            ],
-            [
-                '/foo/bar/',
-                null,
-            ],
-            [
-                '/foo',
-                'foo',
-            ],
-            [
-                'foo',
-                'foo',
-            ],
-            [
-                '',
-                null,
-            ],
-            [
-                'foo/bar.jpg',
-                'bar.jpg',
-            ],
+        yield [
+            '/foo/baz/bar',
+            'bar',
+        ];
+        yield [
+            '/foo/bar/',
+            null,
+        ];
+        yield [
+            '/foo',
+            'foo',
+        ];
+        yield [
+            'foo',
+            'foo',
+        ];
+        yield [
+            '',
+            null,
+        ];
+        yield [
+            'foo/bar.jpg',
+            'bar.jpg',
         ];
     }
 

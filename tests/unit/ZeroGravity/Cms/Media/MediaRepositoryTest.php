@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Media;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Media\MediaRepository;
@@ -24,12 +25,10 @@ class MediaRepositoryTest extends BaseUnit
         $this->assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
     }
 
-    public function provideValidMediaPaths(): array
+    public function provideValidMediaPaths(): Iterator
     {
-        return [
-            ['01.yaml_only/file1.png'],
-            ['01.yaml_only/file2.png'],
-        ];
+        yield ['01.yaml_only/file1.png'];
+        yield ['01.yaml_only/file2.png'];
     }
 
     /**
@@ -45,11 +44,9 @@ class MediaRepositoryTest extends BaseUnit
         $this->assertNull($mediaRepository->getFile($pathString));
     }
 
-    public function provideInvalidMediaPaths(): array
+    public function provideInvalidMediaPaths(): Iterator
     {
-        return [
-            ['01.yaml_only/file1.png.meta.yaml'],
-            ['01.yaml_only/file4.png'],
-        ];
+        yield ['01.yaml_only/file1.png.meta.yaml'];
+        yield ['01.yaml_only/file4.png'];
     }
 }

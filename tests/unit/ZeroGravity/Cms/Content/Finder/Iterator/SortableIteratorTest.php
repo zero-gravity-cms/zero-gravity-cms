@@ -4,6 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Content\Finder\Iterator;
 
 use ArrayIterator;
 use InvalidArgumentException;
+use Iterator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -56,7 +57,7 @@ class SortableIteratorTest extends BaseUnit
         $this->assertSame($expectedKeys, $keys);
     }
 
-    public function provideSortResults()
+    public function provideSortResults(): Iterator
     {
         $pagesSortedByName = [
             '/not_published/child1' => '01.child1',
@@ -186,18 +187,15 @@ class SortableIteratorTest extends BaseUnit
         ];
 
         $customFunction = fn (Page $a, Page $b) => strcmp($a->getTitle(), $b->getTitle());
-
-        return [
-            SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName],
-            SortableIterator::SORT_BY_SLUG => [SortableIterator::SORT_BY_SLUG, $pagesSortedBySlug],
-            SortableIterator::SORT_BY_TITLE => [SortableIterator::SORT_BY_TITLE, $pagesSortedByTitle],
-            SortableIterator::SORT_BY_DATE => [SortableIterator::SORT_BY_DATE, $pagesSortedByDate],
-            SortableIterator::SORT_BY_PUBLISH_DATE => [SortableIterator::SORT_BY_PUBLISH_DATE, $pagesSortedByPublishDate],
-            SortableIterator::SORT_BY_PATH => [SortableIterator::SORT_BY_PATH, $pagesSortedByPath],
-            SortableIterator::SORT_BY_FILESYSTEM_PATH => [SortableIterator::SORT_BY_FILESYSTEM_PATH, $pagesSortedByFilesystemPath],
-            SortableIterator::SORT_BY_EXTRA_VALUE => [[SortableIterator::SORT_BY_EXTRA_VALUE, 'my_custom_date'], $pagesSortedByExtraValue],
-            'custom callback' => [$customFunction, $pagesSortedByCustomFunction],
-        ];
+        yield SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName];
+        yield SortableIterator::SORT_BY_SLUG => [SortableIterator::SORT_BY_SLUG, $pagesSortedBySlug];
+        yield SortableIterator::SORT_BY_TITLE => [SortableIterator::SORT_BY_TITLE, $pagesSortedByTitle];
+        yield SortableIterator::SORT_BY_DATE => [SortableIterator::SORT_BY_DATE, $pagesSortedByDate];
+        yield SortableIterator::SORT_BY_PUBLISH_DATE => [SortableIterator::SORT_BY_PUBLISH_DATE, $pagesSortedByPublishDate];
+        yield SortableIterator::SORT_BY_PATH => [SortableIterator::SORT_BY_PATH, $pagesSortedByPath];
+        yield SortableIterator::SORT_BY_FILESYSTEM_PATH => [SortableIterator::SORT_BY_FILESYSTEM_PATH, $pagesSortedByFilesystemPath];
+        yield SortableIterator::SORT_BY_EXTRA_VALUE => [[SortableIterator::SORT_BY_EXTRA_VALUE, 'my_custom_date'], $pagesSortedByExtraValue];
+        yield 'custom callback' => [$customFunction, $pagesSortedByCustomFunction];
     }
 
     /**

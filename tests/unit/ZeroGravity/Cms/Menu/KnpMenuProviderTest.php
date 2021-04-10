@@ -151,10 +151,11 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function eventsAreDispatchedDuringBuild()
     {
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $run = 0;
 
         $beforeBuildMenuCallback = function ($argument) {
@@ -370,6 +371,7 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function itemsCanBeChangedThroughEvents()
     {
@@ -409,7 +411,7 @@ class KnpMenuProviderTest extends BaseUnit
 
     protected function getMockUrlGenerator(): UrlGeneratorInterface
     {
-        $generator = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $generator = $this->createMock(UrlGeneratorInterface::class);
         $generator->expects($this->any())
             ->method('generate')
             ->willReturnArgument(0)

@@ -76,6 +76,15 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         // SetList::TWIG_20,
         // SetList::TWIG_240,
         // SetList::SYMFONY_CONSTRUCTOR_INJECTION,
+        // SetList::PHPUNIT_40,
+        // SetList::PHPUNIT_50,
+        // SetList::PHPUNIT_60,
+        // SetList::PHPUNIT_70,
+        // SetList::PHPUNIT_75,
+        // SetList::PHPUNIT_80,
+        // SetList::PHPUNIT_YIELD_DATA_PROVIDER,
+        // SetList::PHPUNIT_SPECIFIC_METHOD,
+        SetList::PHPUNIT_CODE_QUALITY,
     ]);
 
     // is your PHP version different from the one your refactor to? [default: your PHP version]

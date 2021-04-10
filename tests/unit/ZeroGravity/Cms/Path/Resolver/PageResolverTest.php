@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
@@ -24,34 +25,32 @@ class PageResolverTest extends BaseUnit
         $this->assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths()
+    public function provideSingleFilePaths(): Iterator
     {
-        return [
-            [
-                '/yaml_only/file2.png',
-                null,
-                '/01.yaml_only/file2.png',
-            ],
-            [
-                'yaml_only/file2.png',
-                null,
-                '/01.yaml_only/file2.png',
-            ],
-            [
-                'with_children/_child1/child_file3.png',
-                null,
-                '/04.with_children/_child1/child_file3.png',
-            ],
-            [
-                '_child1/child_file3.png',
-                'with_children/',
-                '/04.with_children/_child1/child_file3.png',
-            ],
-            [
-                'with_children/03.empty/sub/dir/child_file7.png',
-                null,
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
+        yield [
+            '/yaml_only/file2.png',
+            null,
+            '/01.yaml_only/file2.png',
+        ];
+        yield [
+            'yaml_only/file2.png',
+            null,
+            '/01.yaml_only/file2.png',
+        ];
+        yield [
+            'with_children/_child1/child_file3.png',
+            null,
+            '/04.with_children/_child1/child_file3.png',
+        ];
+        yield [
+            '_child1/child_file3.png',
+            'with_children/',
+            '/04.with_children/_child1/child_file3.png',
+        ];
+        yield [
+            'with_children/03.empty/sub/dir/child_file7.png',
+            null,
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
         ];
     }
 
@@ -69,21 +68,19 @@ class PageResolverTest extends BaseUnit
         $this->assertNull($pageFile);
     }
 
-    public function provideNonExistingPagePaths()
+    public function provideNonExistingPagePaths(): Iterator
     {
-        return [
-            [
-                '01.yaml_only',
-                null,
-            ],
-            [
-                'yaml_only/file4.png',
-                null,
-            ],
-            [
-                '',
-                null,
-            ],
+        yield [
+            '01.yaml_only',
+            null,
+        ];
+        yield [
+            'yaml_only/file4.png',
+            null,
+        ];
+        yield [
+            '',
+            null,
         ];
     }
 

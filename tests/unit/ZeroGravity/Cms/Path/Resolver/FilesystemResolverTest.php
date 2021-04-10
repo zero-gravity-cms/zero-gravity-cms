@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Iterator;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Exception\ResolverException;
@@ -27,49 +28,47 @@ class FilesystemResolverTest extends BaseUnit
         $this->assertSame($pathName, $resolved->getPathname(), 'pathname matches');
     }
 
-    public function provideSingleValidFiles()
+    public function provideSingleValidFiles(): Iterator
     {
-        return [
-            [
-                '01.yaml_only/file1.png',
-                null,
-                '/01.yaml_only/file1.png',
-            ],
-            [
-                '/01.yaml_only/file3.png',
-                null,
-                '/01.yaml_only/file3.png',
-            ],
-            [
-                'root_file1.png',
-                null,
-                '/root_file1.png',
-            ],
-            [
-                '/root_file2.png',
-                null,
-                '/root_file2.png',
-            ],
-            [
-                '04.with_children/03.empty/sub/dir/child_file7.png',
-                null,
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
-            [
-                'file1.png',
-                '/01.yaml_only',
-                '/01.yaml_only/file1.png',
-            ],
-            [
-                'sub/dir/child_file7.png',
-                '04.with_children/03.empty',
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
-            [
-                'sub/dir/child_file7.png',
-                '/04.with_children/03.empty/',
-                '/04.with_children/03.empty/sub/dir/child_file7.png',
-            ],
+        yield [
+            '01.yaml_only/file1.png',
+            null,
+            '/01.yaml_only/file1.png',
+        ];
+        yield [
+            '/01.yaml_only/file3.png',
+            null,
+            '/01.yaml_only/file3.png',
+        ];
+        yield [
+            'root_file1.png',
+            null,
+            '/root_file1.png',
+        ];
+        yield [
+            '/root_file2.png',
+            null,
+            '/root_file2.png',
+        ];
+        yield [
+            '04.with_children/03.empty/sub/dir/child_file7.png',
+            null,
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
+        ];
+        yield [
+            'file1.png',
+            '/01.yaml_only',
+            '/01.yaml_only/file1.png',
+        ];
+        yield [
+            'sub/dir/child_file7.png',
+            '04.with_children/03.empty',
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
+        ];
+        yield [
+            'sub/dir/child_file7.png',
+            '/04.with_children/03.empty/',
+            '/04.with_children/03.empty/sub/dir/child_file7.png',
         ];
     }
 
@@ -109,16 +108,14 @@ class FilesystemResolverTest extends BaseUnit
         $this->assertNull($resolved);
     }
 
-    public function provideSingleInvalidFiles()
+    public function provideSingleInvalidFiles(): Iterator
     {
-        return [
-            ['foo'],
-            ['root_file1'],
-            ['01.yaml_only/'],
-            ['01.yaml_only/file1.png.meta.yaml'],
-            ['01.yaml_only'],
-            ['04.with_children/_child1/'],
-        ];
+        yield ['foo'];
+        yield ['root_file1'];
+        yield ['01.yaml_only/'];
+        yield ['01.yaml_only/file1.png.meta.yaml'];
+        yield ['01.yaml_only'];
+        yield ['04.with_children/_child1/'];
     }
 
     /**
@@ -147,133 +144,131 @@ class FilesystemResolverTest extends BaseUnit
         $this->assertEquals($foundFiles, array_keys($resolved), 'result matches when searching for '.$pattern);
     }
 
-    public function provideMultipleFilePatterns()
+    public function provideMultipleFilePatterns(): Iterator
     {
-        return [
-            [
-                'file1.png',
-                null,
-                [
-                    '01.yaml_only/file1.png',
-                    'images/file1.png',
-                ],
-            ],
-            [
-                '/file1.png',
-                null,
-                [],
-            ],
-            [
-                'file2.png',
-                null,
-                [
-                    '01.yaml_only/file2.png',
-                ],
-            ],
-            [
-                'file?.png',
-                null,
-                [
-                    '01.yaml_only/file1.png',
-                    '01.yaml_only/file2.png',
-                    '01.yaml_only/file3.png',
-                    'images/file1.png',
-                ],
-            ],
+        yield [
+            'file1.png',
+            null,
             [
                 '01.yaml_only/file1.png',
-                null,
-                [
-                    '01.yaml_only/file1.png',
-                ],
+                'images/file1.png',
             ],
+        ];
+        yield [
+            '/file1.png',
+            null,
+            [],
+        ];
+        yield [
+            'file2.png',
+            null,
+            [
+                '01.yaml_only/file2.png',
+            ],
+        ];
+        yield [
+            'file?.png',
+            null,
+            [
+                '01.yaml_only/file1.png',
+                '01.yaml_only/file2.png',
+                '01.yaml_only/file3.png',
+                'images/file1.png',
+            ],
+        ];
+        yield [
+            '01.yaml_only/file1.png',
+            null,
+            [
+                '01.yaml_only/file1.png',
+            ],
+        ];
+        yield [
+            'root_file1.png',
+            null,
             [
                 'root_file1.png',
-                null,
-                [
-                    'root_file1.png',
-                ],
             ],
+        ];
+        yield [
+            '*file1.png',
+            null,
             [
-                '*file1.png',
-                null,
-                [
-                    '01.yaml_only/file1.png',
-                    '04.with_children/_child1/child_file1.png',
-                    'images/file1.png',
-                    'root_file1.png',
-                ],
+                '01.yaml_only/file1.png',
+                '04.with_children/_child1/child_file1.png',
+                'images/file1.png',
+                'root_file1.png',
             ],
+        ];
+        yield [
+            '*file1.png',
+            'images',
             [
-                '*file1.png',
-                'images',
-                [
-                    'images/file1.png',
-                ],
+                'images/file1.png',
             ],
+        ];
+        yield [
+            '*file1.png',
+            'images/',
             [
-                '*file1.png',
-                'images/',
-                [
-                    'images/file1.png',
-                ],
+                'images/file1.png',
             ],
+        ];
+        yield [
+            '#^[^/]*file1.png#',
+            null,
             [
-                '#^[^/]*file1.png#',
-                null,
-                [
-                    'root_file1.png',
-                ],
+                'root_file1.png',
             ],
+        ];
+        yield [
+            'child_file{3,4,5}.png',
+            null,
             [
-                'child_file{3,4,5}.png',
-                null,
-                [
-                    '04.with_children/03.empty/child_file5.png',
-                    '04.with_children/_child1/child_file3.png',
-                    '04.with_children/_child1/child_file4.png',
-                ],
+                '04.with_children/03.empty/child_file5.png',
+                '04.with_children/_child1/child_file3.png',
+                '04.with_children/_child1/child_file4.png',
             ],
+        ];
+        yield [
+            'child_file{3,4,5}.png',
+            '04.with_children',
             [
-                'child_file{3,4,5}.png',
-                '04.with_children',
-                [
-                    '04.with_children/03.empty/child_file5.png',
-                    '04.with_children/_child1/child_file3.png',
-                    '04.with_children/_child1/child_file4.png',
-                ],
+                '04.with_children/03.empty/child_file5.png',
+                '04.with_children/_child1/child_file3.png',
+                '04.with_children/_child1/child_file4.png',
             ],
+        ];
+        yield [
+            '04.with_children/_child1/child_file{3,4,5}.png',
+            null,
             [
-                '04.with_children/_child1/child_file{3,4,5}.png',
-                null,
-                [
-                    '04.with_children/_child1/child_file3.png',
-                    '04.with_children/_child1/child_file4.png',
-                ],
+                '04.with_children/_child1/child_file3.png',
+                '04.with_children/_child1/child_file4.png',
             ],
+        ];
+        yield [
+            '#04\\.with_children/_child1/child_file[3,4,5]{1}\\.png#',
+            null,
             [
-                '#04\\.with_children/_child1/child_file[3,4,5]{1}\\.png#',
-                null,
-                [
-                    '04.with_children/_child1/child_file3.png',
-                    '04.with_children/_child1/child_file4.png',
-                ],
+                '04.with_children/_child1/child_file3.png',
+                '04.with_children/_child1/child_file4.png',
             ],
+        ];
+        yield [
+            '../images/person_a.png',
+            '01.yaml_only',
             [
-                '../images/person_a.png',
-                '01.yaml_only',
-                [
-                    'images/person_a.png',
-                ],
+                'images/person_a.png',
             ],
+        ];
+        yield [
+            '../../images/person_?.png',
+            '04.with_children/_child',
             [
-                '../../images/person_?.png',
-                '04.with_children/_child',
-                [
-                    'images/person_a.png',
-                    'images/person_b.png',
-                    'images/person_c.png',
-                ],
+                'images/person_a.png',
+                'images/person_b.png',
+                'images/person_c.png',
             ],
         ];
     }

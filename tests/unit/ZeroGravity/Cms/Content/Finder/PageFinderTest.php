@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
 use InvalidArgumentException;
+use Iterator;
 use LogicException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -51,43 +52,41 @@ class PageFinderTest extends BaseUnit
         $this->assertSame($finder, $returnValue);
     }
 
-    public function provideFinderMethods()
+    public function provideFinderMethods(): Iterator
     {
-        return [
-            ['date', '> now'],
-            ['name', ''],
-            ['notName', ''],
-            ['slug', ''],
-            ['notSlug', ''],
-            ['depth', 0],
-            ['numFiles', 0],
-            ['numImages', 0],
-            ['numDocuments', 0],
-            ['path', ''],
-            ['notPath', ''],
-            ['filesystemPath', ''],
-            ['notFilesystemPath', ''],
-            ['title', ''],
-            ['notTitle', ''],
-            ['contains', ''],
-            ['notContains', ''],
-            ['tag', ''],
-            ['notTag', ''],
-            ['category', ''],
-            ['notCategory', ''],
-            ['author', ''],
-            ['notAuthor', ''],
-            ['published', true],
-            ['modular', true],
-            ['module', true],
-            ['visible', true],
-            ['extra', ''],
-            ['notExtra', ''],
-            ['setting', ''],
-            ['notSetting', ''],
-            ['contentType', ''],
-            ['notContentType', ''],
-        ];
+        yield ['date', '> now'];
+        yield ['name', ''];
+        yield ['notName', ''];
+        yield ['slug', ''];
+        yield ['notSlug', ''];
+        yield ['depth', 0];
+        yield ['numFiles', 0];
+        yield ['numImages', 0];
+        yield ['numDocuments', 0];
+        yield ['path', ''];
+        yield ['notPath', ''];
+        yield ['filesystemPath', ''];
+        yield ['notFilesystemPath', ''];
+        yield ['title', ''];
+        yield ['notTitle', ''];
+        yield ['contains', ''];
+        yield ['notContains', ''];
+        yield ['tag', ''];
+        yield ['notTag', ''];
+        yield ['category', ''];
+        yield ['notCategory', ''];
+        yield ['author', ''];
+        yield ['notAuthor', ''];
+        yield ['published', true];
+        yield ['modular', true];
+        yield ['module', true];
+        yield ['visible', true];
+        yield ['extra', ''];
+        yield ['notExtra', ''];
+        yield ['setting', ''];
+        yield ['notSetting', ''];
+        yield ['contentType', ''];
+        yield ['notContentType', ''];
     }
 
     /**

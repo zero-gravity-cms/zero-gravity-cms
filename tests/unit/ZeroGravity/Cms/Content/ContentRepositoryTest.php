@@ -47,6 +47,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function writablePageIsLoadedFromMapper()
     {
@@ -66,6 +67,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function newWritablePageIsLoadedFromMapper()
     {
@@ -86,6 +88,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function diffIsSavedThroughMapper()
     {
@@ -172,6 +175,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function pagesAreLoadedIfCacheThrowsException()
     {

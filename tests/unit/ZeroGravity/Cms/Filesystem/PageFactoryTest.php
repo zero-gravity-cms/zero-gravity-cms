@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Iterator;
 use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -49,17 +50,15 @@ class PageFactoryTest extends BaseUnit
         $this->assertInstanceOf(Page::class, $page);
     }
 
-    public function provideValidDirectories()
+    public function provideValidDirectories(): Iterator
     {
-        return [
-            ['01.yaml_only'],
-            ['02.markdown_only'],
-            ['03.yaml_and_markdown_and_twig'],
-            ['04.with_children'],
-            ['05.twig_only'],
-            ['06.yaml_and_twig'],
-            ['no_sorting_prefix'],
-        ];
+        yield ['01.yaml_only'];
+        yield ['02.markdown_only'];
+        yield ['03.yaml_and_markdown_and_twig'];
+        yield ['04.with_children'];
+        yield ['05.twig_only'];
+        yield ['06.yaml_and_twig'];
+        yield ['no_sorting_prefix'];
     }
 
     /**
@@ -167,10 +166,11 @@ class PageFactoryTest extends BaseUnit
 
     /**
      * @test
+     * @doesNotPerformAssertions
      */
     public function eventsAreDispatchedDuringCreatePage()
     {
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $run = 0;
 
         $beforeCreatePageCallback = function ($argument) {

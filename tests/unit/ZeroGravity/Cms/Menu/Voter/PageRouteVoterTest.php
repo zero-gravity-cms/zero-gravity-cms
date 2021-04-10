@@ -20,7 +20,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function noMatchingIsDoneWithoutRequest()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->never())
             ->method('getExtra')
         ;
@@ -35,7 +35,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function noMatchingIsDoneIfRequestDoesNotContainPage()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->never())
             ->method('getExtra')
         ;
@@ -52,7 +52,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingIsDoneIfRequestContainsPage()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->atLeastOnce())
             ->method('getExtra')
         ;
@@ -74,7 +74,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function invalidRouteConfigThrowsException()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')
             ->with('routes')
@@ -99,7 +99,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingUsingSingleStringRoute()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')
             ->with('routes')
@@ -123,7 +123,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function matchingUsingRouteArray()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')
             ->with('routes')
@@ -150,7 +150,7 @@ class PageRouteVoterTest extends BaseUnit
      */
     public function notMatchingUsingRouteArray()
     {
-        $item = $this->getMockBuilder(ItemInterface::class)->getMock();
+        $item = $this->createMock(ItemInterface::class);
         $item->expects($this->any())
             ->method('getExtra')
             ->with('routes')
