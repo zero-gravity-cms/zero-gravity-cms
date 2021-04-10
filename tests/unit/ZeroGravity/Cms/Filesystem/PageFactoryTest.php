@@ -171,32 +171,28 @@ class PageFactoryTest extends BaseUnit
     public function eventsAreDispatchedDuringCreatePage()
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
-        $run = 0;
 
-        $beforeCreatePageCallback = function ($argument) {
-            if (!$argument instanceof BeforePageCreate) {
-                return false;
-            }
-            if ('01.yaml_only' !== $argument->getDirectory()->getName()) {
-                return false;
-            }
-            if ('yaml_only' !== $argument->getSettings()['slug']) {
-                return false;
-            }
-            if (null !== $argument->getParentPage()) {
-                return false;
+        $start = true;
+        $createPageCallbacks = function ($argument) use (&$start) {
+            if ($start) {
+                if (!$argument instanceof BeforePageCreate) {
+                    return false;
+                }
+                if ('01.yaml_only' !== $argument->getDirectory()->getName()) {
+                    return false;
+                }
+                if ('yaml_only' !== $argument->getSettings()['slug']) {
+                    return false;
+                }
+                if (null !== $argument->getParentPage()) {
+                    return false;
+                }
+
+                $start = false;
+
+                return true;
             }
 
-            return true;
-        };
-
-        $dispatcher->expects(self::at($run++))
-            ->method('dispatch')
-            ->with(self::callback($beforeCreatePageCallback))
-            ->willReturnArgument(0)
-        ;
-
-        $afterCreatePageCallback = function ($argument) {
             if (!$argument instanceof AfterPageCreate) {
                 return false;
             }
@@ -207,9 +203,9 @@ class PageFactoryTest extends BaseUnit
             return true;
         };
 
-        $dispatcher->expects(static::at($run++))
+        $dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(static::callback($afterCreatePageCallback))
+            ->with(self::callback($createPageCallbacks))
             ->willReturnArgument(0)
         ;
 
