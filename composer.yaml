@@ -17,7 +17,7 @@ require:
     symfony/cache: ^4.4
     twig/twig: ^2.7
 require-dev:
-    codeception/codeception: ^2.3
+    codeception/codeception: ^4.1
     knplabs/knp-menu: ^2.0
     symfony/var-dumper: ^4.4|^5.0
     rector/rector-prefixed: ^0.9
