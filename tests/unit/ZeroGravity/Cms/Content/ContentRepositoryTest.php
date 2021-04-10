@@ -3,8 +3,8 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Codeception\Util\Stub;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Simple\ArrayCache;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
@@ -28,7 +28,7 @@ class ContentRepositoryTest extends BaseUnit
                 $page2,
             ],
         ]);
-        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
 
         $this->assertSame([
             $page1,
@@ -60,7 +60,7 @@ class ContentRepositoryTest extends BaseUnit
             ->method('getWritablePageInstance')
         ;
 
-        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
         $repo->getWritablePageInstance($page1);
     }
 
@@ -80,7 +80,7 @@ class ContentRepositoryTest extends BaseUnit
             ->with($page1)
         ;
 
-        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
         $repo->getNewWritablePage($page1);
     }
 
@@ -96,7 +96,7 @@ class ContentRepositoryTest extends BaseUnit
             ->getMock()
         ;
 
-        $repo = new ContentRepository($mapper, new ArrayCache(), false);
+        $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
         $old = $repo->getWritablePageInstance($page1);
         $new = clone $old;
         $diff = new PageDiff($old, $new);
@@ -124,7 +124,7 @@ class ContentRepositoryTest extends BaseUnit
                 $page2,
             ],
         ]);
-        $cache = new ArrayCache();
+        $cache = new ArrayAdapter();
         $repo = new ContentRepository($mapper, $cache, false);
         $repo->getAllPages();
 
@@ -151,7 +151,6 @@ class ContentRepositoryTest extends BaseUnit
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
-        $page3 = $this->createSimplePage('page3', $page2);
 
         $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
@@ -159,7 +158,7 @@ class ContentRepositoryTest extends BaseUnit
                 $page2,
             ],
         ]);
-        $cache = new ArrayCache();
+        $cache = new ArrayAdapter();
         $repo = new ContentRepository($mapper, $cache, false);
         $repo->getAllPages();
 
@@ -178,7 +177,6 @@ class ContentRepositoryTest extends BaseUnit
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
-        $page3 = $this->createSimplePage('page3', $page2);
 
         $mapper = Stub::makeEmpty(StructureMapper::class, [
             'parse' => [
@@ -187,12 +185,12 @@ class ContentRepositoryTest extends BaseUnit
             ],
         ]);
 
-        $cache = $this->getMockBuilder(ArrayCache::class)
-            ->setMethods(['has'])
+        $cache = $this->getMockBuilder(ArrayAdapter::class)
+            ->setMethods(['getItem'])
             ->getMock()
         ;
-        $cache->expects($this->once())
-            ->method('has')
+        $cache->expects(self::atLeast(1))
+            ->method('getItem')
             ->willThrowException(new InvalidArgumentException())
         ;
 

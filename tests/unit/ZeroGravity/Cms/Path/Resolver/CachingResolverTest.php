@@ -4,7 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\Slugify;
 use Codeception\Util\Stub;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\CachingResolver;
@@ -110,10 +110,10 @@ class CachingResolverTest extends BaseUnit
     }
 
     /**
-     * @return ArrayCache
+     * @return ArrayAdapter
      */
     private function getCache()
     {
-        return new ArrayCache(0, false);
+        return new ArrayAdapter(0, false);
     }
 }

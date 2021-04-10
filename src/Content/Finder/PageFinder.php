@@ -16,6 +16,7 @@ use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some of its code.
@@ -69,7 +70,7 @@ class PageFinder implements IteratorAggregate, Countable
     }
 
     /**
-     * @param Page[] $pages
+     * @param Page[]|ReadablePage[] $pages
      *
      * @return $this
      */

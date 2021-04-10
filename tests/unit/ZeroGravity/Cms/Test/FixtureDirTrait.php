@@ -4,7 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Test;
 
 use Helper\Unit;
 use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\FileFactory;
@@ -72,6 +72,6 @@ trait FixtureDirTrait
         $basePath = $fileFactory->getBasePath();
         $mapper = new FilesystemMapper($fileFactory, $basePath, false, [], new NullLogger(), new EventDispatcher());
 
-        return new ContentRepository($mapper, new ArrayCache(), false);
+        return new ContentRepository($mapper, new ArrayAdapter(), false);
     }
 }
