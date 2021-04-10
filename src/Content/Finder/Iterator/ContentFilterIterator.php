@@ -14,6 +14,6 @@ final class ContentFilterIterator extends MultipleGlobFilterIterator
      */
     public function accept(): bool
     {
-        return $this->isAccepted($this->current()->getContent());
+        return $this->isAccepted((string) $this->current()->getContent());
     }
 }
