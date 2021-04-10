@@ -64,8 +64,11 @@ trait PageSettingsTrait
             return $settings;
         }
 
-        foreach ($this->getParent()->getChildDefaults() as $key => $defaultValue) {
-            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+        foreach ($this->getParent()->getChildDefaults() as $key => $childDefault) {
+            if (!array_key_exists($key, $settings)) {
+                continue;
+            }
+            if ($settings[$key] === $childDefault) {
                 unset($settings[$key]);
             }
         }

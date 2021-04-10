@@ -31,7 +31,7 @@ class ZeroGravityExtensionTest extends BaseUnit
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [
             '_route_params' => [
-                'page' => $repository->getPage('/with_children'),
+                '_zg_page' => $repository->getPage('/with_children'),
             ],
         ]));
 

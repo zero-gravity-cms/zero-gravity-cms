@@ -185,9 +185,14 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     private function validatePageListsAndIterators(): void
     {
-        if (0 === count($this->pageLists) && 0 === count($this->iterators)) {
-            throw new LogicException('You must call one of inPageList() or append() methods before iterating over a PageFinder.');
+        if (0 !== count($this->pageLists)) {
+            return;
         }
+        if (0 !== count($this->iterators)) {
+            return;
+        }
+
+        throw new LogicException('You must call one of inPageList() or append() methods before iterating over a PageFinder.');
     }
 
     private function buildIteratorFromPageListsAndIterators(): Iterator

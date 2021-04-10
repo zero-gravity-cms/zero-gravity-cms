@@ -132,13 +132,14 @@ trait TwigExtensionTestTrait
             }
             $tests[$message] = [str_replace($fixturesDir.'/', '', $file), $message, $condition, $templates, $exception, $outputs];
         }
-
-        if ($legacyTests && empty($tests)) {
-            // add a dummy test to avoid a PHPUnit message
-            return [['not', '-', '', [], '', []]];
+        if (!$legacyTests) {
+            return $tests;
         }
-
-        return $tests;
+        if (!empty($tests)) {
+            return $tests;
+        }
+        // add a dummy test to avoid a PHPUnit message
+        return [['not', '-', '', [], '', []]];
     }
 
     // public function getLegacyTests()

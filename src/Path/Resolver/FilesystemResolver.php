@@ -62,10 +62,15 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         if ($path->isAbsolute() && !$path->isRegex()) {
             $path = $this->toRegexMatchStart($path);
         }
-        if (!$path->isAbsolute() && $path->isGlob()) {
-            // try moving pattern parts into inPath because globs don't work with paths
-            $this->moveNonGlobsToParent($path, $parentPath);
+
+        if ($path->isAbsolute()) {
+            return;
         }
+        if (!$path->isGlob()) {
+            return;
+        }
+
+        $this->moveNonGlobsToParent($path, $parentPath);
     }
 
     /**
@@ -113,12 +118,13 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         if ('.meta.yaml' === substr($trimmedPath, -10)) {
             return null;
         }
+
         $testPath = $this->buildBaseDir().'/'.$trimmedPath;
-        if ($this->filesystem->exists($testPath) && is_file($testPath)) {
-            return $this->fileFactory->createFile('/'.$trimmedPath);
+        if (!is_file($testPath)) {
+            return null;
         }
 
-        return null;
+        return $this->fileFactory->createFile('/'.$trimmedPath);
     }
 
     private function buildBaseDir(?Path $parentPath = null): string

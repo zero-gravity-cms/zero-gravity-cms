@@ -118,22 +118,22 @@ final class RouteProvider implements RouteProviderInterface
     {
         $routes = [
             new Route($page->getPath()->toString(), [
-                'page' => $page,
+                '_zg_page' => $page,
                 '_controller' => $page->getController() ?: $this->defaultController,
             ]),
         ];
         foreach ($page->getDocuments() as $name => $file) {
             $routes[] = new Route($page->getPath()->toString().'/'.$name, [
-                'page' => $page,
+                '_zg_page' => $page,
                 '_controller' => $page->getController() ?: $this->defaultController,
-                'file' => $file,
+                '_zg_file' => $file,
             ]);
         }
         foreach ($page->getImages() as $name => $file) {
             $routes[] = new Route($page->getPath()->toString().'/'.$name, [
-                'page' => $page,
+                '_zg_page' => $page,
                 '_controller' => $page->getController() ?: $this->defaultController,
-                'file' => $file,
+                '_zg_file' => $file,
             ]);
         }
 
@@ -143,7 +143,7 @@ final class RouteProvider implements RouteProviderInterface
     public function createRouteFromPage(ReadablePage $page): Route
     {
         return new Route($page->getPath()->toString(), [
-            'page' => $page,
+            '_zg_page' => $page,
             '_controller' => $page->getController() ?: $this->defaultController,
         ]);
     }

@@ -140,7 +140,10 @@ final class FilesystemMapper implements StructureMapper
         if (!$diff->containsInstancesOf(WritableFilesystemPage::class)) {
             $this->logAndThrow(FilesystemException::unsupportedWritablePageClass($diff));
         }
-        if ($diff->filesystemPathHasChanged() && $this->newFilesystemPathAlreadyExists($diff)) {
+        if (!$diff->filesystemPathHasChanged()) {
+            return;
+        }
+        if ($this->newFilesystemPathAlreadyExists($diff)) {
             $this->logAndThrow(StructureException::newPageNameAlreadyExists($diff));
         }
     }
@@ -179,7 +182,10 @@ final class FilesystemMapper implements StructureMapper
         }
 
         foreach ($this->defaultPageSettings as $key => $defaultValue) {
-            if (array_key_exists($key, $settings) && $settings[$key] === $defaultValue) {
+            if (!array_key_exists($key, $settings)) {
+                continue;
+            }
+            if ($settings[$key] === $defaultValue) {
                 unset($settings[$key]);
             }
         }
