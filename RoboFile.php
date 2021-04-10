@@ -47,9 +47,11 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @see http://robo.li/
  */
-class RoboFile extends \Robo\Tasks
+class RoboFile extends \C33s\Robo\BaseRoboFile
 {
-    const GLOBAL_COMPOSER_PACKAGES = [];
+    const GLOBAL_COMPOSER_PACKAGES = [
+        'symfony/flex' => '^1.0',
+    ];
 
     use \C33s\Robo\C33sTasks;
     use \C33s\Robo\C33sExtraTasks;
@@ -146,7 +148,7 @@ class RoboFile extends \Robo\Tasks
     public function update()
     {
         if ($this->isEnvironmentCi() || $this->isEnvironmentProduction()) {
-            $this->_execPhp('php ./.robo/bin/composer.phar install --no-progress --no-suggest --prefer-dist --optimize-autoloader');
+            $this->_execPhp('php ./.robo/bin/composer.phar install --no-progress --prefer-dist --optimize-autoloader');
         } else {
             $this->_execPhp('php ./.robo/bin/composer.phar install');
         }
