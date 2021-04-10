@@ -4,7 +4,7 @@ namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
 use InvalidArgumentException;
 use LogicException;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Finder\Iterator\ExtraFilterIterator;
@@ -21,7 +21,7 @@ class PageFinderTest extends BaseUnit
     public function _before()
     {
         $mapper = $this->getValidPagesFilesystemMapper();
-        $repository = new ContentRepository($mapper, new ArrayCache(), false);
+        $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
 
         $this->finderPrototype = $repository->getPageFinder();
     }

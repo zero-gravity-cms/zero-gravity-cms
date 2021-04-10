@@ -3,7 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Routing;
 
 use Codeception\Util\Stub;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
@@ -99,7 +99,7 @@ class RouteProviderTest extends BaseUnit
                 $page2,
             ],
         ]);
-        $cache = new ArrayCache();
+        $cache = new ArrayAdapter();
 
         return new ContentRepository($mapper, $cache, false);
     }

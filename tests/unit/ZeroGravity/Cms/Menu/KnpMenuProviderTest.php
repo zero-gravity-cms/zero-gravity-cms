@@ -7,7 +7,7 @@ use Knp\Menu\Integration\Symfony\RoutingExtension;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -385,7 +385,7 @@ class KnpMenuProviderTest extends BaseUnit
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $mapper = new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
-        return new ContentRepository($mapper, new ArrayCache(), false);
+        return new ContentRepository($mapper, new ArrayAdapter(), false);
     }
 
     protected function getProvider(EventDispatcherInterface $dispatcher = null): KnpMenuProvider

@@ -3,8 +3,8 @@
 namespace ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\SlugifyInterface;
-use Psr\SimpleCache\CacheInterface;
-use Psr\SimpleCache\InvalidArgumentException;
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Contracts\Cache\CacheInterface;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
@@ -38,14 +38,10 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
             return [];
         }
         $key = $this->generateCacheKey('find', $path, $parentPath);
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
-        }
 
-        $result = $this->wrappedResolver->find($path, $parentPath);
-        $this->cache->set($key, $result);
-
-        return $result;
+        return $this->cache->get($key, function () use ($path, $parentPath) {
+            return $this->wrappedResolver->find($path, $parentPath);
+        });
     }
 
     /**
@@ -56,14 +52,10 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
     public function get(Path $path, Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
-        }
 
-        $result = $this->wrappedResolver->get($path, $parentPath);
-        $this->cache->set($key, $result);
-
-        return $result;
+        return $this->cache->get($key, function () use ($path, $parentPath) {
+            return $this->wrappedResolver->get($path, $parentPath);
+        });
     }
 
     /**

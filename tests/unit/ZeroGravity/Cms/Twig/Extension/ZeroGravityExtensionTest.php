@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Twig\Extension;
 
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -26,7 +26,7 @@ class ZeroGravityExtensionTest extends BaseUnit
     public function getExtensions()
     {
         $mapper = $this->getValidPagesFilesystemMapper();
-        $repository = new ContentRepository($mapper, new ArrayCache(), false);
+        $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
 
         $requestStack = new RequestStack();
         $requestStack->push(new Request([], [], [

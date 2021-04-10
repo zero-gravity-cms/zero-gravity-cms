@@ -2,8 +2,9 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use Psr\SimpleCache\CacheInterface;
-use Psr\SimpleCache\InvalidArgumentException;
+use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Throwable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
 
@@ -21,7 +22,7 @@ class ContentRepository
      */
     protected ?array $pagesByPath = null;
 
-    private CacheInterface $cache;
+    private AdapterInterface $cache;
 
     private bool $skipCache;
 
@@ -30,7 +31,7 @@ class ContentRepository
     /**
      * This is the main repository handling page loading and caching.
      */
-    public function __construct(StructureMapper $mapper, CacheInterface $cache, bool $skipCache)
+    public function __construct(StructureMapper $mapper, AdapterInterface $cache, bool $skipCache)
     {
         $this->mapper = $mapper;
         $this->cache = $cache;
@@ -74,26 +75,33 @@ class ContentRepository
      */
     protected function loadPagesFromCache(): bool
     {
-        try {
-            if (!$this->skipCache && $this->cache->has(self::ALL_PAGES_CACHE_KEY)) {
-                $this->pages = $this->cache->get(self::ALL_PAGES_CACHE_KEY);
-                $this->flattenPages($this->pages);
-
-                return true;
-            }
-        } catch (InvalidArgumentException $e) {
+        if ($this->skipCache) {
             return false;
         }
 
-        return false;
+        try {
+            $item = $this->cache->getItem(self::ALL_PAGES_CACHE_KEY);
+            if (!$item->isHit()) {
+                return false;
+            }
+            $this->pages = $item->get();
+            $this->flattenPages($this->pages);
+
+            return true;
+        } catch (Throwable $e) {
+            return false;
+        }
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    protected function refreshCache()
+    protected function refreshCache(): void
     {
-        $this->cache->set(self::ALL_PAGES_CACHE_KEY, $this->pages);
+        try {
+            $item = $this->cache->getItem(self::ALL_PAGES_CACHE_KEY);
+        } catch (PsrInvalidArgumentException $e) {
+            return;
+        }
+        $item->set($this->pages);
+        $this->cache->save($item);
     }
 
     /**
