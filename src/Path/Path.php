@@ -292,7 +292,7 @@ class Path
      *
      * @return Path|null
      */
-    public function getFile(): ? self
+    public function getFile(): ?self
     {
         if ($this->isDirectory() || !$this->hasElements()) {
             return null;
@@ -305,7 +305,7 @@ class Path
      * Get the last PathElement of this path.
      * Returns null if Path is empty.
      */
-    public function getLastElement(): ? PathElement
+    public function getLastElement(): ?PathElement
     {
         if ($this->hasElements()) {
             return array_values(array_slice($this->elements, -1))[0];

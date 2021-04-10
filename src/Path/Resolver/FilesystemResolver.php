@@ -101,7 +101,7 @@ class FilesystemResolver extends AbstractResolver implements MultiPathResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         if (null === $parentPath) {
             $parentPath = new Path('');

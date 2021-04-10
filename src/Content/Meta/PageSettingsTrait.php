@@ -166,7 +166,7 @@ trait PageSettingsTrait
     /**
      * Get custom template to embed this page in.
      */
-    public function getLayoutTemplate(): ? string
+    public function getLayoutTemplate(): ?string
     {
         return $this->getSetting('layout_template');
     }
@@ -174,7 +174,7 @@ trait PageSettingsTrait
     /**
      * Get custom template for rendering the page content.
      */
-    public function getContentTemplate(): ? string
+    public function getContentTemplate(): ?string
     {
         return $this->getSetting('content_template');
     }
@@ -182,7 +182,7 @@ trait PageSettingsTrait
     /**
      * Get custom controller name to use for this page.
      */
-    public function getController(): ? string
+    public function getController(): ?string
     {
         return (string) $this->getSetting('controller');
     }
@@ -205,7 +205,7 @@ trait PageSettingsTrait
      *
      * @return DateTimeImmutable
      */
-    public function getDate(): ? DateTimeImmutable
+    public function getDate(): ?DateTimeImmutable
     {
         return $this->getSetting('date');
     }
@@ -215,7 +215,7 @@ trait PageSettingsTrait
      *
      * @return DateTimeImmutable
      */
-    public function getPublishDate(): ? DateTimeImmutable
+    public function getPublishDate(): ?DateTimeImmutable
     {
         return $this->getSetting('publish_date');
     }
@@ -225,7 +225,7 @@ trait PageSettingsTrait
      *
      * @return DateTimeImmutable
      */
-    public function getUnpublishDate(): ? DateTimeImmutable
+    public function getUnpublishDate(): ?DateTimeImmutable
     {
         return $this->getSetting('unpublish_date');
     }

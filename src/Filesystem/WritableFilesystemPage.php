@@ -26,7 +26,7 @@ class WritableFilesystemPage extends Page implements WritablePage
     /**
      * @return Directory
      */
-    public function getDirectory(): ? Directory
+    public function getDirectory(): ?Directory
     {
         return $this->directory;
     }

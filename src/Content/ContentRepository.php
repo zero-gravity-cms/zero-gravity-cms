@@ -140,7 +140,7 @@ class ContentRepository
         return $this->pagesByPath;
     }
 
-    public function getPage(string $path): ? ReadablePage
+    public function getPage(string $path): ?ReadablePage
     {
         $this->fetchPages();
         if (isset($this->pagesByPath[$path])) {

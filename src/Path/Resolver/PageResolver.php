@@ -18,7 +18,7 @@ class PageResolver extends AbstractResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $pagePath = $path->getDirectory();
         $filePath = $path->getFile();

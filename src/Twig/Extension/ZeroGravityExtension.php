@@ -79,7 +79,7 @@ class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
-    public function getPage(string $path): ? Page
+    public function getPage(string $path): ?Page
     {
         if (0 === strpos($path, './')) {
             $currentPage = $this->pageSelector->getCurrentPage();
@@ -92,7 +92,7 @@ class ZeroGravityExtension extends AbstractExtension
         return $this->contentRepository->getPage($path);
     }
 
-    public function getCurrentPage(): ? Page
+    public function getCurrentPage(): ?Page
     {
         return $this->pageSelector->getCurrentPage();
     }

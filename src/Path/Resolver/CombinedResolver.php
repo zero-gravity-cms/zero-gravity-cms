@@ -20,7 +20,7 @@ class CombinedResolver extends AbstractResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $found = $this->filesystemResolver->get($path, $parentPath);
         if (null !== $found) {

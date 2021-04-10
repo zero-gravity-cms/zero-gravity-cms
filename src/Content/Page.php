@@ -65,7 +65,7 @@ class Page implements ReadablePage
     /**
      * @return Page|null
      */
-    public function getParent(): ? ReadablePage
+    public function getParent(): ?ReadablePage
     {
         return $this->parent;
     }
@@ -75,7 +75,7 @@ class Page implements ReadablePage
         $this->content = $content;
     }
 
-    public function getContent(): ? string
+    public function getContent(): ?string
     {
         return $this->content;
     }

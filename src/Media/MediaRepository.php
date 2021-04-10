@@ -18,7 +18,7 @@ class MediaRepository
     /**
      * @param string|Path $relativePath
      */
-    public function getFile($relativePath): ? File
+    public function getFile($relativePath): ?File
     {
         if (!$relativePath instanceof Path) {
             $relativePath = new Path((string) $relativePath);

@@ -53,7 +53,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      *
      * @throws InvalidArgumentException
      */
-    public function get(Path $path, Path $parentPath = null): ? File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
         if ($this->cache->has($key)) {

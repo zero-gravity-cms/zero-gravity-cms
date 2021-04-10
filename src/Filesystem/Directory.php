@@ -234,7 +234,7 @@ class Directory
         ;
     }
 
-    public function getYamlFile(): ? File
+    public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
 
@@ -246,7 +246,7 @@ class Directory
         return null !== $this->getYamlFile();
     }
 
-    public function getMarkdownFile(): ? File
+    public function getMarkdownFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
 
@@ -273,7 +273,7 @@ class Directory
         return $this->getSlug();
     }
 
-    public function getDefaultBasenameTwigFile(): ? File
+    public function getDefaultBasenameTwigFile(): ?File
     {
         foreach ($this->getTwigFiles() as $twigFile) {
             if ($twigFile->getBasename('.html.'.$twigFile->getExtension()) === $this->getDefaultBasename()) {

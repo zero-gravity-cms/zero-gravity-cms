@@ -81,7 +81,7 @@ class PageFiles
     /**
      * Get path to single markdown file if available.
      */
-    public function getMarkdownFile(): ? File
+    public function getMarkdownFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
         if (count($files) > 0) {
@@ -94,7 +94,7 @@ class PageFiles
     /**
      * Get path to single YAML file if available.
      */
-    public function getYamlFile(): ? File
+    public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
         if (count($files) > 0) {
@@ -107,7 +107,7 @@ class PageFiles
     /**
      * Get path to single Twig file if available.
      */
-    public function getTwigFile(): ? File
+    public function getTwigFile(): ?File
     {
         $files = $this->getFilesByType(FileTypeDetector::TYPE_TWIG);
         if (count($files) > 0) {

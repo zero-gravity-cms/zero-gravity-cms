@@ -21,7 +21,7 @@ class RouterPageSelector
         $this->requestStack = $requestStack;
     }
 
-    public function getCurrentPage(): ? Page
+    public function getCurrentPage(): ?Page
     {
         $request = $this->requestStack->getCurrentRequest();
         if (null === $request) {
