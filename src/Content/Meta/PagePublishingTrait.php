@@ -15,8 +15,6 @@ trait PagePublishingTrait
 
     /**
      * Get optional publishing date of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getPublishDate(): ?DateTimeImmutable
     {
@@ -25,14 +23,19 @@ trait PagePublishingTrait
 
     /**
      * Get optional un-publishing date of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getUnpublishDate(): ?DateTimeImmutable
     {
         return $this->getSetting('unpublish_date');
     }
 
+    /**
+     * All the publishing settings are okay.
+     * By default these are:
+     * - 'publish'
+     * - 'publish_date'
+     * - 'unpublish_date'.
+     */
     public function isPublished(): bool
     {
         if (!$this->getSetting('publish')) {
@@ -56,25 +59,21 @@ trait PagePublishingTrait
 
     private function publishDateIsInFuture(): bool
     {
-        if (null === $this->getPublishDate()) {
+        $publishDate = $this->getPublishDate();
+        if (null === $publishDate) {
             return false;
         }
-        if ($this->getPublishDate()->format('U') > time()) {
-            return true;
-        }
 
-        return false;
+        return $publishDate->format('U') > time();
     }
 
     private function unpublishDateIsInPast(): bool
     {
-        if (null === $this->getUnpublishDate()) {
+        $unpublishDate = $this->getUnpublishDate();
+        if (null === $unpublishDate) {
             return false;
         }
-        if ($this->getUnpublishDate()->format('U') < time()) {
-            return true;
-        }
 
-        return false;
+        return $unpublishDate->format('U') < time();
     }
 }

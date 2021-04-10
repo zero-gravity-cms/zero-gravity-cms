@@ -7,16 +7,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
+use ZeroGravity\Cms\Content\ReadablePageRepository;
 
-class RouteProvider implements RouteProviderInterface
+final class RouteProvider implements RouteProviderInterface
 {
-    private ContentRepository $repository;
-
+    private ReadablePageRepository $repository;
     private string $defaultController;
 
-    public function __construct(ContentRepository $repository, string $defaultController)
+    public function __construct(ReadablePageRepository $repository, string $defaultController)
     {
         $this->repository = $repository;
         $this->defaultController = $defaultController;
@@ -44,12 +44,12 @@ class RouteProvider implements RouteProviderInterface
      * @return RouteCollection with all Routes that could potentially match
      *                         $request. Empty collection if nothing can match
      */
-    public function getRouteCollectionForRequest(Request $request)
+    public function getRouteCollectionForRequest(Request $request): RouteCollection
     {
         $collection = new RouteCollection();
 
         foreach ($this->getRoutesByNames(null) as $route) {
-            $collection->add('zerogravity_'.uniqid(), $route);
+            $collection->add('zerogravity_'.uniqid('', true), $route);
         }
 
         return $collection;
@@ -60,12 +60,10 @@ class RouteProvider implements RouteProviderInterface
      *
      * @param string $name The route name to fetch
      *
-     * @return Route
-     *
      * @throws RouteNotFoundException If there is no route with that name in
      *                                this repository
      */
-    public function getRouteByName($name)
+    public function getRouteByName($name): Route
     {
         $page = $this->repository->getPage($name);
         if (null === $page) {
@@ -99,15 +97,18 @@ class RouteProvider implements RouteProviderInterface
      * @return Route[] Iterable list with the keys being the names from the
      *                 $names array
      */
-    public function getRoutesByNames($names)
+    public function getRoutesByNames($names): array
     {
         $pages = $this->repository->getAllPages();
         if (is_array($names)) {
             $pages = array_intersect_key($pages, array_flip($names));
         }
+
         $routes = [];
         foreach ($pages as $page) {
-            $routes = array_merge($routes, $this->extractPageRoutes($page));
+            foreach ($this->extractPageRoutes($page) as $route) {
+                $routes[] = $route;
+            }
         }
 
         return $routes;
@@ -139,10 +140,7 @@ class RouteProvider implements RouteProviderInterface
         return $routes;
     }
 
-    /**
-     * @return Route
-     */
-    public function createRouteFromPage(Page $page)
+    public function createRouteFromPage(ReadablePage $page): Route
     {
         return new Route($page->getPath()->toString(), [
             'page' => $page,

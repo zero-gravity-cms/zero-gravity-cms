@@ -86,6 +86,18 @@ interface ReadablePage
     public function isVisible(): bool;
 
     /**
+     * Page is considered a modular page, not a content page, e.g. for holding addressable sub content.
+     * Modular pages will be hidden from menus.
+     */
+    public function isModular(): bool;
+
+    /**
+     * Page is considered a modular snippet, not a standalone page.
+     * This is usually achieved by prefixing the directory with an underscore.
+     */
+    public function isModule(): bool;
+
+    /**
      * Get custom template to embed this page in.
      */
     public function getLayoutTemplate(): ?string;
@@ -107,24 +119,25 @@ interface ReadablePage
 
     /**
      * Get optional date information of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getDate(): ?DateTimeImmutable;
 
     /**
      * Get optional publishing date of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getPublishDate(): ?DateTimeImmutable;
 
     /**
      * Get optional un-publishing date of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getUnpublishDate(): ?DateTimeImmutable;
 
+    /**
+     * All the publishing settings are okay.
+     * By default these are:
+     * - 'publish'
+     * - 'publish_date'
+     * - 'unpublish_date'.
+     */
     public function isPublished(): bool;
 }

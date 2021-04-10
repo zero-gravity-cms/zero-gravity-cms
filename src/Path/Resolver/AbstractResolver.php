@@ -10,7 +10,7 @@ abstract class AbstractResolver implements SinglePathResolver
     /**
      * @param Path|null $parentPath
      */
-    protected function moveNonGlobsToParent(Path $path, Path $parentPath)
+    protected function moveNonGlobsToParent(Path $path, Path $parentPath): void
     {
         $fromElements = $path->getElements();
         while (count($fromElements) > 1 && !$fromElements[0]->isGlob()) {

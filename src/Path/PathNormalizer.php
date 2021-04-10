@@ -7,7 +7,7 @@ use ZeroGravity\Cms\Exception\UnsafePathException;
 /**
  * Thanks to https://stackoverflow.com/a/39796579/22592.
  */
-class PathNormalizer
+final class PathNormalizer
 {
     /**
      * Normalize a path, resolving all relative jumps ("../").
@@ -15,7 +15,7 @@ class PathNormalizer
      *
      * $parentPath can be used to step outside the filename level.
      */
-    public static function normalizePath(Path $path, Path $parentPath = null)
+    public static function normalizePath(Path $path, Path $parentPath = null): void
     {
         $normalizedElements = [];
         $parentPathElements = (null !== $parentPath) ? $parentPath->getElements() : [];
@@ -23,7 +23,7 @@ class PathNormalizer
         foreach ($path->getElements() as $element) {
             if (!$element->isParentReference()) {
                 // cool, we found a new part
-                array_push($normalizedElements, $element);
+                $normalizedElements[] = $element;
             } elseif (count($normalizedElements) > 0) {
                 // going back up? sure
                 array_pop($normalizedElements);

@@ -109,7 +109,8 @@ trait PageSettingsTrait
     }
 
     /**
-     * Page is considered a modular page, not a content page.
+     * Page is considered a modular page, not a content page, e.g. for holding addressable sub content.
+     * Modular pages will be hidden from menus.
      */
     public function isModular(): bool
     {
@@ -118,6 +119,7 @@ trait PageSettingsTrait
 
     /**
      * Page is considered a modular snippet, not a standalone page.
+     * This is usually achieved by prefixing the directory with an underscore.
      */
     public function isModule(): bool
     {

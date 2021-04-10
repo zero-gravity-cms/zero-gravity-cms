@@ -9,7 +9,7 @@ use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
 
-final class ContentRepository
+final class ContentRepository implements ReadablePageRepository, WritablePageRepository, CacheablePageRepository
 {
     private const ALL_PAGES_CACHE_KEY = 'all_pages';
 

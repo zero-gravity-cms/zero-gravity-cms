@@ -22,9 +22,7 @@ class Page implements ReadablePage
     public const TAXONOMY_AUTHOR = 'author';
 
     protected string $name;
-
     private ?ReadablePage $parent = null;
-
     private ?string $content = null;
 
     /**
@@ -33,7 +31,6 @@ class Page implements ReadablePage
     private array $children = [];
 
     private ?Path $path = null;
-
     private ?Path $filesystemPath = null;
 
     public function __construct(string $name, array $settings = [], ReadablePage $parent = null)

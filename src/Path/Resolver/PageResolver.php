@@ -6,7 +6,7 @@ use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
-class PageResolver extends AbstractResolver
+final class PageResolver extends AbstractResolver
 {
     private ContentRepository $contentRepository;
 

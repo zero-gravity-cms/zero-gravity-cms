@@ -8,14 +8,12 @@ use Symfony\Contracts\Cache\CacheInterface;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 
-class CachingResolver extends AbstractResolver implements MultiPathResolver
+final class CachingResolver extends AbstractResolver implements MultiPathResolver
 {
     use MultiPathFindOneTrait;
 
     protected CacheInterface $cache;
-
     protected SinglePathResolver $wrappedResolver;
-
     protected SlugifyInterface $slugify;
 
     public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
@@ -32,7 +30,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      *
      * @throws InvalidArgumentException
      */
-    public function find(Path $path, Path $parentPath = null): array
+    public function find(Path $path, ?Path $parentPath = null): array
     {
         if (!$this->wrappedResolver instanceof MultiPathResolver) {
             return [];
@@ -49,7 +47,7 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
      *
      * @throws InvalidArgumentException
      */
-    public function get(Path $path, Path $parentPath = null): ?File
+    public function get(Path $path, ?Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
 
@@ -58,18 +56,10 @@ class CachingResolver extends AbstractResolver implements MultiPathResolver
         });
     }
 
-    /**
-     * @param Path $parentPath
-     *
-     * @return string
-     */
-    protected function generateCacheKey(string $method, Path $path, Path $parentPath = null)
+    private function generateCacheKey(string $method, Path $path, ?Path $parentPath = null): string
     {
-        if (null === $parentPath) {
-            $parentPath = '';
-        }
-
-        $signature = sprintf('%s::%s::%s', $method, $path, $parentPath);
+        $parentString = $parentPath ? $parentPath->toString() : '';
+        $signature = sprintf('%s::%s::%s', $method, $path, $parentString);
 
         return $this->slugify->slugify($signature).'_'.sha1($signature);
     }

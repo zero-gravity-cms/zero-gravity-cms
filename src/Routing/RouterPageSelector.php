@@ -9,13 +9,10 @@ use ZeroGravity\Cms\Content\Page;
 /**
  * Determine current page based on routing.
  */
-class RouterPageSelector
+final class RouterPageSelector
 {
     private RequestStack $requestStack;
 
-    /**
-     * RouterPageSelector constructor.
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
