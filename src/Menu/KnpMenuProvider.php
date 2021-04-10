@@ -117,11 +117,11 @@ class KnpMenuProvider implements MenuProviderInterface
             $pageItemSettings
         );
         $itemOptions['extras'] = array_merge(
-            isset($defaultOptions['extras']) ? $defaultOptions['extras'] : [],
+            $defaultOptions['extras'] ?? [],
             [
                 'page_slug' => $page->getSlug(),
             ],
-            isset($pageItemSettings['extras']) ? $pageItemSettings['extras'] : []
+            $pageItemSettings['extras'] ?? []
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 

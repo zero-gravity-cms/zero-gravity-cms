@@ -42,7 +42,7 @@ class SortableIteratorTest extends BaseUnit
             $sortMethod = 'sortBy'.ucfirst($method);
             $finder->$sortMethod();
         } elseif (is_array($method)) {
-            list($method, $parameter) = $method;
+            [$method, $parameter] = $method;
             $sortMethod = 'sortBy'.ucfirst($method);
             $finder->$sortMethod($parameter);
         } elseif (is_callable($method)) {

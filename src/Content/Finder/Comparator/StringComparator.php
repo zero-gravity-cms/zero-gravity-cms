@@ -23,6 +23,6 @@ class StringComparator extends Comparator
 
         $target = $matches[2];
         $this->setTarget($target);
-        $this->setOperator(isset($matches[1]) ? $matches[1] : '==');
+        $this->setOperator($matches[1] ?? '==');
     }
 }

@@ -12,7 +12,6 @@ use IteratorAggregate;
 use LogicException;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
-use Traversable;
 use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
@@ -183,7 +182,7 @@ class PageFinder implements IteratorAggregate, Countable
             $this->iterators[] = $iterator->getIterator();
         } elseif ($iterator instanceof Iterator) {
             $this->iterators[] = $iterator;
-        } elseif ($iterator instanceof Traversable || is_array($iterator)) {
+        } elseif (is_iterable($iterator)) {
             $this->iterators[] = $this->appendPageArrayIterator($iterator);
         } elseif ($iterator instanceof Page) {
             $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);

@@ -41,17 +41,14 @@ class SortableIterator implements IteratorAggregate
             return;
         }
         $parameter = null;
-        if (is_array($sort) && 2 == count($sort)) {
-            list($sort, $parameter) = $sort;
+        if (is_array($sort) && 2 === count($sort)) {
+            [$sort, $parameter] = $sort;
         }
 
         $this->configureSortFunction($sort, $parameter);
     }
 
     /**
-     * @param $sort
-     * @param $parameter
-     *
      * @throws InvalidArgumentException
      */
     private function configureSortFunction(string $sort, string $parameter = null): void

@@ -195,7 +195,7 @@ trait TwigExtensionTestTrait
             // avoid using the same PHP class name for different cases
             $p = new ReflectionProperty($twig, 'templateClassPrefix');
             $p->setAccessible(true);
-            $p->setValue($twig, '__TwigTemplate_'.hash('sha256', uniqid(mt_rand(), true), false).'_');
+            $p->setValue($twig, '__TwigTemplate_'.hash('sha256', uniqid(random_int(0, mt_getrandmax()), true), false).'_');
 
             try {
                 $template = $twig->loadTemplate('index.twig');
