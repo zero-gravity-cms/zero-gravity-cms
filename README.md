@@ -3,9 +3,9 @@ ZeroGravity CMS
 
 A [Grav](https://getgrav.org/)-like CMS made for Symfony-based projects.
 
-[![pipeline status](https://gitlab.com/zero-gravity/zero-gravity-cms/badges/master/pipeline.svg)](https://gitlab.com/zero-gravity/zero-gravity-cms/commits/master)
-[![coverage report](https://gitlab.com/zero-gravity/zero-gravity-cms/badges/master/coverage.svg)](https://gitlab.com/zero-gravity/zero-gravity-cms/commits/master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zero-gravity-cms/zero-gravity-cms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/zero-gravity-cms/zero-gravity-cms/?branch=master)
+[![pipeline status](https://gitlab.com/zero-gravity/zero-gravity-cms/badges/main/pipeline.svg)](https://gitlab.com/zero-gravity/zero-gravity-cms/commits/main)
+[![coverage report](https://gitlab.com/zero-gravity/zero-gravity-cms/badges/main/coverage.svg)](https://gitlab.com/zero-gravity/zero-gravity-cms/commits/main)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/zero-gravity-cms/zero-gravity-cms/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/zero-gravity-cms/zero-gravity-cms/?branch=main)
 
 What is ZeroGravity CMS?
 ------------------------
