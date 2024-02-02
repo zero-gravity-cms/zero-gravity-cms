@@ -3,7 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\Slugify;
-use Codeception\Util\Stub;
+use Codeception\Stub;
 use Iterator;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -22,7 +22,7 @@ class CachingResolverTest extends BaseUnit
      *
      * @dataProvider provideMethods
      */
-    public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null)
+    public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null): void
     {
         if (null === $calledMethod) {
             $calledMethod = $method;

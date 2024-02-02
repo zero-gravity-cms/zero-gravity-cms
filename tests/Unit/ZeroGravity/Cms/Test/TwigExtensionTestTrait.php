@@ -200,7 +200,7 @@ trait TwigExtensionTestTrait
             $p->setValue($twig, '__TwigTemplate_'.hash('sha256', uniqid(random_int(0, mt_getrandmax()), true), false).'_');
 
             try {
-                $template = $twig->loadTemplate('index.twig');
+                $template = $twig->load('index.twig');
             } catch (Exception $e) {
                 if (false !== $exception) {
                     $message = $e->getMessage();

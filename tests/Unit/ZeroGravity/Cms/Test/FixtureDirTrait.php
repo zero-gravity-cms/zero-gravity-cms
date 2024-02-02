@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Test;
 
-use Helper\Unit;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Tests\Support\Helper\Unit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
@@ -23,12 +23,9 @@ trait FixtureDirTrait
         return $this->getUnitHelperModule()->getPageFixtureDir();
     }
 
-    /**
-     * @return Unit
-     */
-    protected function getUnitHelperModule()
+    protected function getUnitHelperModule(): Unit
     {
-        return $this->getModule('\Helper\Unit');
+        return $this->getModule(Unit::class);
     }
 
     /**
@@ -47,10 +44,7 @@ trait FixtureDirTrait
         return new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->getValidPagesDir());
     }
 
-    /**
-     * @return FilesystemMapper
-     */
-    protected function getValidPagesFilesystemMapper()
+    protected function getValidPagesFilesystemMapper(): FilesystemMapper
     {
         $fileFactory = $this->getDefaultFileFactory();
         $path = $this->getValidPagesDir();
@@ -58,10 +52,7 @@ trait FixtureDirTrait
         return new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
     }
 
-    /**
-     * @return FilesystemResolver
-     */
-    protected function getValidPagesResolver()
+    protected function getValidPagesResolver(): FilesystemResolver
     {
         return new FilesystemResolver($this->getDefaultFileFactory());
     }

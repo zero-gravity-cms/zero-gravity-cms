@@ -62,7 +62,7 @@ class ZeroGravityExtensionTest extends BaseUnit
      */
     protected function getFixturesDir()
     {
-        return __DIR__.'/../../../../../_data/twig_fixtures';
+        return codecept_data_dir('twig_fixtures');
     }
 
     /**

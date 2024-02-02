@@ -3,7 +3,6 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
 use DateTime;
-use stdClass;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -68,10 +67,7 @@ class FilterRegistryTest extends BaseUnit
      */
     public function callableFilterWillBeApplied(): void
     {
-        $filter = $this->getMockBuilder(stdClass::class)
-            ->setMethods(['myMethod'])
-            ->getMock()
-        ;
+        $filter = $this->getMockBuilder(MockFilter::class)->getMock();
         $filter->expects(static::once())
             ->method('myMethod')
             ->willReturnArgument(0)
@@ -93,7 +89,7 @@ class FilterRegistryTest extends BaseUnit
     public function pageFinderFilterInstanceWillBeApplied(): void
     {
         $filter = $this->getMockBuilder(PageFinderFilter::class)
-            ->setMethods(['apply'])
+            ->onlyMethods(['apply'])
             ->getMock()
         ;
         $filter->expects(static::once())
@@ -131,7 +127,7 @@ class FilterRegistryTest extends BaseUnit
         $filter = fn (PageFinder $finder) => $finder;
 
         $filters = $this->getMockBuilder(PageFinderFilters::class)
-            ->setMethods(['getFilters'])
+            ->onlyMethods(['getFilters'])
             ->getMock()
         ;
         $filters->expects(static::once())

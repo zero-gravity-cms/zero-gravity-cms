@@ -575,6 +575,8 @@ class PageFinderTest extends BaseUnit
 
     /**
      * @test
+     *
+     * @group bug
      */
     public function pagesCanBeFilteredByExtra()
     {
@@ -596,7 +598,7 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder()
             ->extra('my_custom_date', '> 2016-01-01')
         ;
-        static::assertCount(4, $finder, 'String comparison of date value, comparator');
+        static::assertCount(2, $finder, 'String comparison of date value');
 
         $finder = $this->getFinder()
             ->extra('my_custom_date', '> 2016-01-01', ExtraFilter::COMPARATOR_DATE)

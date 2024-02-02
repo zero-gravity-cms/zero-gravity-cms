@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
-use Codeception\Util\Stub;
+use Codeception\Stub;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -54,10 +54,7 @@ class ContentRepositoryTest extends BaseUnit
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)
-            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
-            ->getMock()
-        ;
+        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
         $mapper->expects(static::once())
             ->method('getWritablePageInstance')
         ;
@@ -75,10 +72,7 @@ class ContentRepositoryTest extends BaseUnit
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)
-            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
-            ->getMock()
-        ;
+        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
         $mapper->expects(static::once())
             ->method('getNewWritablePage')
             ->with($page1)
@@ -97,10 +91,7 @@ class ContentRepositoryTest extends BaseUnit
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)
-            ->setMethods(['parse', 'getWritablePageInstance', 'getNewWritablePage', 'saveChanges'])
-            ->getMock()
-        ;
+        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
 
         $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
         $old = $repo->getWritablePageInstance($page1);
@@ -194,7 +185,7 @@ class ContentRepositoryTest extends BaseUnit
         ]);
 
         $cache = $this->getMockBuilder(ArrayAdapter::class)
-            ->setMethods(['getItem'])
+            ->onlyMethods(['getItem'])
             ->getMock()
         ;
         $cache->expects(self::atLeast(1))

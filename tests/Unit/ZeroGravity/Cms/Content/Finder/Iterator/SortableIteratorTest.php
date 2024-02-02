@@ -19,7 +19,7 @@ class SortableIteratorTest extends BaseUnit
 {
     private ?PageFinder $finderPrototype = null;
 
-    public function _before()
+    public function _before(): void
     {
         $mapper = $this->getValidPagesFilesystemMapper();
         $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
@@ -157,9 +157,9 @@ class SortableIteratorTest extends BaseUnit
             '/no_sorting_prefix' => '/no_sorting_prefix',
         ];
         $pagesSortedByCustomFunction = [
-            '/yaml_and_twig/child1' => 'Child1',
-            '/with_children/_child1' => 'Child1',
             '/not_published/child1' => 'Child1',
+            '/with_children/_child1' => 'Child1',
+            '/yaml_and_twig/child1' => 'Child1',
             '/with_children/_child2' => 'Child2',
             '/yaml_and_twig/child2' => 'Child2',
             '/markdown_only' => 'Markdown Only',
@@ -185,7 +185,8 @@ class SortableIteratorTest extends BaseUnit
             '/yaml_and_twig' => 'invalid date value',
         ];
 
-        $customFunction = fn (Page $a, Page $b) => strcmp($a->getTitle(), $b->getTitle());
+        $customFunction = fn (Page $a, Page $b) => $a->getTitle().$a->getPath() <=> $b->getTitle().$b->getPath();
+
         yield SortableIterator::SORT_BY_NAME => [SortableIterator::SORT_BY_NAME, $pagesSortedByName];
         yield SortableIterator::SORT_BY_SLUG => [SortableIterator::SORT_BY_SLUG, $pagesSortedBySlug];
         yield SortableIterator::SORT_BY_TITLE => [SortableIterator::SORT_BY_TITLE, $pagesSortedByTitle];

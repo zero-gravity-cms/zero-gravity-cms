@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Routing;
 
-use Codeception\Util\Stub;
+use Codeception\Stub;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;

@@ -11,18 +11,14 @@ use Symfony\Component\Finder\Comparator\Comparator;
 final class StringComparator extends Comparator
 {
     /**
-     * @param string|int $test A comparison string or an integer
-     *
      * @throws InvalidArgumentException If the test is not understood
      */
-    public function __construct($test)
+    public function __construct(string $target, string $operator = '==')
     {
-        if (!preg_match('#^\s*(==|!=|[<>]=?)?\s*(.+?)\s*$#i', $test, $matches)) {
-            throw new InvalidArgumentException(sprintf('Don\'t understand "%s" as a string test.', $test));
+        if (!preg_match('#^\s*(==|!=|[<>]=?)?\s*(.+?)\s*$#i', $target, $matches)) {
+            throw new InvalidArgumentException(sprintf('Don\'t understand "%s" as a string test.', $target));
         }
 
-        $target = $matches[2];
-        $this->setTarget($target);
-        $this->setOperator($matches[1] ?? '==');
+        parent::__construct($matches[2], $matches[1] ?: $operator);
     }
 }
