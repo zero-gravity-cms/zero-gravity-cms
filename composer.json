@@ -11,20 +11,20 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.4",
-        "cocur/slugify": "^2.5|^3.0|^4.0",
+        "php": ">=8.2",
+        "cocur/slugify": "^4.0",
         "liip/imagine-bundle": "^2.0",
-        "mnapoli/front-yaml": "^1.5",
-        "symfony-cmf/routing-bundle": "^2.0",
-        "symfony/finder": "^4.4|^5.0",
-        "symfony/cache": "^4.4|^5.0",
-        "twig/twig": "^2.7"
+        "mnapoli/front-yaml": "^2.0",
+        "symfony-cmf/routing-bundle": "^3.0",
+        "symfony/cache": "^6.4|^7.0",
+        "symfony/finder": "^6.4|^7.0",
+        "twig/twig": "^2.7|^3.5"
     },
     "require-dev": {
-        "codeception/codeception": "^4.1",
-        "knplabs/knp-menu": "^2.0",
-        "symfony/var-dumper": "^4.4|^5.0",
-        "rector/rector-prefixed": "^0.9"
+        "codeception/codeception": "^5.0",
+        "knplabs/knp-menu": "^3.0",
+        "symfony/var-dumper": "^6.4|^7.0",
+        "rector/rector": "^0.19"
     },
     "autoload": {
         "psr-4": {
@@ -36,11 +36,14 @@
             "Tests\\Unit\\": "tests/unit/"
         }
     },
+    "config": {
+        "sort-packages": true
+    },
     "extra": {
         "symfony": {
             "id": "",
             "allow-contrib": false,
-            "require": "^4.4"
+            "require": "^6.4"
         }
     }
 }
