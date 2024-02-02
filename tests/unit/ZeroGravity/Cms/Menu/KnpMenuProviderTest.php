@@ -151,7 +151,9 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
+     *
      * @group now
      */
     public function eventsAreDispatchedDuringBuild()
@@ -264,19 +266,19 @@ class KnpMenuProviderTest extends BaseUnit
                 case 3:
                     return $beforeAddHomeChildrenCallback($argument);
 
-                // first item's children post-event
+                    // first item's children post-event
                 case 4:
                     return $afterAddHomeChildrenCallback($argument);
                 case 5:
                     return $argument instanceof AfterAddItem;
 
-                // second item
+                    // second item
                 case 6:
                     return $argument instanceof BeforeAddItem;
                 case 7:
                     return $argument instanceof BeforeAddChildrenToItem;
 
-                // second item first child
+                    // second item first child
                 case 8:
                     return $argument instanceof BeforeAddItem;
                 case 9:
@@ -286,7 +288,7 @@ class KnpMenuProviderTest extends BaseUnit
                 case 11:
                     return $argument instanceof AfterAddItem;
 
-                // second item second child
+                    // second item second child
                 case 12:
                     return $argument instanceof BeforeAddItem;
                 case 13:
@@ -296,13 +298,13 @@ class KnpMenuProviderTest extends BaseUnit
                 case 15:
                     return $afterAddSecondSubChildItemCallback($argument);
 
-                // second item finished
+                    // second item finished
                 case 16:
                     return $afterAddSecondItemChildrenCallback($argument);
                 case 17:
                     return $argument instanceof AfterAddItem;
 
-                // third item
+                    // third item
                 case 18:
                     return $argument instanceof BeforeAddItem;
                 case 19:
@@ -312,7 +314,7 @@ class KnpMenuProviderTest extends BaseUnit
                 case 21:
                     return $argument instanceof AfterAddItem;
 
-                // menu finished
+                    // menu finished
                 case 22:
                     return $argument instanceof AfterBuildMenu;
             }
@@ -331,6 +333,7 @@ class KnpMenuProviderTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function itemsCanBeChangedThroughEvents()

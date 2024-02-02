@@ -23,9 +23,6 @@ final class WritableFilesystemPage extends Page implements WritablePage
         parent::__construct($page->getName(), $page->getSettings(), $page->getParent());
     }
 
-    /**
-     * @return Directory
-     */
     public function getDirectory(): ?Directory
     {
         return $this->directory;

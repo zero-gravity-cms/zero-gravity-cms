@@ -12,6 +12,7 @@ class PageResolverTest extends BaseUnit
 {
     /**
      * @test
+     *
      * @dataProvider provideSingleFilePaths
      *
      * @param string $inPath
@@ -56,6 +57,7 @@ class PageResolverTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideNonExistingPagePaths
      *
      * @param string $inPath

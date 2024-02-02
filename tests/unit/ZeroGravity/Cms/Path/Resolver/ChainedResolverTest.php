@@ -17,6 +17,7 @@ class ChainedResolverTest extends BaseUnit
 {
     /**
      * @test
+     *
      * @dataProvider provideSingleFilePaths
      *
      * @param string $inPath

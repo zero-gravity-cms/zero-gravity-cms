@@ -12,10 +12,8 @@ class PathNormalizerTest extends BaseUnit
 {
     /**
      * @test
-     * @dataProvider provideValidPaths
      *
-     * @param $path
-     * @param $resolvedPath
+     * @dataProvider provideValidPaths
      */
     public function validPathIsNormalized(string $path, string $resolvedPath)
     {
@@ -38,9 +36,8 @@ class PathNormalizerTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideInvalidPaths
      *
-     * @param $path
+     * @dataProvider provideInvalidPaths
      */
     public function invalidPathThrowsException(string $path)
     {
@@ -59,6 +56,7 @@ class PathNormalizerTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider providePathsWithInPath
      */
     public function validPathAndParentPathIsNormalized(string $path, string $parentPath, string $resolvedPath, string $resolvedParentPath)

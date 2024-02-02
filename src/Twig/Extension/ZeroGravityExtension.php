@@ -103,7 +103,7 @@ final class ZeroGravityExtension extends AbstractExtension
     /**
      * This can be used to generate an ID attribute-safe representation of a page path.
      */
-    public function getPageHash(?ReadablePage $page = null): string
+    public function getPageHash(ReadablePage $page = null): string
     {
         if (null === $page) {
             return 'page_'.md5('');

@@ -71,7 +71,7 @@ final class PageFactory
         return $page;
     }
 
-    private function buildPageSettings(array $defaultSettings, Directory $directory, ?Page $parentPage = null): array
+    private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
     {
         $settings = $directory->fetchPageSettings();
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();

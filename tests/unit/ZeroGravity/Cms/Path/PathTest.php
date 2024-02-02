@@ -13,9 +13,8 @@ class PathTest extends BaseUnit
 {
     /**
      * @test
-     * @dataProvider providePathData
      *
-     * @param $pathString
+     * @dataProvider providePathData
      */
     public function pathIsParsedAndAnalyzed($pathString, array $expectations)
     {
@@ -32,9 +31,8 @@ class PathTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider providePathData
      *
-     * @param $pathString
+     * @dataProvider providePathData
      */
     public function toStringRebuildsPath($pathString, array $expectations)
     {
@@ -222,6 +220,7 @@ class PathTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideAppendedPathData
      */
     public function appendReturnsAppendedPathWithChildSettings(
@@ -300,10 +299,8 @@ class PathTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideDirectoryPathData
      *
-     * @param $pathString
-     * @param $expectedDirectoryPath
+     * @dataProvider provideDirectoryPathData
      */
     public function getDirectoryReturnsNewPathInstanceContainingPathDirectory($pathString, $expectedDirectoryPath)
     {
@@ -340,10 +337,8 @@ class PathTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideFilePathData
      *
-     * @param $pathString
-     * @param $expectedFilePath
+     * @dataProvider provideFilePathData
      */
     public function getFileReturnsNewPathInstanceContainingPathFile($pathString, $expectedFilePath)
     {

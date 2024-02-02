@@ -13,7 +13,9 @@ class FilesystemResolverTest extends BaseUnit
 {
     /**
      * @test
+     *
      * @dataProvider provideSingleValidFiles
+     *
      * @group resolver
      *
      * @param Path|null $inPath
@@ -98,6 +100,7 @@ class FilesystemResolverTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideSingleInvalidFiles
      */
     public function singleInvalidFile($file)
@@ -131,6 +134,7 @@ class FilesystemResolverTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideMultipleFilePatterns
      *
      * @param Path|null $inPath

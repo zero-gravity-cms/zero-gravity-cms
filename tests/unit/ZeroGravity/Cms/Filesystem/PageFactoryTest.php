@@ -36,6 +36,7 @@ class PageFactoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideValidDirectories
      *
      * @param string $path
@@ -166,6 +167,7 @@ class PageFactoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function eventsAreDispatchedDuringCreatePage()

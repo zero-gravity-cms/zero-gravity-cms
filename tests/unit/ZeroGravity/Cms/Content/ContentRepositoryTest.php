@@ -47,6 +47,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function writablePageIsLoadedFromMapper()
@@ -67,6 +68,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function newWritablePageIsLoadedFromMapper()
@@ -88,6 +90,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function diffIsSavedThroughMapper()
@@ -175,6 +178,7 @@ class ContentRepositoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function pagesAreLoadedIfCacheThrowsException()
@@ -203,8 +207,6 @@ class ContentRepositoryTest extends BaseUnit
     }
 
     /**
-     * @param $name
-     *
      * @return Page
      */
     private function createSimplePage($name, Page $parent = null)

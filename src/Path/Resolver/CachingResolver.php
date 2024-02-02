@@ -30,7 +30,7 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
      *
      * @throws InvalidArgumentException
      */
-    public function find(Path $path, ?Path $parentPath = null): array
+    public function find(Path $path, Path $parentPath = null): array
     {
         if (!$this->wrappedResolver instanceof MultiPathResolver) {
             return [];
@@ -47,7 +47,7 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
      *
      * @throws InvalidArgumentException
      */
-    public function get(Path $path, ?Path $parentPath = null): ?File
+    public function get(Path $path, Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
 
@@ -56,7 +56,7 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
         });
     }
 
-    private function generateCacheKey(string $method, Path $path, ?Path $parentPath = null): string
+    private function generateCacheKey(string $method, Path $path, Path $parentPath = null): string
     {
         $parentString = $parentPath ? $parentPath->toString() : '';
         $signature = sprintf('%s::%s::%s', $method, $path, $parentString);

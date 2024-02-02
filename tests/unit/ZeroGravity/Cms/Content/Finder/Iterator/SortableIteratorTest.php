@@ -17,7 +17,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class SortableIteratorTest extends BaseUnit
 {
-    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
+    private ?PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -29,9 +29,8 @@ class SortableIteratorTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideSortResults
      *
-     * @param $method
+     * @dataProvider provideSortResults
      */
     public function sortMethodWorks($method, array $expectedElements)
     {

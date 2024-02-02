@@ -19,6 +19,7 @@ class CachingResolverTest extends BaseUnit
 {
     /**
      * @test
+     *
      * @dataProvider provideMethods
      */
     public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null)

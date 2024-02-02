@@ -29,6 +29,7 @@ class FilterRegistryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function allowsPageFinderFilterToBeAdded(): void
@@ -40,6 +41,7 @@ class FilterRegistryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @doesNotPerformAssertions
      */
     public function allowsCallableToBeAdded(): void

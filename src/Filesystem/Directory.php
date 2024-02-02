@@ -222,9 +222,9 @@ final class Directory
     private function yamlAndMarkdownBasenamesMatch(): bool
     {
         return
-            !$this->hasYamlFile() ||
-            !$this->hasMarkdownFile() ||
-            ($this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename())
+            !$this->hasYamlFile()
+            || !$this->hasMarkdownFile()
+            || ($this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename())
         ;
     }
 

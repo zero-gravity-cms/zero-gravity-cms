@@ -14,9 +14,8 @@ class MediaRepositoryTest extends BaseUnit
 {
     /**
      * @test
-     * @dataProvider provideValidMediaPaths
      *
-     * @param $pathString
+     * @dataProvider provideValidMediaPaths
      */
     public function validPathReturnsFile($pathString): void
     {
@@ -33,9 +32,8 @@ class MediaRepositoryTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideInvalidMediaPaths
      *
-     * @param $pathString
+     * @dataProvider provideInvalidMediaPaths
      */
     public function invalidPathReturnsNull($pathString): void
     {

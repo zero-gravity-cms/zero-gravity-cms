@@ -13,16 +13,19 @@ $cacheDir = __DIR__.'/.robo/cache';
 if (!is_dir($cacheDir)) {
     mkdir($cacheDir, 0777, true);
 }
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
 //    ->setUsingCache(false)
-    ->setCacheFile($cacheDir.'/.php_cs.cache')
+    ->setCacheFile($cacheDir.'/.php-cs-fixer.cache')
     ->setRules([
         '@Symfony' => true,
-        'array_syntax' => ['syntax' => 'short'],
+        'global_namespace_import' => [
+            'import_classes' => true,
+            'import_constants' => true,
+            'import_functions' => false,
+        ],
         'no_superfluous_phpdoc_tags' => true,
         'no_superfluous_elseif' => true,
         'phpdoc_add_missing_param_annotation' => true,
-        'ordered_imports' => true,
     ])
     ->setFinder($finder)
 ;

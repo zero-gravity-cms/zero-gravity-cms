@@ -41,6 +41,7 @@ class FilesystemMapperTest extends BaseUnit
 
     /**
      * @test
+     *
      * @group write
      */
     public function parserReturnsWritablePage()

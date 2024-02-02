@@ -47,6 +47,7 @@ class DirectoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider provideInvalidDirectories
      *
      * @param string $path
@@ -95,6 +96,7 @@ class DirectoryTest extends BaseUnit
 
     /**
      * @test
+     *
      * @dataProvider providePathsAndStrategies
      *
      * @param string $path

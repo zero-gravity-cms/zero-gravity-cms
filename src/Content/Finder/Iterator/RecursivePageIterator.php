@@ -9,7 +9,7 @@ use ZeroGravity\Cms\Content\Page;
 /**
  * @method Page current()
  */
-final class RecursivePageIterator extends ArrayIterator implements \RecursiveIterator
+final class RecursivePageIterator extends ArrayIterator implements RecursiveIterator
 {
     /**
      * Returns if an iterator can be created for the current pages children.

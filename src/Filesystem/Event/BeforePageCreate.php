@@ -14,7 +14,7 @@ final class BeforePageCreate extends Event
 
     private ?Page $parentPage;
 
-    public function __construct(Directory $directory, array $settings, ?Page $parentPage = null)
+    public function __construct(Directory $directory, array $settings, Page $parentPage = null)
     {
         $this->directory = $directory;
         $this->settings = $settings;

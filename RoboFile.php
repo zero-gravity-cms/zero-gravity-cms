@@ -47,14 +47,13 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @see http://robo.li/
  */
-class RoboFile extends \C33s\Robo\BaseRoboFile
+class RoboFile extends C33s\Robo\BaseRoboFile
 {
-    const GLOBAL_COMPOSER_PACKAGES = [
-        'symfony/flex' => '^1.0',
+    use C33s\Robo\C33sTasks;
+    use C33s\Robo\C33sExtraTasks;
+    public const GLOBAL_COMPOSER_PACKAGES = [
+        'symfony/flex' => '^1.18',
     ];
-
-    use \C33s\Robo\C33sTasks;
-    use \C33s\Robo\C33sExtraTasks;
 
     protected $portsToCheck = [
         // 'http' => null,
@@ -72,10 +71,10 @@ class RoboFile extends \C33s\Robo\BaseRoboFile
     {
         $this->stopOnFail(true);
         $this->_prepareCiModules([
-            'composer' => '2.0.7',
-            'php-cs-fixer' => 'v2.17.3',
-            'phpstan' => '0.12.67',
-            'phpcs' => '3.4.0',
+            'composer' => '2.6.6',
+            'php-cs-fixer' => 'v3.48.0',
+            'phpstan' => '1.10.56',
+            'phpcs' => '3.7.2',
         ]);
     }
 

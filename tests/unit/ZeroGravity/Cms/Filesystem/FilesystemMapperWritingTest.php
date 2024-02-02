@@ -309,6 +309,7 @@ class FilesystemMapperWritingTest extends BaseUnit
 
     /**
      * @test
+     *
      * @group new
      */
     public function newPageCanBeSavedInRootDir()
@@ -336,6 +337,7 @@ class FilesystemMapperWritingTest extends BaseUnit
 
     /**
      * @test
+     *
      * @group new
      */
     public function newPageCanBeSavedInAnotherPageDir()

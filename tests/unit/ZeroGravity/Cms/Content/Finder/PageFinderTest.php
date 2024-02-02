@@ -18,7 +18,7 @@ use ZeroGravity\Cms\Content\Page;
  */
 class PageFinderTest extends BaseUnit
 {
-    private ?\ZeroGravity\Cms\Content\Finder\PageFinder $finderPrototype = null;
+    private ?PageFinder $finderPrototype = null;
 
     public function _before()
     {
@@ -40,9 +40,8 @@ class PageFinderTest extends BaseUnit
 
     /**
      * @test
-     * @dataProvider provideFinderMethods
      *
-     * @param $param
+     * @dataProvider provideFinderMethods
      */
     public function finderMethodReturnsThisForChaining(string $method, $param)
     {
