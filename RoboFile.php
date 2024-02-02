@@ -51,8 +51,8 @@ class RoboFile extends C33s\Robo\BaseRoboFile
 {
     use C33s\Robo\C33sTasks;
     use C33s\Robo\C33sExtraTasks;
+
     public const GLOBAL_COMPOSER_PACKAGES = [
-        'symfony/flex' => '^1.18',
     ];
 
     protected $portsToCheck = [
