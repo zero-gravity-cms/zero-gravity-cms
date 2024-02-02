@@ -101,9 +101,6 @@ final class SortableIterator implements IteratorAggregate
         };
     }
 
-    /**
-     * @param $getter
-     */
     private function sortByDateOrPath($getter): void
     {
         $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter) {
@@ -124,9 +121,6 @@ final class SortableIterator implements IteratorAggregate
         };
     }
 
-    /**
-     * @param $getter
-     */
     private function sortByGetter($getter): void
     {
         $this->sortBy = static fn (Page $pageA, Page $pageB) => strcasecmp($pageA->$getter()->toString(), $pageB->$getter()->toString());

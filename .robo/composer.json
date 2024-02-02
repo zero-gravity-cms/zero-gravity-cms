@@ -1,9 +1,12 @@
 {
     "require": {
         "c33s/robofile": "^4.0",
-        "squizlabs/php_codesniffer": "3.5.3",
-        "phpcompatibility/php-compatibility": "9.3.4",
-        "phpcompatibility/phpcompatibility-symfony": "*",
-        "yzalis/identicon": "^1.2"
+        "squizlabs/php_codesniffer": "^3.5",
+        "phpcompatibility/php-compatibility": "^9.3.5",
+        "phpcompatibility/phpcompatibility-symfony": "^1.2"
+    }
+    ,
+    "config": {
+        "sort-packages": true
     }
 }

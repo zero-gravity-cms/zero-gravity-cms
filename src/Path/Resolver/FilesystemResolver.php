@@ -127,7 +127,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         return $this->fileFactory->createFile('/'.$trimmedPath);
     }
 
-    private function buildBaseDir(?Path $parentPath = null): string
+    private function buildBaseDir(Path $parentPath = null): string
     {
         if (null === $parentPath) {
             return $this->basePath;

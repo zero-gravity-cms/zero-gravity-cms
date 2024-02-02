@@ -25,8 +25,6 @@ final class Path
 
     /**
      * Resolve relative reference ('../') in this path.
-     *
-     * @param Path|null $parentPath
      */
     public function normalize(self $parentPath = null): void
     {
@@ -123,10 +121,6 @@ final class Path
 
     /**
      * Create a new Path instance where the elements of the given child Path have been appended.
-     *
-     * @param Path $childPath
-     *
-     * @return Path
      */
     public function appendPath(self $childPath): self
     {
@@ -170,8 +164,6 @@ final class Path
      * If the Path is a directory, null is returned.
      *
      * @see https://stackoverflow.com/a/35957563/22592
-     *
-     * @return Path|null
      */
     public function getFile(): ?self
     {

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Traversable;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\ReadablePageRepository;
@@ -63,7 +64,7 @@ final class RouteProvider implements RouteProviderInterface
      * @throws RouteNotFoundException If there is no route with that name in
      *                                this repository
      */
-    public function getRouteByName($name): Route
+    public function getRouteByName(string $name): Route
     {
         $page = $this->repository->getPage($name);
         if (null === $page) {
@@ -97,7 +98,7 @@ final class RouteProvider implements RouteProviderInterface
      * @return Route[] Iterable list with the keys being the names from the
      *                 $names array
      */
-    public function getRoutesByNames($names): array
+    public function getRoutesByNames(array $names = null): Traversable|array
     {
         $pages = $this->repository->getAllPages();
         if (is_array($names)) {

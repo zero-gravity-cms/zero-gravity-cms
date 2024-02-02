@@ -11,21 +11,21 @@ final class ExtraFilter
     public const COMPARATOR_NUMERIC = 'number';
 
     private string $name;
-    private $value;
+    private mixed $value;
     private string $comparator;
     private bool $inverted;
 
-    public static function has(string $name, $value, string $comparator = self::COMPARATOR_STRING): self
+    public static function has(string $name, mixed $value, string $comparator = self::COMPARATOR_STRING): self
     {
         return new self($name, $value, $comparator, false);
     }
 
-    public static function hasNot(string $name, $value, string $comparator = self::COMPARATOR_STRING): self
+    public static function hasNot(string $name, mixed $value, string $comparator = self::COMPARATOR_STRING): self
     {
         return new self($name, $value, $comparator, true);
     }
 
-    private function __construct(string $name, $value, string $comparator, bool $inverted)
+    private function __construct(string $name, mixed $value, string $comparator, bool $inverted)
     {
         $this->name = $name;
         $this->value = $value;
@@ -38,7 +38,7 @@ final class ExtraFilter
         return $this->name;
     }
 
-    public function value()
+    public function value(): mixed
     {
         return $this->value;
     }

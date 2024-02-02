@@ -168,8 +168,6 @@ trait PageSettingsTrait
 
     /**
      * Get optional date information of this page.
-     *
-     * @return DateTimeImmutable
      */
     public function getDate(): ?DateTimeImmutable
     {

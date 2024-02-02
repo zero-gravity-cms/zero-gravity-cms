@@ -92,9 +92,6 @@ class Page implements ReadablePage
         return $this->filesystemPath;
     }
 
-    /**
-     * @param Page $childPage
-     */
     public function addChild(self $childPage): void
     {
         $this->children[$childPage->getPath()->toString()] = $childPage;
