@@ -16,8 +16,8 @@
         "liip/imagine-bundle": "^2.0",
         "mnapoli/front-yaml": "^2.0",
         "symfony-cmf/routing-bundle": "^3.0",
-        "symfony/cache": "^6.4|^7.0",
-        "symfony/finder": "^6.4|^7.0",
+        "symfony/cache": "^6.0|^7.0",
+        "symfony/finder": "^6.0|^7.0",
         "twig/twig": "^2.7|^3.5"
     },
     "require-dev": {
@@ -25,7 +25,7 @@
         "codeception/stub": "^4.1",
         "knplabs/knp-menu": "^3.0",
         "rector/rector": "^0.19",
-        "symfony/var-dumper": "^6.4|^7.0",
+        "symfony/var-dumper": "^6.0|^7.0",
         "webmozart/assert": "^1.11"
     },
     "autoload": {
