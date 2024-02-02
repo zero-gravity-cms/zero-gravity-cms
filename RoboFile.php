@@ -203,4 +203,12 @@ class RoboFile extends C33s\Robo\BaseRoboFile
             file_put_contents($path, $data);
         }
     }
+
+    /**
+     * Check if the current mode is interactive.
+     */
+    protected function isInteractive(): bool
+    {
+        return $this->input()->isInteractive() && !$this->isEnvironmentCi();
+    }
 }
