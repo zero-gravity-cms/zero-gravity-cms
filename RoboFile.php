@@ -43,6 +43,7 @@ require $roboDir.'/vendor/autoload.php';
 use C33s\Robo\BaseRoboFile;
 use C33s\Robo\C33sExtraTasks;
 use C33s\Robo\C33sTasks;
+use Jdenticon\Identicon;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -162,7 +163,7 @@ class RoboFile extends BaseRoboFile
     public function generateTestIdenticons()
     {
         require_once __DIR__.'/vendor/autoload.php';
-        $basePath = __DIR__.'/tests/_data/page_fixtures/valid_pages/';
+        $basePath = __DIR__.'/tests/Support/_data/page_fixtures/valid_pages/';
 
         $files = [
             'root_file1.png',
@@ -191,7 +192,9 @@ class RoboFile extends BaseRoboFile
             'images/gallery/fancy_picture_21.png',
         ];
 
-        $identicon = new Identicon();
+        $identicon = new Identicon([
+            'Size' => 64,
+        ]);
         $fs = new Filesystem();
 
         foreach ($files as $file) {
@@ -202,7 +205,11 @@ class RoboFile extends BaseRoboFile
             }
 
             echo "$path\n";
-            $data = $identicon->getImageData($file, 64);
+
+            $data = $identicon
+                ->setValue($file)
+                ->getImageData()
+            ;
             file_put_contents($path, $data);
         }
     }
