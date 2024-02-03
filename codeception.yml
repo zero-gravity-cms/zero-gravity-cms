@@ -17,5 +17,3 @@ coverage:
     enabled: true
     include:
         - src/**/*.php
-
-#bootstrap: _bootstrap.php
