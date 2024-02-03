@@ -7,18 +7,13 @@ variables:
   COMPOSER_HOME: .composer
   COMPOSER_NO_INTERACTION: '1'
   SYMFONY_DEPRECATIONS_HELPER: 'weak'
-  TIMEZONE: 'Europe/Vienna'
 
-  PHP_DATE_TIMEZONE: "Europe/Vienna"
   PHP_XDEBUG_MODE: 'on'
   PHP_XDEBUG_EXTENSION_PATH: 'xdebug.so'
 
 .caches:
   composer:
-    - key:
-        files:
-          - composer.lock
-          - symfony.lock
+    - key: composer-$CI_DEFAULT_BRANCH
       when: always
       paths:
         - $COMPOSER_HOME/cache
@@ -37,10 +32,7 @@ variables:
         - .robo/cache/rector
 
   robo:
-    - key:
-        files:
-          - .robo/composer.json
-          - RoboFile.php
+    - key: robo-$CI_DEFAULT_BRANCH
       when: always
       paths:
         - .robo/bin
@@ -96,7 +88,6 @@ test_matrix:
 check:
   stage: test
   script:
-    #- rm -rf $CI_PROJECT_DIR/.ci
     - php .robo/bin/robo.phar init
     - php .robo/bin/robo.phar check
 

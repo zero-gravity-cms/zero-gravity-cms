@@ -5,6 +5,7 @@
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 // phpcs:disable Generic.Files.LineLength.TooLong
 // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.FoundInExtendedClass
+
 define('C33S_SKIP_LOAD_DOT_ENV', true);
 /*
  * =================================================================
@@ -39,7 +40,10 @@ require $roboDir.'/vendor/autoload.php';
  * =================================================================.
  */
 
-use Identicon\Identicon;
+use C33s\Robo\BaseRoboFile;
+use C33s\Robo\C33sExtraTasks;
+use C33s\Robo\C33sTasks;
+use Jdenticon\Identicon;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -47,15 +51,15 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * @see http://robo.li/
  */
-class RoboFile extends C33s\Robo\BaseRoboFile
+class RoboFile extends BaseRoboFile
 {
-    use C33s\Robo\C33sTasks;
-    use C33s\Robo\C33sExtraTasks;
+    use C33sTasks;
+    use C33sExtraTasks;
 
-    public const GLOBAL_COMPOSER_PACKAGES = [
+    private const GLOBAL_COMPOSER_PACKAGES = [
     ];
 
-    protected $portsToCheck = [
+    protected array $portsToCheck = [
         // 'http' => null,
         // 'https' => null,
         // 'mysql' => null,
@@ -67,7 +71,7 @@ class RoboFile extends C33s\Robo\BaseRoboFile
     /**
      * @hook pre-command
      */
-    public function preCommand()
+    public function preCommand(): void
     {
         $this->stopOnFail(true);
         $this->_prepareCiModules([
@@ -81,7 +85,7 @@ class RoboFile extends C33s\Robo\BaseRoboFile
     /**
      * Initialize project.
      */
-    public function init()
+    public function init(): void
     {
         if (!$this->confirmIfInteractive('Have you read the README.md?')) {
             $this->abort();
@@ -105,9 +109,9 @@ class RoboFile extends C33s\Robo\BaseRoboFile
      *
      * @param string $arguments Optional path or other arguments
      */
-    public function check($arguments = '')
+    public function check(string $arguments = ''): void
     {
-        $this->_execPhp("php .robo/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
+        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
     }
 
     /**
@@ -115,10 +119,10 @@ class RoboFile extends C33s\Robo\BaseRoboFile
      *
      * @param string $arguments Optional path or other arguments
      */
-    public function fix($arguments = '')
+    public function fix(string $arguments = ''): void
     {
         if ($this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
-            $this->_execPhp("php .robo/bin/php-cs-fixer.phar fix --verbose $arguments");
+            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose $arguments");
         } else {
             $this->abort();
         }
@@ -127,7 +131,7 @@ class RoboFile extends C33s\Robo\BaseRoboFile
     /**
      * Run tests.
      */
-    public function test()
+    public function test(): void
     {
         $this->_execPhp('php ./vendor/bin/codecept run --coverage-xml --coverage-html --coverage-text', true);
         $this->outputCoverage();
@@ -144,12 +148,12 @@ class RoboFile extends C33s\Robo\BaseRoboFile
     /**
      * Update the Project.
      */
-    public function update()
+    public function update(): void
     {
         if ($this->isEnvironmentCi() || $this->isEnvironmentProduction()) {
-            $this->_execPhp('php ./.robo/bin/composer.phar install --no-progress --prefer-dist --optimize-autoloader');
+            $this->_execPhp("php ./{$this->dir()}/bin/composer.phar install --no-progress --prefer-dist --optimize-autoloader");
         } else {
-            $this->_execPhp('php ./.robo/bin/composer.phar install');
+            $this->_execPhp("php ./{$this->dir()}/bin/composer.phar install");
         }
     }
 
@@ -159,7 +163,7 @@ class RoboFile extends C33s\Robo\BaseRoboFile
     public function generateTestIdenticons()
     {
         require_once __DIR__.'/vendor/autoload.php';
-        $basePath = __DIR__.'/tests/_data/page_fixtures/valid_pages/';
+        $basePath = __DIR__.'/tests/Support/_data/page_fixtures/valid_pages/';
 
         $files = [
             'root_file1.png',
@@ -188,7 +192,9 @@ class RoboFile extends C33s\Robo\BaseRoboFile
             'images/gallery/fancy_picture_21.png',
         ];
 
-        $identicon = new Identicon();
+        $identicon = new Identicon([
+            'Size' => 64,
+        ]);
         $fs = new Filesystem();
 
         foreach ($files as $file) {
@@ -199,7 +205,11 @@ class RoboFile extends C33s\Robo\BaseRoboFile
             }
 
             echo "$path\n";
-            $data = $identicon->getImageData($file, 64);
+
+            $data = $identicon
+                ->setValue($file)
+                ->getImageData()
+            ;
             file_put_contents($path, $data);
         }
     }
