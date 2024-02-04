@@ -2,10 +2,8 @@
 
 namespace ZeroGravity\Cms\Exception;
 
-interface ZeroGravityException
+use Throwable;
+
+interface ZeroGravityException extends Throwable
 {
-    /**
-     * @return string
-     */
-    public function getMessage();
 }

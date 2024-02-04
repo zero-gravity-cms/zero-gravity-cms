@@ -20,6 +20,9 @@ final class PageFiles
         $this->applyFileAliases($fileAliases);
     }
 
+    /**
+     * @param array<string, string> $fileAliases
+     */
     private function applyFileAliases(array $fileAliases): void
     {
         foreach ($fileAliases as $from => $to) {
@@ -49,7 +52,7 @@ final class PageFiles
     /**
      * Get all files for the given type.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     private function getFilesByType(string $type): array
     {
@@ -59,7 +62,7 @@ final class PageFiles
     /**
      * Get names/aliases for all available image files.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getImages(): array
     {
@@ -69,7 +72,7 @@ final class PageFiles
     /**
      * Get names/aliases and paths for all available document files.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getDocuments(): array
     {

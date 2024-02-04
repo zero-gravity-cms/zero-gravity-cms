@@ -4,10 +4,17 @@ namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Meta\PagePublishingTrait;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
 use ZeroGravity\Cms\Content\Meta\PageTaxonomyTrait;
 use ZeroGravity\Cms\Path\Path;
 
+/**
+ * This trait contains settings related methods (mostly getters) of the Page class.
+ * This helps to separate native properties from validated settings/options.
+ *
+ * @phpstan-import-type SettingValue from PageSettings
+ */
 class Page implements ReadablePage
 {
     use PageFilesTrait;
@@ -20,17 +27,20 @@ class Page implements ReadablePage
     final public const TAXONOMY_TAG = 'tag';
     final public const TAXONOMY_CATEGORY = 'category';
     final public const TAXONOMY_AUTHOR = 'author';
-    private ?ReadablePage $parent = null;
+    private ReadablePage|Page|null $parent = null;
     private ?string $content = null;
 
     /**
-     * @var Page[]
+     * @var array<string, Page>
      */
     private array $children = [];
 
     private ?Path $path = null;
     private ?Path $filesystemPath = null;
 
+    /**
+     * @param array<string, SettingValue> $settings
+     */
     public function __construct(
         protected string $name,
         array $settings = [],
@@ -49,20 +59,17 @@ class Page implements ReadablePage
     /**
      * Set parent page and initialize all dependent values.
      */
-    protected function initParent(ReadablePage $parent = null): void
+    protected function initParent(ReadablePage|self $parent = null): void
     {
         $this->parent = $parent;
         $this->buildFilesystemPath();
         $this->buildPath();
-        if ($this->parent instanceof ReadablePage) {
+        if ($this->parent instanceof Page) {
             $this->parent->addChild($this);
         }
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getParent(): ?ReadablePage
+    public function getParent(): ReadablePage|self|null
     {
         return $this->parent;
     }
@@ -101,7 +108,7 @@ class Page implements ReadablePage
     {
         return PageFinder::create()
             ->inPageList($this->children)
-            ->depth(0)
+            ->depth('== 0')
         ;
     }
 

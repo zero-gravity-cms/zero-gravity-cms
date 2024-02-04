@@ -2,6 +2,12 @@
 
 namespace ZeroGravity\Cms\Content;
 
+use ZeroGravity\Cms\Content\Meta\PageSettings;
+
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettings
+ */
 final readonly class PageDiff
 {
     public function __construct(
@@ -35,9 +41,13 @@ final readonly class PageDiff
         return $this->old->getSettings(true) !== $this->new->getSettings(true);
     }
 
-    public function getNewNonDefaultSettings(): array
+    /**
+     * @return array<string, SettingValue>
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     */
+    public function getNewNonDefaultSettings(bool $serialize = false): array
     {
-        return $this->new->getNonDefaultSettings();
+        return $this->new->getNonDefaultSettings($serialize);
     }
 
     public function contentHasChanged(): bool

@@ -29,7 +29,9 @@ readonly class KnpMenuProvider implements MenuProviderInterface
     /**
      * Retrieves a menu by its name.
      *
-     * @throws InvalidArgumentException if the menu does not exists
+     * @param array<string, mixed> $options
+     *
+     * @throws InvalidArgumentException if the menu does not exist
      */
     public function get(string $name, array $options = []): ItemInterface
     {
@@ -42,6 +44,8 @@ readonly class KnpMenuProvider implements MenuProviderInterface
 
     /**
      * Checks whether a menu exists in this provider.
+     *
+     * @param array<string, mixed> $options
      */
     public function has(string $name, array $options = []): bool
     {
@@ -54,6 +58,9 @@ readonly class KnpMenuProvider implements MenuProviderInterface
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildMenu(string $menuName, array $options = []): ItemInterface
     {
         $rootItem = $this->factory->createItem('root');
@@ -71,6 +78,8 @@ readonly class KnpMenuProvider implements MenuProviderInterface
 
     /**
      * Adds item to the given parent item if page should have an item.
+     *
+     * @param array<string, mixed> $defaultOptions
      */
     protected function addPageItem(
         ReadablePage $page,

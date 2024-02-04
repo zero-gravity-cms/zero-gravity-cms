@@ -25,6 +25,9 @@ final class ZeroGravityExtension extends AbstractExtension
     ) {
     }
 
+    /**
+     * @return list<TwigFilter>
+     */
     public function getFilters(): array
     {
         return [
@@ -48,6 +51,9 @@ final class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @return list<TwigFunction>
+     */
     public function getFunctions(): array
     {
         return [
@@ -91,6 +97,9 @@ final class ZeroGravityExtension extends AbstractExtension
         return $this->pageSelector->getCurrentPage();
     }
 
+    /**
+     * @param array<string, mixed> $filterOptions
+     */
     public function filterPages(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
     {
         return $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
@@ -108,6 +117,9 @@ final class ZeroGravityExtension extends AbstractExtension
         return 'page_'.md5($page->getPath()->toString());
     }
 
+    /**
+     * @param array<string, mixed> $filterOptions
+     */
     public function filterAllPages(string $filterName, array $filterOptions = []): PageFinder
     {
         $pageFinder = $this->contentRepository->getPageFinder();
@@ -116,6 +128,8 @@ final class ZeroGravityExtension extends AbstractExtension
     }
 
     /**
+     * @param array<string, mixed> $context
+     *
      * @throws LoaderError  When the template cannot be found
      * @throws SyntaxError  When an error occurred during compilation
      * @throws RuntimeError When an error occurred during rendering

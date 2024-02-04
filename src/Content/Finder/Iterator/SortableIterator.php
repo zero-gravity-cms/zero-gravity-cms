@@ -7,22 +7,25 @@ use Closure;
 use InvalidArgumentException;
 use Iterator;
 use IteratorAggregate;
-use Traversable;
+use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
+ *
+ * @implements IteratorAggregate<string, ReadablePage>
  */
 final class SortableIterator implements IteratorAggregate
 {
+    public const SORT_BY_DATE = 'date';
+    public const SORT_BY_EXTRA_VALUE = 'extra';
+    public const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
     public const SORT_BY_NAME = 'name';
+    public const SORT_BY_PATH = 'path';
+    public const SORT_BY_PUBLISH_DATE = 'publishDate';
     public const SORT_BY_SLUG = 'slug';
     public const SORT_BY_TITLE = 'title';
-    public const SORT_BY_DATE = 'date';
-    public const SORT_BY_PUBLISH_DATE = 'publishDate';
-    public const SORT_BY_PATH = 'path';
-    public const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
-    public const SORT_BY_EXTRA_VALUE = 'extra';
 
     /**
      * @var callable
@@ -30,15 +33,15 @@ final class SortableIterator implements IteratorAggregate
     private $sortBy;
 
     /**
-     * @param Traversable          $iterator The Iterator to filter
-     * @param string|Closure|array $sortBy   the sort type (one of the SORT_BY_* constants),
-     *                                       a PHP closure or
-     *                                       an array holding a SORT_BY_ type and an additional parameter
+     * @param Iterator<string, ReadablePage>                      $iterator The Iterator to filter
+     * @param self::SORT_BY_*|Closure|array{0: string, 1: string} $sortBy   the sort type (one of the SORT_BY_* constants),
+     *                                                                      a PHP closure or
+     *                                                                      an array holding a SORT_BY_ type and an additional parameter
      *
      * @throws InvalidArgumentException
      */
     public function __construct(
-        private readonly Traversable $iterator,
+        private readonly Iterator $iterator,
         string|Closure|array $sortBy,
     ) {
         if ($sortBy instanceof Closure) {
@@ -49,10 +52,23 @@ final class SortableIterator implements IteratorAggregate
         $parameter = null;
         if (is_array($sortBy) && 2 === count($sortBy)) {
             [$sortBy, $parameter] = $sortBy;
-            $parameter = (string) $parameter;
+        }
+        if (is_array($sortBy)) {
+            throw new InvalidArgumentException('Arrays not holding a sorting type and parameters are not supported');
         }
 
-        $this->configureSortFunction((string) $sortBy, $parameter);
+        Assert::oneOf($sortBy, [
+            self::SORT_BY_DATE,
+            self::SORT_BY_EXTRA_VALUE,
+            self::SORT_BY_FILESYSTEM_PATH,
+            self::SORT_BY_NAME,
+            self::SORT_BY_PATH,
+            self::SORT_BY_PUBLISH_DATE,
+            self::SORT_BY_SLUG,
+            self::SORT_BY_TITLE,
+        ]);
+
+        $this->configureSortFunction($sortBy, $parameter);
     }
 
     /**
@@ -65,8 +81,10 @@ final class SortableIterator implements IteratorAggregate
             self::SORT_BY_SLUG,
             self::SORT_BY_TITLE,
             self::SORT_BY_EXTRA_VALUE => $this->sortByGetterOrPath('get'.ucfirst($sortBy), $parameter),
+
             self::SORT_BY_DATE,
             self::SORT_BY_PUBLISH_DATE => $this->sortByDateOrPath('get'.ucfirst($sortBy)),
+
             self::SORT_BY_PATH,
             self::SORT_BY_FILESYSTEM_PATH => $this->sortByGetter('get'.ucfirst($sortBy)),
             default => throw new InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.'),

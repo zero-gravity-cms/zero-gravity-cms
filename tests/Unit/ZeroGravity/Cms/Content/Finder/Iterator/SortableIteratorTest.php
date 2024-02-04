@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder\Iterator;
 
 use ArrayIterator;
+use Closure;
 use Codeception\Attribute\DataProvider;
 use Codeception\Attribute\Group;
 use InvalidArgumentException;
@@ -28,9 +29,13 @@ class SortableIteratorTest extends BaseUnit
         $this->finderPrototype = $repository->getPageFinder();
     }
 
+    /**
+     * @param string|Closure|array<string> $method
+     * @param array<string|null>           $expectedElements
+     */
     #[DataProvider('provideSortResults')]
     #[Test]
-    public function sortMethodWorks($method, array $expectedElements): void
+    public function sortMethodWorks(string|Closure|array $method, array $expectedElements): void
     {
         $finder = $this->getFinder();
         if (is_string($method)) {

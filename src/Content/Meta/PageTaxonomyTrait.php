@@ -11,10 +11,12 @@ use ZeroGravity\Cms\Content\Page;
  */
 trait PageTaxonomyTrait
 {
-    abstract public function getSetting(string $name);
+    abstract public function getSetting(string $name): mixed;
 
     /**
      * Get all defined taxonomy keys and values.
+     *
+     * @return array<string, list<string>>
      */
     public function getTaxonomies(): array
     {
@@ -23,6 +25,8 @@ trait PageTaxonomyTrait
 
     /**
      * Get values for a single taxonomy key.
+     *
+     * @return list<string>
      */
     public function getTaxonomy(string $name): array
     {
@@ -34,16 +38,25 @@ trait PageTaxonomyTrait
         return [];
     }
 
+    /**
+     * @return list<string>
+     */
     public function getTags(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_TAG);
     }
 
+    /**
+     * @return list<string>
+     */
     public function getCategories(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_CATEGORY);
     }
 
+    /**
+     * @return list<string>
+     */
     public function getAuthors(): array
     {
         return $this->getTaxonomy(Page::TAXONOMY_AUTHOR);

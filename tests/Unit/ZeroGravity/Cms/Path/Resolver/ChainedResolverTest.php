@@ -16,12 +16,9 @@ use ZeroGravity\Cms\Path\Resolver\PageResolver;
 #[Group('resolver')]
 class ChainedResolverTest extends BaseUnit
 {
-    /**
-     * @param string $inPath
-     */
     #[DataProvider('provideSingleFilePaths')]
     #[Test]
-    public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath): void
+    public function singleFilesAreResolvedByPath(string $path, ?string $inPath, string $expectedPath): void
     {
         $pageResolver = $this->getPageResolver();
         $filesystemResolver = new FilesystemResolver($this->getDefaultFileFactory());

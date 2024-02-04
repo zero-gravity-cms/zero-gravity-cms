@@ -38,6 +38,9 @@ final readonly class PageRouteVoter implements VoterInterface
         return $this->matchRoutes($routes, $page->getPath()->toString());
     }
 
+    /**
+     * @param array<mixed> $routes
+     */
     private function matchRoutes(array $routes, string $pagePath): ?bool
     {
         foreach ($routes as $route) {

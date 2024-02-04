@@ -2,8 +2,12 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Closure;
 use ZeroGravity\Cms\Exception\FilterException;
 
+/**
+ * @phpstan-import-type PageFinderFilterOptions from PageFinderFilter
+ */
 final class FilterRegistry
 {
     /**
@@ -18,29 +22,18 @@ final class FilterRegistry
         }
     }
 
-    /**
-     * @param callable|PageFinderFilter $filter
-     */
-    public function addFilter(string $filterName, $filter): void
+    public function addFilter(string $filterName, callable|Closure|PageFinderFilter $filter): void
     {
         if (isset($this->filters[$filterName])) {
             throw FilterException::filterAlreadyExists($filterName);
-        }
-        if (!$this->isValidFilter($filter)) {
-            throw FilterException::notAValidFilter($filterName, $filter);
         }
 
         $this->filters[$filterName] = $filter;
     }
 
     /**
-     * @param callable|PageFinderFilter|mixed $filter
+     * @param PageFinderFilterOptions $filterOptions
      */
-    private function isValidFilter($filter): bool
-    {
-        return is_callable($filter) || $filter instanceof PageFinderFilter;
-    }
-
     public function applyFilter(PageFinder $pageFinder, string $filterName, array $filterOptions): PageFinder
     {
         if (!isset($this->filters[$filterName])) {

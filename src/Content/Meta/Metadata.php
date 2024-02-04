@@ -6,18 +6,29 @@ use ArrayAccess;
 
 /**
  * This class represents metadata for a content file.
+ *
+ * @implements ArrayAccess<string, mixed>
  */
 final class Metadata implements ArrayAccess
 {
+    /**
+     * @param array<string, mixed> $values
+     */
     public function __construct(private array $values)
     {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getAll(): array
     {
         return $this->values;
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     public function setAll(array $values): self
     {
         $this->values = $values;
@@ -41,21 +52,33 @@ final class Metadata implements ArrayAccess
         return $this;
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->values);
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetGet($offset): mixed
     {
         return $this->getValue($offset);
     }
 
-    public function offsetSet($offset, $value): void
+    /**
+     * @param string $offset
+     */
+    public function offsetSet($offset, mixed $value): void
     {
         $this->setValue($offset, $value);
     }
 
+    /**
+     * @param string $offset
+     */
     public function offsetUnset($offset): void
     {
         unset($this->values[$offset]);

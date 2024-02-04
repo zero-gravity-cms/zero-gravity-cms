@@ -7,6 +7,7 @@ use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\FileFactory;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Content\ReadablePage;
@@ -19,10 +20,16 @@ use ZeroGravity\Cms\Filesystem\Event\AfterPageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ */
 final readonly class FilesystemMapper implements StructureMapper
 {
     private PageFactory $pageFactory;
 
+    /**
+     * @param array<string, SettingValue> $defaultPageSettings
+     */
     public function __construct(
         private FileFactory $fileFactory,
         private string $path,
@@ -37,7 +44,7 @@ final readonly class FilesystemMapper implements StructureMapper
     /**
      * Parse any content source for all Page data and return Page tree as array containing base nodes.
      *
-     * @return Page[]
+     * @return array<string, Page>
      *
      * @throws ZeroGravityException|FilesystemException
      */
@@ -102,7 +109,7 @@ final readonly class FilesystemMapper implements StructureMapper
         /* @var $directory Directory */
         $directory = $diff->getNew()->getDirectory();
         $isNew = false;
-        if (null === $directory) {
+        if (!$directory instanceof Directory) {
             $isNew = true;
             $directory = $this->createDirectoryForNewPage($diff);
         }
@@ -162,9 +169,12 @@ final readonly class FilesystemMapper implements StructureMapper
         return $this->createDirectory($realPath, $parentPath);
     }
 
+    /**
+     * @return array<string, SettingValue>
+     */
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
     {
-        $settings = $diff->getNewNonDefaultSettings();
+        $settings = $diff->getNewNonDefaultSettings(true);
         if ($diff->getNew()->getParent() instanceof ReadablePage) {
             return $settings;
         }

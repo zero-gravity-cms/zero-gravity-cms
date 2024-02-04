@@ -4,18 +4,21 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use FilterIterator;
 use Iterator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * SettingFilterIterator filters out pages that do not match the required setting value.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class SettingFilterIterator extends FilterIterator
 {
     /**
-     * @param Iterator        $iterator The Iterator to filter
-     * @param SettingFilter[] $settings
+     * @param Iterator<string, ReadablePage> $iterator The Iterator to filter
+     * @param list<SettingFilter>            $settings
      */
     public function __construct(
         Iterator $iterator,

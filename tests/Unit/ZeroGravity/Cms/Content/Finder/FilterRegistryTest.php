@@ -3,7 +3,6 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
 use Codeception\Attribute\Group;
-use DateTime;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -16,15 +15,6 @@ use ZeroGravity\Cms\Exception\FilterException;
 #[Group('filter')]
 class FilterRegistryTest extends BaseUnit
 {
-    #[Test]
-    public function throwsExceptionIfNotValidType(): void
-    {
-        $registry = new FilterRegistry();
-
-        $this->expectException(FilterException::class);
-        $registry->addFilter('somename', new DateTime());
-    }
-
     #[Test]
     #[DoesNotPerformAssertions]
     public function allowsPageFinderFilterToBeAdded(): void
@@ -60,7 +50,7 @@ class FilterRegistryTest extends BaseUnit
     public function callableFilterWillBeApplied(): void
     {
         $filter = $this->createMock(MockFilter::class);
-        $filter->expects(static::once())
+        $filter->expects($this->once())
             ->method('myMethod')
             ->willReturnArgument(0)
         ;
@@ -82,7 +72,7 @@ class FilterRegistryTest extends BaseUnit
             ->onlyMethods(['apply'])
             ->getMock()
         ;
-        $filter->expects(static::once())
+        $filter->expects($this->once())
             ->method('apply')
             ->willReturnArgument(0)
         ;
@@ -116,7 +106,7 @@ class FilterRegistryTest extends BaseUnit
             ->onlyMethods(['getFilters'])
             ->getMock()
         ;
-        $filters->expects(static::once())
+        $filters->expects($this->once())
             ->method('getFilters')
             ->willReturn(['somename' => $filter])
         ;

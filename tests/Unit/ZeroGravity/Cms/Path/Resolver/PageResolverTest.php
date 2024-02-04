@@ -12,12 +12,9 @@ use ZeroGravity\Cms\Path\Resolver\PageResolver;
 
 class PageResolverTest extends BaseUnit
 {
-    /**
-     * @param string $inPath
-     */
     #[DataProvider('provideSingleFilePaths')]
     #[Test]
-    public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath): void
+    public function singleFilesAreResolvedByPath(string $path, ?string $inPath, string $expectedPath): void
     {
         $resolver = $this->getPageResolver();
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
@@ -55,12 +52,9 @@ class PageResolverTest extends BaseUnit
         ];
     }
 
-    /**
-     * @param string $inPath
-     */
     #[DataProvider('provideNonExistingPagePaths')]
     #[Test]
-    public function singlePagesThatAreNotFound(string $path, $inPath): void
+    public function singlePagesThatAreNotFound(string $path, ?string $inPath): void
     {
         $resolver = $this->getPageResolver();
         $pageFile = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
@@ -81,6 +75,10 @@ class PageResolverTest extends BaseUnit
         yield [
             '',
             null,
+        ];
+        yield [
+            '_child1/this-does-not-exist.png',
+            'with_children/',
         ];
     }
 

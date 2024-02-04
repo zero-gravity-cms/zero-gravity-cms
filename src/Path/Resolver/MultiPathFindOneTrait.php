@@ -31,10 +31,10 @@ trait MultiPathFindOneTrait
         if (1 === count($files)) {
             return array_shift($files);
         }
-        if (count($files) > 1 && !$strict) {
-            return array_shift($files);
+        if ($strict) {
+            throw ResolverException::moreThanOneFileMatchingPattern($path->toString(), $files);
         }
 
-        throw ResolverException::moreThanOneFileMatchingPattern($path->toString(), $files);
+        return array_shift($files);
     }
 }

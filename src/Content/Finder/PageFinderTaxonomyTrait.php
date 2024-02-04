@@ -6,21 +6,22 @@ use Iterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\TaxonomiesFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderTaxonomyTrait
 {
     /**
-     * @var TaxonomyTester[]
+     * @var list<TaxonomyTester>
      */
     private array $taxonomies = [];
 
     /**
      * Add taxonomies that pages must provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|list<string>             $values
      */
-    public function taxonomy($name, $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function taxonomy(string $name, string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         $this->taxonomies[] = TaxonomyTester::has($name, (array) $values, $operator);
 
@@ -30,10 +31,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add taxonomies that pages must not provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|list<string>             $values
      */
-    public function notTaxonomy($name, $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function notTaxonomy(string $name, string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         $this->taxonomies[] = TaxonomyTester::hasNot($name, (array) $values, $operator);
 
@@ -43,10 +44,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add tag or tags that pages must provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function tag($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function tag(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->taxonomy(Page::TAXONOMY_TAG, $values, $operator);
     }
@@ -54,10 +55,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add tag or tags that pages must provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function notTag($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function notTag(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->notTaxonomy(Page::TAXONOMY_TAG, $values, $operator);
     }
@@ -65,10 +66,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add category or categories that pages must provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function category($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function category(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->taxonomy(Page::TAXONOMY_CATEGORY, $values, $operator);
     }
@@ -76,10 +77,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add category or categories that pages must not provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function notCategory($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function notCategory(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->notTaxonomy(Page::TAXONOMY_CATEGORY, $values, $operator);
     }
@@ -87,10 +88,10 @@ trait PageFinderTaxonomyTrait
     /**
      * Add author or authors that pages must provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function author($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function author(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->taxonomy(Page::TAXONOMY_AUTHOR, $values, $operator);
     }
@@ -98,20 +99,25 @@ trait PageFinderTaxonomyTrait
     /**
      * Add author or authors that pages must not provide.
      *
-     * @param string|array $values
-     * @param string|null  $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
+     * @param string|array<string>            $values
+     * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
-    public function notAuthor($values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
+    public function notAuthor(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
     {
         return $this->notTaxonomy(Page::TAXONOMY_AUTHOR, $values, $operator);
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyTaxonomyIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->taxonomies) || !empty($this->notTaxonomies)) {
-            return new TaxonomiesFilterIterator($iterator, $this->taxonomies);
+        if ([] === $this->taxonomies) {
+            return $iterator;
         }
 
-        return $iterator;
+        return new TaxonomiesFilterIterator($iterator, $this->taxonomies);
     }
 }

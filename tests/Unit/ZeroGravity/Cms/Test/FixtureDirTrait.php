@@ -13,6 +13,8 @@ use ZeroGravity\Cms\Filesystem\FilesystemMapper;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 
+use function PHPUnit\Framework\assertInstanceOf;
+
 trait FixtureDirTrait
 {
     /**
@@ -25,7 +27,10 @@ trait FixtureDirTrait
 
     protected function getUnitHelperModule(): Unit
     {
-        return $this->getModule(Unit::class);
+        $module = $this->getModule(Unit::class);
+        assertInstanceOf(Unit::class, $module);
+
+        return $module;
     }
 
     /**

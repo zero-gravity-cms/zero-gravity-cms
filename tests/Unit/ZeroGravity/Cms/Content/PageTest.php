@@ -16,14 +16,6 @@ use ZeroGravity\Cms\Content\Page;
 #[Group('page')]
 class PageTest extends BaseUnit
 {
-    protected function _before()
-    {
-    }
-
-    protected function _after()
-    {
-    }
-
     #[Test]
     public function filesystemPathContainsParentPath(): void
     {
@@ -410,7 +402,9 @@ class PageTest extends BaseUnit
     }
 
     /**
-     * @return File[]
+     * @param array<string, array<string, string>> $fileNamesByType
+     *
+     * @return array<string, File>
      */
     private function createFiles(array $fileNamesByType): array
     {

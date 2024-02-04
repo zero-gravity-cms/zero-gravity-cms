@@ -21,7 +21,7 @@ class PageFinderTest extends BaseUnit
 {
     private ?PageFinder $finderPrototype = null;
 
-    protected function _before()
+    protected function _before(): void
     {
         $mapper = $this->getValidPagesFilesystemMapper();
         $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
@@ -39,7 +39,7 @@ class PageFinderTest extends BaseUnit
 
     #[DataProvider('provideFinderMethods')]
     #[Test]
-    public function finderMethodReturnsThisForChaining(string $method, $param): void
+    public function finderMethodReturnsThisForChaining(string $method, string|int|true $param): void
     {
         $finder = $this->getFinder();
         $returnValue = $finder->$method($param, null);
@@ -287,7 +287,7 @@ class PageFinderTest extends BaseUnit
     public function pagesCanBeFilteredByDepth(): void
     {
         $finder = $this->getFinder()
-            ->depth(0)
+            ->depth('0')
         ;
         self::assertCount(7, $finder, 'Depth 0');
 
@@ -312,12 +312,12 @@ class PageFinderTest extends BaseUnit
         self::assertCount(12, $finder, 'Depth >= 0');
 
         $finder = $this->getFinder()
-            ->depth(1)
+            ->depth('1')
         ;
         self::assertCount(5, $finder, 'Depth 1');
 
         $finder = $this->getFinder()
-            ->depth(2)
+            ->depth('2')
         ;
         self::assertCount(0, $finder, 'Depth 2');
     }
@@ -574,11 +574,10 @@ class PageFinderTest extends BaseUnit
     #[Test]
     public function extraFilterThrowsExceptionForInvalidComparator(): void
     {
-        $finder = $this->getFinder()
+        $this->expectException(InvalidArgumentException::class);
+        $this->getFinder()
             ->extra('custom', 'somevalue', 'this-is-not-a-comparator')
         ;
-        $this->expectException(InvalidArgumentException::class);
-        $finder->count();
     }
 
     #[Test]
@@ -643,9 +642,6 @@ class PageFinderTest extends BaseUnit
         $finder = $this->getFinder();
         $finder->append($this->getFinder()->getIterator());
         self::assertCount(24, $finder);
-
-        $this->expectException(InvalidArgumentException::class);
-        $finder->append('string');
     }
 
     private function getFinder(): ?PageFinder

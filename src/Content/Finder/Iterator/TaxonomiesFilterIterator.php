@@ -5,12 +5,12 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 use FilterIterator;
 use Iterator;
 use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * TaxonomiesFilterIterator filters out pages that do not match the required taxonomies.
  *
- * @method Page current()
+ * @method ReadablePage current()
  */
 final class TaxonomiesFilterIterator extends FilterIterator
 {

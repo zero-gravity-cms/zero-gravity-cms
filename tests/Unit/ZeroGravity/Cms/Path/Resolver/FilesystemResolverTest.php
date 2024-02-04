@@ -14,13 +14,10 @@ use ZeroGravity\Cms\Path\Path;
 
 class FilesystemResolverTest extends BaseUnit
 {
-    /**
-     * @param Path|null $inPath
-     */
     #[DataProvider('provideSingleValidFiles')]
     #[Group('resolver')]
     #[Test]
-    public function singleValidFile(string $file, $inPath, string $pathName): void
+    public function singleValidFile(string $file, ?string $inPath, string $pathName): void
     {
         $resolver = $this->getValidPagesResolver();
 
@@ -96,7 +93,7 @@ class FilesystemResolverTest extends BaseUnit
 
     #[DataProvider('provideSingleInvalidFiles')]
     #[Test]
-    public function singleInvalidFile($file): void
+    public function singleInvalidFile(string $file): void
     {
         $resolver = $this->getValidPagesResolver();
 
@@ -124,11 +121,11 @@ class FilesystemResolverTest extends BaseUnit
     }
 
     /**
-     * @param Path|null $inPath
+     * @param array<string> $foundFiles
      */
     #[DataProvider('provideMultipleFilePatterns')]
     #[Test]
-    public function multipleFiles(string $pattern, $inPath, array $foundFiles): void
+    public function multipleFiles(string $pattern, ?string $inPath, array $foundFiles): void
     {
         $resolver = $this->getValidPagesResolver();
 

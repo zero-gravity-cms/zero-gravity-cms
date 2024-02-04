@@ -4,17 +4,20 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use FilterIterator;
 use Iterator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * VisibleFilterIterator filters out pages that do not match the required visible state.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class VisibleFilterIterator extends FilterIterator
 {
     /**
-     * @param Iterator $iterator The Iterator to filter
+     * @param Iterator<string, ReadablePage> $iterator The Iterator to filter
      */
     public function __construct(
         Iterator $iterator,

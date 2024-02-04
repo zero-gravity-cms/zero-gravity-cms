@@ -13,9 +13,13 @@ use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypes;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
 
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ */
 final class Directory
 {
     use WritableDirectoryTrait;
@@ -49,12 +53,12 @@ final class Directory
     public const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
 
     /**
-     * @var File[]
+     * @var array<string, File>
      */
     private ?array $files = null;
 
     /**
-     * @var Directory[]
+     * @var array<string, Directory>|null
      */
     private ?array $directories = null;
 
@@ -154,7 +158,7 @@ final class Directory
     }
 
     /**
-     * @return File[]
+     * @return array<string, File>
      */
     public function getFilesByType(string $type): array
     {
@@ -270,7 +274,7 @@ final class Directory
     }
 
     /**
-     * @return File[]
+     * @return array<string, File>
      */
     public function getTwigFiles(): array
     {
@@ -280,7 +284,7 @@ final class Directory
     /**
      * File objects indexed by filename.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getFiles(): array
     {
@@ -290,7 +294,7 @@ final class Directory
     /**
      * Subdirectories indexed by directory name.
      *
-     * @return Directory[]
+     * @return array<string, self>
      */
     public function getDirectories(): array
     {
@@ -300,7 +304,7 @@ final class Directory
     /**
      * Get files of this directory and all subdirectories.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getFilesRecursively(): array
     {
@@ -338,6 +342,8 @@ final class Directory
 
     /**
      * Fetch page settings from either YAML or markdown/frontmatter.
+     *
+     * @return array<string, SettingValue>
      */
     public function fetchPageSettings(): array
     {

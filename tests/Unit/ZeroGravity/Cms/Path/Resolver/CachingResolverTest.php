@@ -10,6 +10,7 @@ use Iterator;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
+use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\CachingResolver;
 use ZeroGravity\Cms\Path\Resolver\MultiPathResolver;
@@ -18,9 +19,12 @@ use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 #[Group('resolver')]
 class CachingResolverTest extends BaseUnit
 {
+    /**
+     * @param string|array<mixed> $expectedReturnValue
+     */
     #[DataProvider('provideMethods')]
     #[Test]
-    public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null): void
+    public function methodIsCached(string $method, string|array $expectedReturnValue, string $calledMethod = null): void
     {
         if (null === $calledMethod) {
             $calledMethod = $method;
@@ -31,7 +35,7 @@ class CachingResolverTest extends BaseUnit
         }
 
         $called = false;
-        $callback = static function () use (&$called, $expectedReturnValue) {
+        $callback = static function () use (&$called, $expectedReturnValue): string|File|array {
             $called = true;
 
             // this is required for php-level return checks
@@ -77,10 +81,7 @@ class CachingResolverTest extends BaseUnit
         yield 'findOne' => ['findOne', 'file', 'get'];
     }
 
-    /**
-     * @return MultiPathResolver
-     */
-    private function getWrappedResolver(string $method, callable $callback)
+    private function getWrappedResolver(string $method, callable $callback): MultiPathResolver
     {
         return Stub::makeEmpty(MultiPathResolver::class, [
             $method => $callback,

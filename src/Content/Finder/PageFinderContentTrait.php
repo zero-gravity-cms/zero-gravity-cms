@@ -5,12 +5,25 @@ namespace ZeroGravity\Cms\Content\Finder;
 use Iterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\NameFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderContentTrait
 {
+    /**
+     * @var list<string>
+     */
     private array $names = [];
+    /**
+     * @var list<string>
+     */
     private array $notNames = [];
+    /**
+     * @var list<string>
+     */
     private array $contains = [];
+    /**
+     * @var list<string>
+     */
     private array $notContains = [];
 
     /**
@@ -87,6 +100,11 @@ trait PageFinderContentTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyNamesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->names) || !empty($this->notNames)) {
@@ -96,6 +114,11 @@ trait PageFinderContentTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyContentIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contains) || !empty($this->notContains)) {

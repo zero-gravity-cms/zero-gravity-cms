@@ -2,7 +2,7 @@
 
 namespace ZeroGravity\Cms\Content\Finder\Tester;
 
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 final readonly class TaxonomyTester
 {
@@ -10,18 +10,24 @@ final readonly class TaxonomyTester
     public const OPERATOR_OR = 'OR';
     private string $mode;
 
+    /**
+     * @param list<string> $values
+     */
     public static function has(string $name, array $values, ?string $mode): self
     {
         return new self($name, $values, $mode, false);
     }
 
+    /**
+     * @param list<string> $values
+     */
     public static function hasNot(string $name, array $values, ?string $mode): self
     {
         return new self($name, $values, $mode, true);
     }
 
     /**
-     * @param string[] $values
+     * @param list<string> $values
      */
     public function __construct(
         private string $name,
@@ -35,7 +41,7 @@ final readonly class TaxonomyTester
     /**
      * Return true if value matches the taxonomies to test against, false if not.
      */
-    public function pageMatchesTaxonomy(Page $page): bool
+    public function pageMatchesTaxonomy(ReadablePage $page): bool
     {
         $pageValues = $page->getTaxonomy($this->name);
 
@@ -47,7 +53,7 @@ final readonly class TaxonomyTester
     }
 
     /**
-     * @param string[] $pageValues
+     * @param list<string> $pageValues
      */
     private function testOr(array $pageValues): bool
     {
@@ -61,7 +67,7 @@ final readonly class TaxonomyTester
     }
 
     /**
-     * @param string[] $pageValues
+     * @param list<string> $pageValues
      */
     private function testAnd(array $pageValues): bool
     {

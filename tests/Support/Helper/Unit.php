@@ -9,7 +9,7 @@ use Codeception\Module;
 
 class Unit extends Module
 {
-    public function getPageFixtureDir()
+    public function getPageFixtureDir(): string
     {
         return codecept_data_dir('page_fixtures');
     }

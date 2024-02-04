@@ -8,10 +8,64 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use ZeroGravity\Cms\Content\Page;
 
+/**
+ * @phpstan-type TaxonomySettingValue array<string>
+ * @phpstan-type DateTimeSettingValue int|string|DateTimeInterface
+ * @phpstan-type SettingValue null|string|bool|DateTimeSettingValue|array<string, TaxonomySettingValue>|array<string, mixed>
+ * @phpstan-type SerializedSettingValue null|string|bool|int|array<string, TaxonomySettingValue>|array<string, mixed>
+ * @phpstan-type SettingValues array{
+ *      child_defaults: null|array<string, SettingValue>,
+ *      content_template: null|string,
+ *      content_type: string,
+ *      controller: string|null,
+ *      date: null|string|int|DateTimeInterface,
+ *      extra: array<string, mixed>,
+ *      file_aliases: array<string, string>,
+ *      layout_template: null|string,
+ *      menu_id: string|false,
+ *      menu_label: null|string,
+ *      modular: bool,
+ *      module: bool,
+ *      publish: bool,
+ *      publish_date: null|string|int|DateTimeInterface,
+ *      slug: string,
+ *      taxonomy: array<string, list<string>>,
+ *      title: null|string,
+ *      unpublish_date: null|string|int|DateTimeInterface,
+ *      visible: bool
+ * }
+ * @phpstan-type SerializedSettingValues array{
+ *      child_defaults: null|array<string, mixed>,
+ *      content_template: null|string,
+ *      content_type: string,
+ *      controller: string|null,
+ *      date: null|string,
+ *      extra: array<string, mixed>,
+ *      file_aliases: array<string, string>,
+ *      layout_template: null|string,
+ *      menu_id: string|false,
+ *      menu_label: null|string,
+ *      modular: bool,
+ *      module: bool,
+ *      publish: bool,
+ *      publish_date: null|string,
+ *      slug: string,
+ *      taxonomy: array<string, list<string>>,
+ *      title: null|string,
+ *      unpublish_date: null|string,
+ *      visible: bool
+ * }
+ */
 final class PageSettings
 {
+    /**
+     * @var SettingValues|null
+     */
     private ?array $values = null;
 
+    /**
+     * @param array<string, SettingValue> $values
+     */
     public function __construct(
         array $values,
         private readonly string $pageName,
@@ -31,6 +85,8 @@ final class PageSettings
      * Get array copy of all settings.
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
     public function toArray(bool $serialize = false): array
     {
@@ -41,6 +97,8 @@ final class PageSettings
      * Get all values that wouldn't have been set by default.
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
     public function getNonDefaultValues(bool $serialize = false): array
     {
@@ -59,6 +117,8 @@ final class PageSettings
     /**
      * Resolve and validate page settings.
      * If everything was fine, assign them.
+     *
+     * @param array<string, SettingValue> $values
      */
     private function validate(array $values): void
     {
@@ -82,46 +142,49 @@ final class PageSettings
     private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'child_defaults' => [],
+            'content_template' => null,
+            'content_type' => 'page',
             'controller' => null,
+            'date' => null,
             'extra' => [],
             'file_aliases' => [],
-            'modular' => false,
-            'module' => false,
-            'visible' => false,
+            'layout_template' => null,
             'menu_id' => 'zero-gravity',
             'menu_label' => null,
-            'date' => null,
+            'modular' => false,
+            'module' => false,
             'publish' => true,
             'publish_date' => null,
-            'unpublish_date' => null,
             'slug' => $this->pageName,
-            'layout_template' => null,
-            'content_template' => null,
-            'title' => null,
             'taxonomy' => [],
-            'content_type' => 'page',
-            'child_defaults' => [],
+            'title' => null,
+            'unpublish_date' => null,
+            'visible' => false,
         ]);
     }
 
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
-        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
+
         $resolver->setAllowedTypes('child_defaults', ['null', 'array']);
-        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
-        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
-        $resolver->setAllowedTypes('visible', 'bool');
-        $resolver->setAllowedTypes('modular', 'bool');
-        $resolver->setAllowedTypes('module', 'bool');
-        $resolver->setAllowedTypes('title', ['null', 'string']);
-        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_type', 'string');
-
-        $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
-        $resolver->setAllowedTypes('publish_date', $dateTypes);
-        $resolver->setAllowedTypes('unpublish_date', $dateTypes);
+        $resolver->setAllowedTypes('controller', ['null', 'string']);
         $resolver->setAllowedTypes('date', $dateTypes);
+        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
+        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
+        $resolver->setAllowedTypes('menu_id', ['string', 'bool']);
+        $resolver->setAllowedTypes('menu_label', ['null', 'string']);
+        $resolver->setAllowedTypes('modular', 'bool');
+        $resolver->setAllowedTypes('module', 'bool');
+        $resolver->setAllowedTypes('publish_date', $dateTypes);
+        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
+        $resolver->setAllowedTypes('title', ['null', 'string']);
+        $resolver->setAllowedTypes('unpublish_date', $dateTypes);
+        $resolver->setAllowedTypes('visible', 'bool');
     }
 
     private function configureNormalizers(OptionsResolver $resolver): void

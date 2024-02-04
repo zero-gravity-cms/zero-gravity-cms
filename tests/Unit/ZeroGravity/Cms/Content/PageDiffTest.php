@@ -18,9 +18,21 @@ class PageDiffTest extends BaseUnit
     {
         $oldPage = new class('page') extends Page implements WritablePage {
             use BasicWritablePageTrait;
+
+            public function __construct(string $name)
+            {
+                $this->directory = null;
+                parent::__construct($name);
+            }
         };
         $newPage = new class('page') extends Page implements WritablePage {
             use BasicWritablePageTrait;
+
+            public function __construct(string $name)
+            {
+                $this->directory = null;
+                parent::__construct($name);
+            }
         };
 
         $diff = new PageDiff($oldPage, $newPage);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
+use Webmozart\Assert\Assert;
+
 final readonly class ExtraFilter
 {
     public const COMPARATOR_STRING = 'string';
@@ -26,6 +28,11 @@ final readonly class ExtraFilter
         private string $comparator,
         private bool $inverted,
     ) {
+        Assert::oneOf($this->comparator, [
+            self::COMPARATOR_DATE,
+            self::COMPARATOR_NUMERIC,
+            self::COMPARATOR_STRING,
+        ]);
     }
 
     public function name(): string

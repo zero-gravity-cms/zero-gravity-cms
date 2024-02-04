@@ -12,43 +12,44 @@ use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilter;
 use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\SlugFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\TitleFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderSettingsTrait
 {
     /**
-     * @var ExtraFilter[]
+     * @var list<ExtraFilter>
      */
     private array $extras = [];
     /**
-     * @var SettingFilter[]
+     * @var list<SettingFilter>
      */
     private array $settings = [];
     /**
-     * @var DateComparator[]
+     * @var list<DateComparator>
      */
     private array $dates = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $slugs = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notSlugs = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $titles = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notTitles = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $contentTypes = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notContentTypes = [];
 
@@ -61,7 +62,7 @@ trait PageFinderSettingsTrait
      *
      * @see ExtraFilterIterator
      */
-    public function extra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function extra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::has($name, $value, $comparator);
 
@@ -77,7 +78,7 @@ trait PageFinderSettingsTrait
      *
      * @see ExtraFilterIterator
      */
-    public function notExtra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function notExtra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::hasNot($name, $value, $comparator);
 
@@ -91,7 +92,7 @@ trait PageFinderSettingsTrait
      *
      * @see SettingFilterIterator
      */
-    public function setting(string $name, $value): self
+    public function setting(string $name, mixed $value): self
     {
         $this->settings[] = SettingFilter::has($name, $value);
 
@@ -105,7 +106,7 @@ trait PageFinderSettingsTrait
      *
      * @see SettingFilterIterator
      */
-    public function notSetting(string $name, $value): self
+    public function notSetting(string $name, mixed $value): self
     {
         $this->settings[] = SettingFilter::hasNot($name, $value);
 
@@ -237,6 +238,11 @@ trait PageFinderSettingsTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applySlugsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->slugs) || !empty($this->notSlugs)) {
@@ -246,6 +252,11 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyTitlesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->titles) || !empty($this->notTitles)) {
@@ -255,6 +266,11 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyExtrasIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->extras)) {
@@ -264,6 +280,11 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applySettingsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->settings)) {
@@ -273,6 +294,11 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyContentTypesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
@@ -282,6 +308,11 @@ trait PageFinderSettingsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyDatesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->dates)) {

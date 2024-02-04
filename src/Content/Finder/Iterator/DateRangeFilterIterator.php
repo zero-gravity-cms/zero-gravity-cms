@@ -5,12 +5,15 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 use FilterIterator;
 use Iterator;
 use Symfony\Component\Finder\Comparator\DateComparator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * DateRangeFilterIterator filters out pages that are not in the given date range or do not have a date defined.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class DateRangeFilterIterator extends FilterIterator
 {

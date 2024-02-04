@@ -24,12 +24,12 @@ class FilesystemMapperWritingTest extends BaseUnit
 {
     use TempDirTrait;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->setupTempDir($this->getValidPagesDir());
     }
 
-    protected function _after()
+    protected function _after(): void
     {
         $this->cleanupTempDir();
     }
@@ -39,6 +39,12 @@ class FilesystemMapperWritingTest extends BaseUnit
     {
         $oldPage = new class('page') extends Page implements WritablePage {
             use BasicWritablePageTrait;
+
+            public function __construct(string $name)
+            {
+                $this->directory = null;
+                parent::__construct($name);
+            }
         };
         $newPage = clone $oldPage;
         $diff = new PageDiff($oldPage, $newPage);

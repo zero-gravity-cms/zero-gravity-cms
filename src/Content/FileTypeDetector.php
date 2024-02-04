@@ -29,13 +29,16 @@ class FileTypeDetector
         ],
     ];
 
+    /**
+     * @var array<string, string>
+     */
     protected array $extensionMap = [];
 
     public function __construct()
     {
         foreach (static::EXTENSIONS as $type => $extensions) {
             foreach ($extensions as $extension) {
-                $this->extensionMap[$extension] = $type;
+                $this->extensionMap[(string) $extension] = $type;
             }
         }
     }

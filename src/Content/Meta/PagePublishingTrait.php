@@ -11,7 +11,7 @@ use DateTimeImmutable;
  */
 trait PagePublishingTrait
 {
-    abstract public function getSetting(string $name);
+    abstract public function getSetting(string $name): mixed;
 
     /**
      * Get optional publishing date of this page.

@@ -5,13 +5,14 @@ namespace ZeroGravity\Cms\Content\Finder;
 use Closure;
 use Iterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\SortableIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderSortingTrait
 {
     /**
-     * @var string|Closure
+     * @var string|array{string, mixed}|Closure|null
      */
-    private $sortBy;
+    private string|array|Closure|null $sortBy = null;
 
     /**
      * Sorts pages by an anonymous function. The function will receive two Page instances to compare.
@@ -121,13 +122,17 @@ trait PageFinderSortingTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applySortIterator(Iterator $iterator): Iterator
     {
         if (null === $this->sortBy) {
             return $iterator;
         }
-        $iteratorAggregate = new SortableIterator($iterator, $this->sortBy);
 
-        return $iteratorAggregate->getIterator();
+        return (new SortableIterator($iterator, $this->sortBy))->getIterator();
     }
 }

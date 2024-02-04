@@ -7,6 +7,7 @@ use ZeroGravity\Cms\Content\Finder\Iterator\ModularFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ModuleFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\PublishedFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\VisibleFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderFlagsTrait
 {
@@ -63,6 +64,11 @@ trait PageFinderFlagsTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyFlagsIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->modular) {
@@ -80,6 +86,11 @@ trait PageFinderFlagsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyPublishedIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->published) {

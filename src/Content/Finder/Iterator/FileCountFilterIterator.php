@@ -6,12 +6,15 @@ use FilterIterator;
 use InvalidArgumentException;
 use Iterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * FileCountFilterIterator filters out pages that do not contain the given number of files.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class FileCountFilterIterator extends FilterIterator
 {

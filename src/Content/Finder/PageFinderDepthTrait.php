@@ -7,11 +7,13 @@ use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
+use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderDepthTrait
 {
     /**
-     * @var Comparator\NumberComparator[]
+     * @var list<Comparator\NumberComparator>
      */
     private array $depths = [];
 
@@ -23,18 +25,23 @@ trait PageFinderDepthTrait
      *   $finder->depth('> 1') // the Finder will start matching at level 1.
      *   $finder->depth('< 3') // the Finder will descend at most 3 levels of directories below the starting point.
      *
-     * @param string|int $level The depth level expression
+     * @param string|null $level The depth level expression
      *
      * @see DepthRangeFilterIterator
      * @see NumberComparator
      */
-    public function depth($level): self
+    public function depth(?string $level): self
     {
         $this->depths[] = new NumberComparator($level);
 
         return $this;
     }
 
+    /**
+     * @param RecursiveIteratorIterator<RecursivePageIterator> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyDepthsIterator(RecursiveIteratorIterator $iterator): Iterator
     {
         $minDepth = 0;

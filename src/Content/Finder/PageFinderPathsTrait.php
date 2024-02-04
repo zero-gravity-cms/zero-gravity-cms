@@ -5,12 +5,25 @@ namespace ZeroGravity\Cms\Content\Finder;
 use Iterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\FilesystemPathFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\PathFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderPathsTrait
 {
+    /**
+     * @var list<string>
+     */
     private array $paths = [];
+    /**
+     * @var list<string>
+     */
     private array $notPaths = [];
+    /**
+     * @var list<string>
+     */
     private array $filesystemPaths = [];
+    /**
+     * @var list<string>
+     */
     private array $notFilesystemPaths = [];
 
     /**
@@ -23,8 +36,6 @@ trait PageFinderPathsTrait
      * Use only / as dirname separator.
      *
      * @param string $pattern A pattern (a regexp or a string)
-     *
-     * @return $this
      *
      * @see FilenameFilterIterator
      */
@@ -95,6 +106,11 @@ trait PageFinderPathsTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->paths) || !empty($this->notPaths)) {
@@ -104,6 +120,11 @@ trait PageFinderPathsTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyFilesystemPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->filesystemPaths) || !empty($this->notFilesystemPaths)) {

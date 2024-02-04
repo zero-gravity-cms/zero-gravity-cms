@@ -10,13 +10,16 @@ use Iterator;
 use Symfony\Component\Finder\Comparator\Comparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
+use Traversable;
 use ZeroGravity\Cms\Content\Finder\Comparator\StringComparator;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * ExtraFilterIterator filters out pages that do not match the required extra setting value.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class ExtraFilterIterator extends FilterIterator
 {
@@ -51,7 +54,7 @@ final class ExtraFilterIterator extends FilterIterator
         return true;
     }
 
-    private function compareExtra(ExtraFilter $extraFilter, Page $page): bool
+    private function compareExtra(ExtraFilter $extraFilter, ReadablePage $page): bool
     {
         $comparator = $this->getComparator($extraFilter);
         $value = $this->getExtraValue($page, $extraFilter);
@@ -59,7 +62,7 @@ final class ExtraFilterIterator extends FilterIterator
         return $comparator->test($value);
     }
 
-    private function getExtraValue(Page $page, ExtraFilter $extraFilter)
+    private function getExtraValue(ReadablePage $page, ExtraFilter $extraFilter): mixed
     {
         $value = $page->getExtra($extraFilter->name());
         if (null === $value) {

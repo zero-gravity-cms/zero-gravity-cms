@@ -5,12 +5,16 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ */
 final class PageFactory
 {
     /**
@@ -26,6 +30,8 @@ final class PageFactory
 
     /**
      * Create Page from directory content.
+     *
+     * @param array<string, SettingValue> $defaultSettings
      */
     public function createPage(
         Directory $directory,
@@ -71,6 +77,11 @@ final class PageFactory
         return $page;
     }
 
+    /**
+     * @param array<string, SettingValue> $defaultSettings
+     *
+     * @return array<string, SettingValue>
+     */
     private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
     {
         $settings = $directory->fetchPageSettings();
@@ -99,7 +110,9 @@ final class PageFactory
     /**
      * Merge 2 or more arrays, deep merging array values while replacing scalar values.
      *
-     * @param array[] $params 1 or more arrays to merge
+     * @param array<string, SettingValue> $params 1 or more arrays to merge
+     *
+     * @return array<string, SettingValue>
      */
     private function mergeSettings(array ...$params): array
     {

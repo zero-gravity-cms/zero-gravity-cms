@@ -9,7 +9,7 @@ trait PageFilesTrait
     private ?PageFiles $files = null;
 
     /**
-     * @param File[] $files
+     * @param array<string, File> $files
      */
     public function setFiles(array $files): void
     {
@@ -17,7 +17,7 @@ trait PageFilesTrait
     }
 
     /**
-     * @return File[]
+     * @return array<string, File>
      */
     public function getFiles(): array
     {
@@ -32,7 +32,7 @@ trait PageFilesTrait
     /**
      * Get representations for all available image files.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getImages(): array
     {
@@ -42,7 +42,7 @@ trait PageFilesTrait
     /**
      * Get representations for all available document files.
      *
-     * @return File[]
+     * @return array<string, File>
      */
     public function getDocuments(): array
     {

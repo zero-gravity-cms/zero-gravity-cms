@@ -13,6 +13,9 @@ use ZeroGravity\Cms\Path\Path;
  */
 class PathTest extends BaseUnit
 {
+    /**
+     * @param array<string, int|bool> $expectations
+     */
     #[DataProvider('providePathData')]
     #[Test]
     public function pathIsParsedAndAnalyzed(string $pathString, array $expectations): void
@@ -28,6 +31,9 @@ class PathTest extends BaseUnit
         self::assertSame($expectations['elements'] > 0, $path->hasElements());
     }
 
+    /**
+     * @param array<string, int|bool> $expectations
+     */
     #[DataProvider('providePathData')]
     #[Test]
     public function toStringRebuildsPath(mixed $pathString, array $expectations): void
@@ -208,6 +214,9 @@ class PathTest extends BaseUnit
         self::assertSame('/', $path->toString());
     }
 
+    /**
+     * @param array<string, int|bool> $expect
+     */
     #[DataProvider('provideAppendedPathData')]
     #[Test]
     public function appendReturnsAppendedPathWithChildSettings(
@@ -286,7 +295,7 @@ class PathTest extends BaseUnit
 
     #[DataProvider('provideDirectoryPathData')]
     #[Test]
-    public function getDirectoryReturnsNewPathInstanceContainingPathDirectory($pathString, mixed $expectedDirectoryPath): void
+    public function getDirectoryReturnsNewPathInstanceContainingPathDirectory(string $pathString, mixed $expectedDirectoryPath): void
     {
         $path = new Path($pathString);
         $directory = $path->getDirectory();
@@ -321,7 +330,7 @@ class PathTest extends BaseUnit
 
     #[DataProvider('provideFilePathData')]
     #[Test]
-    public function getFileReturnsNewPathInstanceContainingPathFile($pathString, $expectedFilePath): void
+    public function getFileReturnsNewPathInstanceContainingPathFile(string $pathString, ?string $expectedFilePath): void
     {
         $path = new Path($pathString);
         $file = $path->getFile();

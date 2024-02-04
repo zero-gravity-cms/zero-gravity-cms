@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use Tests\Unit\ZeroGravity\Cms\Test\TwigExtensionTestTrait;
+use Twig\Extension\ExtensionInterface;
 use Twig\Loader\FilesystemLoader;
 use Twig\Loader\LoaderInterface;
 use ZeroGravity\Cms\Content\ContentRepository;
@@ -22,7 +23,10 @@ class ZeroGravityExtensionTest extends BaseUnit
 {
     use TwigExtensionTestTrait;
 
-    public function getExtensions(): array
+    /**
+     * @return ExtensionInterface[]
+     */
+    protected function getExtensions(): array
     {
         $mapper = $this->getValidPagesFilesystemMapper();
         $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
