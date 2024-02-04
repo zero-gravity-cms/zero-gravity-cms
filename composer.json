@@ -24,7 +24,7 @@
         "codeception/codeception": "^5.0",
         "codeception/stub": "^4.1",
         "knplabs/knp-menu": "^3.0",
-        "rector/rector": "^0.19",
+        "rector/rector": "^0.19.6",
         "symfony/var-dumper": "^6.0|^7.0",
         "webmozart/assert": "^1.11"
     },
