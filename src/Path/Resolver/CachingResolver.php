@@ -12,15 +12,11 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
 {
     use MultiPathFindOneTrait;
 
-    protected CacheInterface $cache;
-    protected SinglePathResolver $wrappedResolver;
-    protected SlugifyInterface $slugify;
-
-    public function __construct(CacheInterface $cache, SinglePathResolver $wrappedResolver, SlugifyInterface $slugify)
-    {
-        $this->cache = $cache;
-        $this->wrappedResolver = $wrappedResolver;
-        $this->slugify = $slugify;
+    public function __construct(
+        protected readonly CacheInterface $cache,
+        protected readonly SinglePathResolver $wrappedResolver,
+        protected readonly SlugifyInterface $slugify,
+    ) {
     }
 
     /**
@@ -37,9 +33,7 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
         }
         $key = $this->generateCacheKey('find', $path, $parentPath);
 
-        return $this->cache->get($key, function () use ($path, $parentPath) {
-            return $this->wrappedResolver->find($path, $parentPath);
-        });
+        return $this->cache->get($key, fn (): array => $this->wrappedResolver->find($path, $parentPath));
     }
 
     /**
@@ -51,14 +45,12 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
 
-        return $this->cache->get($key, function () use ($path, $parentPath) {
-            return $this->wrappedResolver->get($path, $parentPath);
-        });
+        return $this->cache->get($key, fn (): ?File => $this->wrappedResolver->get($path, $parentPath));
     }
 
     private function generateCacheKey(string $method, Path $path, Path $parentPath = null): string
     {
-        $parentString = $parentPath ? $parentPath->toString() : '';
+        $parentString = $parentPath instanceof Path ? $parentPath->toString() : '';
         $signature = sprintf('%s::%s::%s', $method, $path, $parentString);
 
         return $this->slugify->slugify($signature).'_'.sha1($signature);

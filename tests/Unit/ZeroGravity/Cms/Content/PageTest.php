@@ -2,59 +2,53 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
+use Codeception\Attribute\Group;
 use DateTime;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Finder\SplFileInfo;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
-use ZeroGravity\Cms\Content\FileTypeDetector;
+use ZeroGravity\Cms\Content\FileTypes;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 use ZeroGravity\Cms\Content\Page;
 
-/**
- * @group page
- */
+#[Group('page')]
 class PageTest extends BaseUnit
 {
-    public function _before()
+    protected function _before()
     {
     }
 
-    public function _after()
+    protected function _after()
     {
     }
 
-    /**
-     * @test
-     */
-    public function filesystemPathContainsParentPath()
+    #[Test]
+    public function filesystemPathContainsParentPath(): void
     {
         $parentPage = new Page('the_parent', [], null);
         $childPage = new Page('the_child', [], $parentPage);
         $childChildPage = new Page('one_more_child', [], $childPage);
 
-        static::assertSame('/the_parent/the_child', $childPage->getFilesystemPath()->toString());
-        static::assertSame('/the_parent/the_child/one_more_child', $childChildPage->getFilesystemPath()->toString());
+        self::assertSame('/the_parent/the_child', $childPage->getFilesystemPath()->toString());
+        self::assertSame('/the_parent/the_child/one_more_child', $childChildPage->getFilesystemPath()->toString());
     }
 
-    /**
-     * @test
-     */
-    public function pathContainsParentSlug()
+    #[Test]
+    public function pathContainsParentSlug(): void
     {
         $parentPage = new Page('the_parent', ['slug' => ''], null);
         $childPage = new Page('the_child', ['slug' => 'foo'], $parentPage);
         $childChildPage = new Page('one_more_child', ['slug' => 'bar'], $childPage);
 
-        static::assertSame('/', $parentPage->getPath()->toString());
-        static::assertSame('/foo', $childPage->getPath()->toString());
-        static::assertSame('/foo/bar', $childChildPage->getPath()->toString());
+        self::assertSame('/', $parentPage->getPath()->toString());
+        self::assertSame('/foo', $childPage->getPath()->toString());
+        self::assertSame('/foo/bar', $childChildPage->getPath()->toString());
     }
 
-    /**
-     * @test
-     */
-    public function fileAliasesAreApplied()
+    #[Test]
+    public function fileAliasesAreApplied(): void
     {
         $page = new Page('page', [
             'file_aliases' => [
@@ -63,98 +57,88 @@ class PageTest extends BaseUnit
         ]);
 
         $page->setFiles($this->createFiles([
-            FileTypeDetector::TYPE_IMAGE => [
+            FileTypes::TYPE_IMAGE => [
                 'some-image.jpg' => '/some-image.jpg',
                 'some-other-image.jpg' => '/some-other-image.jpg',
             ],
         ]));
 
-        static::assertArrayHasKey('my_alias', $page->getFiles());
-        static::assertArrayHasKey('some-image.jpg', $page->getFiles());
-        static::assertSame($page->getFile('some-image.jpg'), $page->getFile('my_alias'));
+        self::assertArrayHasKey('my_alias', $page->getFiles());
+        self::assertArrayHasKey('some-image.jpg', $page->getFiles());
+        self::assertSame($page->getFile('some-image.jpg'), $page->getFile('my_alias'));
     }
 
-    /**
-     * @test
-     */
-    public function filesCanBeFetchedByType()
+    #[Test]
+    public function filesCanBeFetchedByType(): void
     {
         $page = new Page('page');
 
         $page->setFiles($this->createFiles([
-            FileTypeDetector::TYPE_IMAGE => [
+            FileTypes::TYPE_IMAGE => [
                 'some-image.jpg' => '/some-image.jpg',
                 'some-other-image.jpg' => '/some-other-image.jpg',
             ],
-            FileTypeDetector::TYPE_DOCUMENT => [
+            FileTypes::TYPE_DOCUMENT => [
                 'foo.pdf' => '/foo.pdf',
             ],
-            FileTypeDetector::TYPE_MARKDOWN => [
+            FileTypes::TYPE_MARKDOWN => [
                 'page.md' => '/page.md',
             ],
-            FileTypeDetector::TYPE_YAML => [
+            FileTypes::TYPE_YAML => [
                 'page.yaml' => '/page.yaml',
             ],
-            FileTypeDetector::TYPE_TWIG => [
+            FileTypes::TYPE_TWIG => [
                 'page.html.twig' => '/page.html.twig',
             ],
         ]));
 
-        static::assertSame([
+        self::assertSame([
             'some-image.jpg',
             'some-other-image.jpg',
         ], array_keys($page->getImages()));
-        static::assertSame([
+        self::assertSame([
             'foo.pdf',
         ], array_keys($page->getDocuments()));
-        static::assertSame('/page.md', $page->getMarkdownFile()->getPathname());
-        static::assertSame('/page.yaml', $page->getYamlFile()->getPathname());
-        static::assertSame('/page.html.twig', $page->getTwigFile()->getPathname());
+        self::assertSame('/page.md', $page->getMarkdownFile()->getPathname());
+        self::assertSame('/page.yaml', $page->getYamlFile()->getPathname());
+        self::assertSame('/page.html.twig', $page->getTwigFile()->getPathname());
     }
 
-    /**
-     * @test
-     */
-    public function filesByTypeReturnEmptyDefaults()
+    #[Test]
+    public function filesByTypeReturnEmptyDefaults(): void
     {
         $page = new Page('page');
 
-        static::assertEmpty($page->getImages());
-        static::assertEmpty($page->getDocuments());
-        static::assertNull($page->getMarkdownFile());
-        static::assertNull($page->getYamlFile());
-        static::assertNull($page->getTwigFile());
+        self::assertEmpty($page->getImages());
+        self::assertEmpty($page->getDocuments());
+        self::assertNull($page->getMarkdownFile());
+        self::assertNull($page->getYamlFile());
+        self::assertNull($page->getTwigFile());
     }
 
-    /**
-     * @test
-     */
-    public function contentCanBeSetAndNullified()
+    #[Test]
+    public function contentCanBeSetAndNullified(): void
     {
         $page = new Page('page');
 
-        static::assertNull($page->getContent());
+        self::assertNull($page->getContent());
         $page->setContent('This is the content');
-        static::assertSame('This is the content', $page->getContent());
+        self::assertSame('This is the content', $page->getContent());
         $page->setContent(null);
-        static::assertNull($page->getContent());
+        self::assertNull($page->getContent());
     }
 
-    /**
-     * @test
-     */
-    public function parentCanBeFetched()
+    #[Test]
+    public function parentCanBeFetched(): void
     {
         $parentPage = new Page('the_parent', [], null);
         $childPage = new Page('the_child', [], $parentPage);
 
-        static::assertSame($parentPage, $childPage->getParent());
+        self::assertSame($parentPage, $childPage->getParent());
     }
 
-    /**
-     * @test
-     */
-    public function settingsCanBeFetchedExplicitly()
+    #[Test]
+    public function settingsCanBeFetchedExplicitly(): void
     {
         $page = new Page('page', [
             'slug' => 'page',
@@ -171,69 +155,61 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        static::assertSame('Page title', $page->getTitle());
-        static::assertTrue($page->isVisible());
-        static::assertTrue($page->isModular());
-        static::assertSame('main.html.twig', $page->getLayoutTemplate());
-        static::assertSame('render_with_h1.html.twig', $page->getContentTemplate());
-        static::assertSame('CustomBundle:Custom:action', $page->getController());
-        static::assertSame('custom_id', $page->getMenuId());
-        static::assertSame('custom label', $page->getMenuLabel());
-        static::assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
+        self::assertSame('Page title', $page->getTitle());
+        self::assertTrue($page->isVisible());
+        self::assertTrue($page->isModular());
+        self::assertSame('main.html.twig', $page->getLayoutTemplate());
+        self::assertSame('render_with_h1.html.twig', $page->getContentTemplate());
+        self::assertSame('CustomBundle:Custom:action', $page->getController());
+        self::assertSame('custom_id', $page->getMenuId());
+        self::assertSame('custom label', $page->getMenuLabel());
+        self::assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
     }
 
-    /**
-     * @test
-     */
-    public function childrenCanBeAssignedAndFetched()
+    #[Test]
+    public function childrenCanBeAssignedAndFetched(): void
     {
         $parent = new Page('page');
         $child1 = new Page('child1', [], $parent);
         $child2 = new Page('child2', [], $parent);
 
-        static::assertSame([
+        self::assertSame([
             '/page/child1' => $child1,
             '/page/child2' => $child2,
         ], $parent->getChildren()->toArray());
     }
 
-    /**
-     * @test
-     */
-    public function childrenAreRestrictedToOneLevelByDefault()
+    #[Test]
+    public function childrenAreRestrictedToOneLevelByDefault(): void
+    {
+        $parent = new Page('page');
+        $child1 = new Page('child1', [], $parent);
+        $child2 = new Page('child2', [], $parent);
+        new Page('child3', [], $child2);
+
+        self::assertSame([
+            '/page/child1' => $child1,
+            '/page/child2' => $child2,
+        ], $parent->getChildren()->toArray());
+    }
+
+    #[Test]
+    public function childrenFinderCanBeExtendedToDeeperLevel(): void
     {
         $parent = new Page('page');
         $child1 = new Page('child1', [], $parent);
         $child2 = new Page('child2', [], $parent);
         $child3 = new Page('child3', [], $child2);
 
-        static::assertSame([
-            '/page/child1' => $child1,
-            '/page/child2' => $child2,
-        ], $parent->getChildren()->toArray());
-    }
-
-    /**
-     * @test
-     */
-    public function childrenFinderCanBeExtendedToDeeperLevel()
-    {
-        $parent = new Page('page');
-        $child1 = new Page('child1', [], $parent);
-        $child2 = new Page('child2', [], $parent);
-        $child3 = new Page('child3', [], $child2);
-
-        static::assertSame([
+        self::assertSame([
             '/page/child1' => $child1,
             '/page/child2' => $child2,
             '/page/child2/child3' => $child3,
         ], $parent->getChildren()->depth('< 2')->toArray());
     }
 
-    /**
-     * @test
-     */
-    public function extraValuesCanBeFetched()
+    #[Test]
+    public function extraValuesCanBeFetched(): void
     {
         $page = new Page('page', [
             'extra' => [
@@ -241,146 +217,130 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        static::assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
-        static::assertNull($page->getExtra('does_not_exist'));
-        static::assertSame('default', $page->getExtra('does_not_exist', 'default'));
+        self::assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
+        self::assertNull($page->getExtra('does_not_exist'));
+        self::assertSame('default', $page->getExtra('does_not_exist', 'default'));
     }
 
-    /**
-     * @test
-     */
-    public function publishDateIsCastToDateTimeImmutable()
+    #[Test]
+    public function publishDateIsCastToDateTimeImmutable(): void
     {
         $page = new Page('page');
-        static::assertNull($page->getPublishDate());
+        self::assertNull($page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => new DateTime()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => new DateTimeImmutable()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
 
         $page = new Page('page', ['publish_date' => '2017-01-01 12:00:00']);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getPublishDate());
     }
 
-    /**
-     * @test
-     */
-    public function unpublishDateIsCastToDateTimeImmutable()
+    #[Test]
+    public function unpublishDateIsCastToDateTimeImmutable(): void
     {
         $page = new Page('page');
-        static::assertNull($page->getUnpublishDate());
+        self::assertNull($page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => new DateTime()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => new DateTimeImmutable()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
 
         $page = new Page('page', ['unpublish_date' => '2017-01-01 12:00:00']);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getUnpublishDate());
     }
 
-    /**
-     * @test
-     */
-    public function dateIsCastToDateTimeImmutable()
+    #[Test]
+    public function dateIsCastToDateTimeImmutable(): void
     {
         $page = new Page('page');
-        static::assertNull($page->getDate());
+        self::assertNull($page->getDate());
 
         $page = new Page('page', ['date' => new DateTime()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
         $page = new Page('page', ['date' => new DateTimeImmutable()]);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
 
         $page = new Page('page', ['date' => '2017-01-01 12:00:00']);
-        static::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
+        self::assertInstanceOf(DateTimeImmutable::class, $page->getDate());
     }
 
-    /**
-     * @test
-     */
-    public function pageIsPublishedByDefault()
+    #[Test]
+    public function pageIsPublishedByDefault(): void
     {
         $page = new Page('page');
-        static::assertTrue($page->isPublished());
+        self::assertTrue($page->isPublished());
     }
 
-    /**
-     * @test
-     */
-    public function publishingCanBeControlledByDates()
+    #[Test]
+    public function publishingCanBeControlledByDates(): void
     {
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
-        static::assertTrue($page->isPublished());
+        self::assertTrue($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
             'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        static::assertTrue($page->isPublished());
+        self::assertTrue($page->isPublished());
 
         $page = new Page('page', [
             'publish_date' => new DateTimeImmutable('-10 seconds'),
             'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'unpublish_date' => new DateTimeImmutable('-5 seconds'),
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
     }
 
-    /**
-     * @test
-     */
-    public function pageCanBeUnpublishedAndDatesAreIgnored()
+    #[Test]
+    public function pageCanBeUnpublishedAndDatesAreIgnored(): void
     {
         $page = new Page('page', [
             'publish' => false,
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish' => false,
             'publish_date' => new DateTimeImmutable('-10 seconds'),
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
 
         $page = new Page('page', [
             'publish' => false,
             'unpublish_date' => new DateTimeImmutable('+10 seconds'),
         ]);
-        static::assertFalse($page->isPublished());
+        self::assertFalse($page->isPublished());
     }
 
-    /**
-     * @test
-     */
-    public function defaultTitleIsGeneratedBasedOnName()
+    #[Test]
+    public function defaultTitleIsGeneratedBasedOnName(): void
     {
         $page = new Page('page');
-        static::assertSame('Page', $page->getTitle());
+        self::assertSame('Page', $page->getTitle());
 
         $page = new Page('name-with_dashes_and_underscores');
-        static::assertSame('Name With Dashes And Underscores', $page->getTitle());
+        self::assertSame('Name With Dashes And Underscores', $page->getTitle());
     }
 
-    /**
-     * @test
-     */
-    public function taxonomyIsNormalizedToArrays()
+    #[Test]
+    public function taxonomyIsNormalizedToArrays(): void
     {
         $page = new Page('page', [
             'taxonomy' => [
@@ -389,22 +349,20 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        static::assertSame([
-            'tag' => ['foo', 'bar'],
+        self::assertSame([
             'category' => ['baz'],
+            'tag' => ['foo', 'bar'],
         ], $page->getTaxonomies());
 
         $page = new Page('page', [
             'taxonomy' => null,
         ]);
 
-        static::assertSame([], $page->getTaxonomies());
+        self::assertSame([], $page->getTaxonomies());
     }
 
-    /**
-     * @test
-     */
-    public function taxonomyGetterDefaultsEmpty()
+    #[Test]
+    public function taxonomyGetterDefaultsEmpty(): void
     {
         $page = new Page('page', [
             'taxonomy' => [
@@ -412,14 +370,12 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        static::assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
-        static::assertSame([], $page->getTaxonomy('category'));
+        self::assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
+        self::assertSame([], $page->getTaxonomy('category'));
     }
 
-    /**
-     * @test
-     */
-    public function taxonomyProvidesQuickGetters()
+    #[Test]
+    public function taxonomyProvidesQuickGetters(): void
     {
         $page = new Page('page', [
             'taxonomy' => [
@@ -429,38 +385,34 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        static::assertSame(['foo', 'bar'], $page->getTags());
-        static::assertSame(['baz'], $page->getCategories());
-        static::assertSame(['David', 'Julian'], $page->getAuthors());
+        self::assertSame(['foo', 'bar'], $page->getTags());
+        self::assertSame(['baz'], $page->getCategories());
+        self::assertSame(['David', 'Julian'], $page->getAuthors());
     }
 
-    /**
-     * @test
-     */
-    public function contentTypeDefaultsToPage()
+    #[Test]
+    public function contentTypeDefaultsToPage(): void
     {
         $page = new Page('page', [
         ]);
 
-        static::assertSame('page', $page->getContentType());
+        self::assertSame('page', $page->getContentType());
     }
 
-    /**
-     * @test
-     */
-    public function contentTypeCanBeSet()
+    #[Test]
+    public function contentTypeCanBeSet(): void
     {
         $page = new Page('page', [
             'content_type' => 'custom-type',
         ]);
 
-        static::assertSame('custom-type', $page->getContentType());
+        self::assertSame('custom-type', $page->getContentType());
     }
 
     /**
      * @return File[]
      */
-    private function createFiles(array $fileNamesByType)
+    private function createFiles(array $fileNamesByType): array
     {
         $files = [];
         foreach ($fileNamesByType as $type => $fileNames) {

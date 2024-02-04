@@ -12,15 +12,12 @@ use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\ReadablePageRepository;
 
-final class RouteProvider implements RouteProviderInterface
+final readonly class RouteProvider implements RouteProviderInterface
 {
-    private ReadablePageRepository $repository;
-    private string $defaultController;
-
-    public function __construct(ReadablePageRepository $repository, string $defaultController)
-    {
-        $this->repository = $repository;
-        $this->defaultController = $defaultController;
+    public function __construct(
+        private ReadablePageRepository $repository,
+        private string $defaultController
+    ) {
     }
 
     /**
@@ -67,7 +64,7 @@ final class RouteProvider implements RouteProviderInterface
     public function getRouteByName(string $name): Route
     {
         $page = $this->repository->getPage($name);
-        if (null === $page) {
+        if (!$page instanceof ReadablePage) {
             throw new RouteNotFoundException(sprintf('Cannot find zerogravity page route with name %s', $name));
         }
 

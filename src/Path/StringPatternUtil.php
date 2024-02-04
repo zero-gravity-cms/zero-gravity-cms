@@ -15,7 +15,7 @@ final class StringPatternUtil
      */
     public static function stringContainsRegex(string $pathString): bool
     {
-        return !(false === @preg_match($pathString, ''));
+        return false !== @preg_match($pathString, '');
     }
 
     /**
@@ -28,8 +28,8 @@ final class StringPatternUtil
         }
 
         return
-            false !== strpos($pathString, '*')
-            || false !== strpos($pathString, '?')
+            str_contains($pathString, '*')
+            || str_contains($pathString, '?')
             || preg_match('/\{.*\}/', $pathString);
     }
 }

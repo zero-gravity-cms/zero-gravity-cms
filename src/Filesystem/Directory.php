@@ -12,7 +12,7 @@ use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
-use ZeroGravity\Cms\Content\FileTypeDetector;
+use ZeroGravity\Cms\Content\FileTypes;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
 
@@ -20,7 +20,7 @@ final class Directory
 {
     use WritableDirectoryTrait;
 
-    public const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+    public const SORTING_PREFIX_PATTERN = '/^\d+\.(.*)/';
     public const MODULAR_PREFIX_PATTERN = '/^_(.*)/';
 
     /**
@@ -48,10 +48,6 @@ final class Directory
      */
     public const CONTENT_STRATEGY_YAML_AND_MARKDOWN = 'yaml_and_markdown';
 
-    private SplFileInfo $directoryInfo;
-    private FileFactory $fileFactory;
-    private ?string $parentPath;
-
     /**
      * @var File[]
      */
@@ -62,21 +58,13 @@ final class Directory
      */
     private ?array $directories = null;
 
-    private LoggerInterface $logger;
-    private EventDispatcherInterface $eventDispatcher;
-
     public function __construct(
-        SplFileInfo $directoryInfo,
-        FileFactory $fileFactory,
-        LoggerInterface $logger,
-        EventDispatcherInterface $eventDispatcher,
-        string $parentPath = null
+        private SplFileInfo $directoryInfo,
+        private readonly FileFactory $fileFactory,
+        private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ?string $parentPath = null
     ) {
-        $this->directoryInfo = $directoryInfo;
-        $this->fileFactory = $fileFactory;
-        $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->parentPath = $parentPath;
         $this->parseFiles();
         $this->parseDirectories();
     }
@@ -106,7 +94,7 @@ final class Directory
     }
 
     /**
-     * Parse this directory for sub directories.
+     * Parse this directory for subdirectories.
      */
     private function parseDirectories(): void
     {
@@ -170,7 +158,7 @@ final class Directory
      */
     public function getFilesByType(string $type): array
     {
-        return array_filter($this->getFiles(), static fn (File $file) => $file->getType() === $type);
+        return array_filter($this->files, static fn (File $file): bool => $file->getType() === $type);
     }
 
     public function hasSortingPrefix(): bool
@@ -199,11 +187,11 @@ final class Directory
      */
     private function validateFileCounts(): void
     {
-        $yamlFiles = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
+        $yamlFiles = $this->getFilesByType(FileTypes::TYPE_YAML);
         if (count($yamlFiles) > 1) {
             throw StructureException::moreThanOneYamlFile($this->directoryInfo, $yamlFiles);
         }
-        $markdownFiles = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
+        $markdownFiles = $this->getFilesByType(FileTypes::TYPE_MARKDOWN);
         if (count($markdownFiles) > 1) {
             throw StructureException::moreThanOneMarkdownFile($this->directoryInfo, $markdownFiles);
         }
@@ -221,35 +209,38 @@ final class Directory
 
     private function yamlAndMarkdownBasenamesMatch(): bool
     {
-        return
-            !$this->hasYamlFile()
-            || !$this->hasMarkdownFile()
-            || ($this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename())
-        ;
+        if (!$this->hasYamlFile()) {
+            return true;
+        }
+        if (!$this->hasMarkdownFile()) {
+            return true;
+        }
+
+        return $this->getYamlFile()?->getDefaultBasename() === $this->getMarkdownFile()?->getDefaultBasename();
     }
 
     public function getYamlFile(): ?File
     {
-        $files = $this->getFilesByType(FileTypeDetector::TYPE_YAML);
+        $files = $this->getFilesByType(FileTypes::TYPE_YAML);
 
         return count($files) ? current($files) : null;
     }
 
     public function hasYamlFile(): bool
     {
-        return null !== $this->getYamlFile();
+        return $this->getYamlFile() instanceof File;
     }
 
     public function getMarkdownFile(): ?File
     {
-        $files = $this->getFilesByType(FileTypeDetector::TYPE_MARKDOWN);
+        $files = $this->getFilesByType(FileTypes::TYPE_MARKDOWN);
 
         return count($files) ? current($files) : null;
     }
 
     public function hasMarkdownFile(): bool
     {
-        return null !== $this->getMarkdownFile();
+        return $this->getMarkdownFile() instanceof File;
     }
 
     /**
@@ -283,7 +274,7 @@ final class Directory
      */
     public function getTwigFiles(): array
     {
-        return $this->getFilesByType(FileTypeDetector::TYPE_TWIG);
+        return $this->getFilesByType(FileTypes::TYPE_TWIG);
     }
 
     /**
@@ -297,7 +288,7 @@ final class Directory
     }
 
     /**
-     * Sub directories indexed by directory name.
+     * Subdirectories indexed by directory name.
      *
      * @return Directory[]
      */
@@ -307,14 +298,14 @@ final class Directory
     }
 
     /**
-     * Get files of this directory and all sub directories.
+     * Get files of this directory and all subdirectories.
      *
      * @return File[]
      */
     public function getFilesRecursively(): array
     {
-        $files = $this->getFiles();
-        foreach ($this->getDirectories() as $directory) {
+        $files = $this->files;
+        foreach ($this->directories as $directory) {
             foreach ($directory->getFilesRecursively() as $path => $file) {
                 $files[$directory->getName().'/'.$path] = $file;
             }
@@ -335,12 +326,11 @@ final class Directory
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
         $markdownFile = $this->getMarkdownFile();
-        if (null === $markdownFile) {
+        if (!$markdownFile instanceof File) {
             throw FilesystemException::missingMarkdownFile($this);
         }
-        $parser = new FrontYAMLParser();
 
-        return $parser->parse(
+        return (new FrontYAMLParser())->parse(
             file_get_contents($markdownFile->getFilesystemPathname()),
             $convertMarkdown
         );

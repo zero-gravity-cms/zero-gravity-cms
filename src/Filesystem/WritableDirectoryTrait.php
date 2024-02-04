@@ -18,15 +18,11 @@ trait WritableDirectoryTrait
      */
     public function saveContent(string $newRawContent = null): void
     {
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-                $this->updateMarkdown($newRawContent);
-                break;
-
-            default:
-                $this->createMarkdown($newRawContent);
-        }
+        match ($this->getContentStrategy()) {
+            self::CONTENT_STRATEGY_YAML_AND_MARKDOWN,
+            self::CONTENT_STRATEGY_MARKDOWN_ONLY => $this->updateMarkdown($newRawContent),
+            default => $this->createMarkdown($newRawContent),
+        };
     }
 
     /**
@@ -36,16 +32,12 @@ trait WritableDirectoryTrait
     {
         $newYaml = $this->dumpSettingsToYaml($newSettings);
 
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_ONLY:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-                $this->updateYaml($newYaml);
-                break;
-
-            default:
-                $this->createYaml($newYaml);
-        }
+        match ($this->getContentStrategy()) {
+            self::CONTENT_STRATEGY_YAML_ONLY,
+            self::CONTENT_STRATEGY_MARKDOWN_ONLY,
+            self::CONTENT_STRATEGY_YAML_AND_MARKDOWN => $this->updateYaml($newYaml),
+            default => $this->createYaml($newYaml),
+        };
     }
 
     /**
@@ -53,7 +45,7 @@ trait WritableDirectoryTrait
      */
     public function renameOrMove(string $newRealPath): void
     {
-        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to $newRealPath");
+        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to {$newRealPath}");
         $fs = new Filesystem();
         $fs->rename($this->getFilesystemPathname(), $newRealPath, false);
 
@@ -70,9 +62,9 @@ trait WritableDirectoryTrait
             $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
             $newRawContent = <<<FRONTMATTER
 ---
-$yamlContent
+{$yamlContent}
 ---
-$newRawContent
+{$newRawContent}
 FRONTMATTER;
         }
 
@@ -109,7 +101,7 @@ FRONTMATTER;
         $document = $this->getFrontYAMLDocument(false);
         $newYaml = <<<FRONTMATTER
 ---
-$newYaml
+{$newYaml}
 ---
 {$document->getContent()}
 FRONTMATTER;

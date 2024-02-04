@@ -12,7 +12,7 @@ class ResolverException extends RuntimeException implements ZeroGravityException
      */
     public static function moreThanOneFileMatchingPattern(string $pattern, array $files): self
     {
-        $files = array_map(fn (File $file) => $file->getPathname(), $files);
+        $files = array_map(static fn (File $file): string => $file->getPathname(), $files);
 
         return new static(
             sprintf(

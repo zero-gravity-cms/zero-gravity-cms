@@ -14,18 +14,13 @@ use ZeroGravity\Cms\Content\Page;
 final class SettingFilterIterator extends FilterIterator
 {
     /**
-     * @var SettingFilter[]
-     */
-    private array $settings;
-
-    /**
      * @param Iterator        $iterator The Iterator to filter
      * @param SettingFilter[] $settings
      */
-    public function __construct(Iterator $iterator, array $settings)
-    {
-        $this->settings = $settings;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly array $settings,
+    ) {
         parent::__construct($iterator);
     }
 

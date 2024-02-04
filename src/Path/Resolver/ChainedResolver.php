@@ -8,16 +8,11 @@ use ZeroGravity\Cms\Path\Path;
 final class ChainedResolver extends AbstractResolver
 {
     /**
-     * @var AbstractResolver[]
-     */
-    private array $resolvers;
-
-    /**
      * @param AbstractResolver[] $resolvers
      */
-    public function __construct(array $resolvers)
-    {
-        $this->resolvers = $resolvers;
+    public function __construct(
+        private readonly array $resolvers
+    ) {
     }
 
     /**

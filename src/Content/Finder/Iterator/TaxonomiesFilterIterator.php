@@ -8,25 +8,20 @@ use ZeroGravity\Cms\Content\Finder\Tester\TaxonomyTester;
 use ZeroGravity\Cms\Content\Page;
 
 /**
- * ModularFilterIterator filters out pages that do not match the required modular state.
+ * TaxonomiesFilterIterator filters out pages that do not match the required taxonomies.
  *
  * @method Page current()
  */
 final class TaxonomiesFilterIterator extends FilterIterator
 {
     /**
-     * @var TaxonomyTester[]
-     */
-    private array $taxonomies;
-
-    /**
      * @param Iterator         $iterator   The Iterator to filter
      * @param TaxonomyTester[] $taxonomies
      */
-    public function __construct(Iterator $iterator, array $taxonomies)
-    {
-        $this->taxonomies = $taxonomies;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly array $taxonomies,
+    ) {
         parent::__construct($iterator);
     }
 

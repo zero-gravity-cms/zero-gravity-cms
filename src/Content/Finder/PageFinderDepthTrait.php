@@ -57,7 +57,8 @@ trait PageFinderDepthTrait
                     $maxDepth = $target;
                     break;
                 default:
-                    $minDepth = $maxDepth = $target;
+                    $minDepth = $target;
+                    $maxDepth = $target;
             }
         }
 

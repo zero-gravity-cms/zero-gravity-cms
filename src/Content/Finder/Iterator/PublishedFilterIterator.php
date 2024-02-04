@@ -13,15 +13,13 @@ use ZeroGravity\Cms\Content\Page;
  */
 final class PublishedFilterIterator extends FilterIterator
 {
-    private bool $published;
-
     /**
      * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Iterator $iterator, bool $published)
-    {
-        $this->published = $published;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly bool $published,
+    ) {
         parent::__construct($iterator);
     }
 

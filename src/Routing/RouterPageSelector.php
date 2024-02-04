@@ -2,25 +2,24 @@
 
 namespace ZeroGravity\Cms\Routing;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * Determine current page based on routing.
  */
-final class RouterPageSelector
+final readonly class RouterPageSelector
 {
-    private RequestStack $requestStack;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->requestStack = $requestStack;
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
     }
 
-    public function getCurrentPage(): ?Page
+    public function getCurrentPage(): ?ReadablePage
     {
         $request = $this->requestStack->getCurrentRequest();
-        if (null === $request) {
+        if (!$request instanceof Request) {
             return null;
         }
 
@@ -28,7 +27,7 @@ final class RouterPageSelector
         if (!isset($params['_zg_page'])) {
             return null;
         }
-        if (!$params['_zg_page'] instanceof Page) {
+        if (!$params['_zg_page'] instanceof ReadablePage) {
             return null;
         }
 

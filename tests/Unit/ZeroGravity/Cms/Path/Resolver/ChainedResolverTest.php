@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Group;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
@@ -10,18 +13,14 @@ use ZeroGravity\Cms\Path\Resolver\ChainedResolver;
 use ZeroGravity\Cms\Path\Resolver\FilesystemResolver;
 use ZeroGravity\Cms\Path\Resolver\PageResolver;
 
-/**
- * @group resolver
- */
+#[Group('resolver')]
 class ChainedResolverTest extends BaseUnit
 {
     /**
-     * @test
-     *
-     * @dataProvider provideSingleFilePaths
-     *
      * @param string $inPath
      */
+    #[DataProvider('provideSingleFilePaths')]
+    #[Test]
     public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath): void
     {
         $pageResolver = $this->getPageResolver();
@@ -30,11 +29,11 @@ class ChainedResolverTest extends BaseUnit
 
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        static::assertSame($expectedPath, $file->getPathname());
+        self::assertInstanceOf(File::class, $file, "Page {$path} was found in {$inPath}");
+        self::assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths(): Iterator
+    public static function provideSingleFilePaths(): Iterator
     {
         yield [
             '/yaml_only/file2.png',

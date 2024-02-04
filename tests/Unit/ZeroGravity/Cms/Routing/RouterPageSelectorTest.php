@@ -3,6 +3,7 @@
 namespace Tests\Unit\ZeroGravity\Cms\Routing;
 
 use Codeception\Test\Unit;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use ZeroGravity\Cms\Content\Page;
@@ -10,21 +11,17 @@ use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 class RouterPageSelectorTest extends Unit
 {
-    /**
-     * @test
-     */
-    public function selectorReturnsNullIfThereIsNoRequest()
+    #[Test]
+    public function selectorReturnsNullIfThereIsNoRequest(): void
     {
         $stack = new RequestStack();
         $selector = new RouterPageSelector($stack);
 
-        static::assertNull($selector->getCurrentPage());
+        self::assertNull($selector->getCurrentPage());
     }
 
-    /**
-     * @test
-     */
-    public function selectorReturnsNullIfCurrentRequestDoesNotContainPageKey()
+    #[Test]
+    public function selectorReturnsNullIfCurrentRequestDoesNotContainPageKey(): void
     {
         $stack = new RequestStack();
         $stack->push(new Request([], [], [
@@ -32,13 +29,11 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        static::assertNull($selector->getCurrentPage());
+        self::assertNull($selector->getCurrentPage());
     }
 
-    /**
-     * @test
-     */
-    public function selectorReturnsNullIfCurrentRequestDoesNotContainPage()
+    #[Test]
+    public function selectorReturnsNullIfCurrentRequestDoesNotContainPage(): void
     {
         $stack = new RequestStack();
         $stack->push(new Request([], [], [
@@ -48,13 +43,11 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        static::assertNull($selector->getCurrentPage());
+        self::assertNull($selector->getCurrentPage());
     }
 
-    /**
-     * @test
-     */
-    public function selectorReturnsPageIfCurrentRequestContainsPage()
+    #[Test]
+    public function selectorReturnsPageIfCurrentRequestContainsPage(): void
     {
         $stack = new RequestStack();
         $stack->push(new Request([], [], [
@@ -64,6 +57,6 @@ class RouterPageSelectorTest extends Unit
         ]));
         $selector = new RouterPageSelector($stack);
 
-        static::assertInstanceOf(Page::class, $selector->getCurrentPage());
+        self::assertInstanceOf(Page::class, $selector->getCurrentPage());
     }
 }

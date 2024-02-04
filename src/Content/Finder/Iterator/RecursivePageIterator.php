@@ -28,6 +28,6 @@ final class RecursivePageIterator extends ArrayIterator implements RecursiveIter
      */
     public function getChildren(): RecursiveIterator
     {
-        return new static($this->current()->getChildren()->toArray());
+        return new self($this->current()->getChildren()->toArray());
     }
 }

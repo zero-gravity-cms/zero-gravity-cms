@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Group;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Exception\ResolverException;
@@ -12,25 +15,22 @@ use ZeroGravity\Cms\Path\Path;
 class FilesystemResolverTest extends BaseUnit
 {
     /**
-     * @test
-     *
-     * @dataProvider provideSingleValidFiles
-     *
-     * @group resolver
-     *
      * @param Path|null $inPath
      */
-    public function singleValidFile(string $file, $inPath, string $pathName)
+    #[DataProvider('provideSingleValidFiles')]
+    #[Group('resolver')]
+    #[Test]
+    public function singleValidFile(string $file, $inPath, string $pathName): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $parent = (null !== $inPath) ? new Path($inPath) : null;
         $resolved = $resolver->get(new Path($file), $parent);
-        static::assertInstanceOf(File::class, $resolved, 'path results in file: '.$file);
-        static::assertSame($pathName, $resolved->getPathname(), 'pathname matches');
+        self::assertInstanceOf(File::class, $resolved, 'path results in file: '.$file);
+        self::assertSame($pathName, $resolved->getPathname(), 'pathname matches');
     }
 
-    public function provideSingleValidFiles(): Iterator
+    public static function provideSingleValidFiles(): Iterator
     {
         yield [
             '01.yaml_only/file1.png',
@@ -74,44 +74,37 @@ class FilesystemResolverTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     */
-    public function parentDirectoryNotationIsNormalized()
+    #[Test]
+    public function parentDirectoryNotationIsNormalized(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('foo/bar/../../root_file1.png'));
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/root_file1.png', $resolved->getPathname(), 'pathname matches');
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/root_file1.png', $resolved->getPathname(), 'pathname matches');
     }
 
-    /**
-     * @test
-     */
-    public function singleFileCanReachRelativePathOutsideInPath()
+    #[Test]
+    public function singleFileCanReachRelativePathOutsideInPath(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('../../images/person_a.png'), new Path('04.with_children/_child1'));
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/images/person_a.png', $resolved->getPathname(), 'pathname matches');
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/images/person_a.png', $resolved->getPathname(), 'pathname matches');
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideSingleInvalidFiles
-     */
-    public function singleInvalidFile($file)
+    #[DataProvider('provideSingleInvalidFiles')]
+    #[Test]
+    public function singleInvalidFile($file): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path($file));
-        static::assertNull($resolved);
+        self::assertNull($resolved);
     }
 
-    public function provideSingleInvalidFiles(): Iterator
+    public static function provideSingleInvalidFiles(): Iterator
     {
         yield ['foo'];
         yield ['root_file1'];
@@ -121,10 +114,8 @@ class FilesystemResolverTest extends BaseUnit
         yield ['04.with_children/_child1/'];
     }
 
-    /**
-     * @test
-     */
-    public function parentDirectoryNotationLeavingBaseDirThrowsException()
+    #[Test]
+    public function parentDirectoryNotationLeavingBaseDirThrowsException(): void
     {
         $resolver = $this->getValidPagesResolver();
 
@@ -133,22 +124,20 @@ class FilesystemResolverTest extends BaseUnit
     }
 
     /**
-     * @test
-     *
-     * @dataProvider provideMultipleFilePatterns
-     *
      * @param Path|null $inPath
      */
-    public function multipleFiles(string $pattern, $inPath, array $foundFiles)
+    #[DataProvider('provideMultipleFilePatterns')]
+    #[Test]
+    public function multipleFiles(string $pattern, $inPath, array $foundFiles): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $parent = (null !== $inPath) ? new Path($inPath) : null;
         $resolved = $resolver->find(new Path($pattern), $parent);
-        static::assertEquals($foundFiles, array_keys($resolved), 'result matches when searching for '.$pattern);
+        self::assertEquals($foundFiles, array_keys($resolved), 'result matches when searching for '.$pattern);
     }
 
-    public function provideMultipleFilePatterns(): Iterator
+    public static function provideMultipleFilePatterns(): Iterator
     {
         yield [
             'file1.png',
@@ -277,71 +266,59 @@ class FilesystemResolverTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithNonStrictSearchReturnsDirectMatch()
+    #[Test]
+    public function singleFileWithNonStrictSearchReturnsDirectMatch(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('01.yaml_only/file1.png'));
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithNonStrictSearchReturnsFirstFile()
+    #[Test]
+    public function singleFileWithNonStrictSearchReturnsFirstFile(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->get(new Path('file1.png'));
-        static::assertNull($resolved);
+        self::assertNull($resolved);
 
         $resolved = $resolver->findOne(new Path('file1.png'), null, false);
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/01.yaml_only/file1.png', $resolved->getPathname());
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithNonStrictSearchReturnsNullIfNothingFound()
+    #[Test]
+    public function singleFileWithNonStrictSearchReturnsNullIfNothingFound(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('does_not_exist.png'), null, false);
-        static::assertNull($resolved);
+        self::assertNull($resolved);
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithStrictSearchReturnsNullIfNothingFound()
+    #[Test]
+    public function singleFileWithStrictSearchReturnsNullIfNothingFound(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('does_not_exist.png'), null, true);
-        static::assertNull($resolved);
+        self::assertNull($resolved);
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithStrictSearchReturnsResultIfExactlyOne()
+    #[Test]
+    public function singleFileWithStrictSearchReturnsResultIfExactlyOne(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('child_file8.png'), null, true);
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
     }
 
-    /**
-     * @test
-     */
-    public function singleFileWithStrictSearchExistingMoreThanOnceThrowsException()
+    #[Test]
+    public function singleFileWithStrictSearchExistingMoreThanOnceThrowsException(): void
     {
         $resolver = $this->getValidPagesResolver();
 
@@ -349,15 +326,13 @@ class FilesystemResolverTest extends BaseUnit
         $resolver->findOne(new Path('file1.png'), null, true);
     }
 
-    /**
-     * @test
-     */
-    public function singleFileSearchSupportsInPath()
+    #[Test]
+    public function singleFileSearchSupportsInPath(): void
     {
         $resolver = $this->getValidPagesResolver();
 
         $resolved = $resolver->findOne(new Path('child_file8.png'), new Path('04.with_children/03.empty'), true);
-        static::assertInstanceOf(File::class, $resolved);
-        static::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
+        self::assertInstanceOf(File::class, $resolved);
+        self::assertSame('/04.with_children/03.empty/sub/dir/child_file8.png', $resolved->getPathname());
     }
 }

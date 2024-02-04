@@ -98,7 +98,7 @@ trait PageFinderPathsTrait
     private function applyPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->paths) || !empty($this->notPaths)) {
-            $iterator = new PathFilterIterator($iterator, $this->paths, $this->notPaths);
+            return new PathFilterIterator($iterator, $this->paths, $this->notPaths);
         }
 
         return $iterator;
@@ -107,7 +107,7 @@ trait PageFinderPathsTrait
     private function applyFilesystemPathsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->filesystemPaths) || !empty($this->notFilesystemPaths)) {
-            $iterator = new FilesystemPathFilterIterator(
+            return new FilesystemPathFilterIterator(
                 $iterator,
                 $this->filesystemPaths,
                 $this->notFilesystemPaths

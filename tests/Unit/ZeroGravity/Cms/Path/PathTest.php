@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path;
 
+use Codeception\Attribute\DataProvider;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\Path;
 
@@ -11,30 +13,24 @@ use ZeroGravity\Cms\Path\Path;
  */
 class PathTest extends BaseUnit
 {
-    /**
-     * @test
-     *
-     * @dataProvider providePathData
-     */
-    public function pathIsParsedAndAnalyzed($pathString, array $expectations)
+    #[DataProvider('providePathData')]
+    #[Test]
+    public function pathIsParsedAndAnalyzed(string $pathString, array $expectations): void
     {
         $path = new Path($pathString);
 
-        static::assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
-        static::assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
-        static::assertSame($expectations['directory'], $path->isDirectory(), 'directory detection matches: '.$pathString);
-        static::assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
-        static::assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
+        self::assertCount($expectations['elements'], $path->getElements(), 'element count matches: '.$pathString);
+        self::assertSame($expectations['absolute'], $path->isAbsolute(), 'absolute detection matches: '.$pathString);
+        self::assertSame($expectations['directory'], $path->isDirectory(), 'directory detection matches: '.$pathString);
+        self::assertSame($expectations['regex'], $path->isRegex(), 'regex detection matches: '.$pathString);
+        self::assertSame($expectations['glob'], $path->isGlob(), 'glob detection matches: '.$pathString);
 
-        static::assertSame($expectations['elements'] > 0, $path->hasElements());
+        self::assertSame($expectations['elements'] > 0, $path->hasElements());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider providePathData
-     */
-    public function toStringRebuildsPath($pathString, array $expectations)
+    #[DataProvider('providePathData')]
+    #[Test]
+    public function toStringRebuildsPath(mixed $pathString, array $expectations): void
     {
         if (isset($expectations['cannotRebuild']) && $expectations['cannotRebuild']) {
             // this is for paths containing "empty" elements that get lost during parsing
@@ -42,10 +38,10 @@ class PathTest extends BaseUnit
         }
 
         $path = new Path($pathString);
-        static::assertSame($pathString, $path->toString(true));
+        self::assertSame($pathString, $path->toString(true));
     }
 
-    public function providePathData(): Iterator
+    public static function providePathData(): Iterator
     {
         yield [
             '/foo/bar.txt',
@@ -181,71 +177,62 @@ class PathTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     */
-    public function pathCanBeNormalized()
+    #[Test]
+    public function pathCanBeNormalized(): void
     {
         $path = new Path('path/../with/parent');
         $path->normalize();
-        static::assertSame('with/parent', $path->toString());
-        static::assertSame('with/parent', (string) $path);
+        self::assertSame('with/parent', $path->toString());
+        self::assertSame('with/parent', (string) $path);
 
         $path = new Path('path/../../leaving/structure');
         $parent = new Path('parent/path');
         $path->normalize($parent);
-        static::assertSame('leaving/structure', $path->toString());
-        static::assertSame('parent', $parent->toString());
+        self::assertSame('leaving/structure', $path->toString());
+        self::assertSame('parent', $parent->toString());
     }
 
-    /**
-     * @test
-     */
-    public function regexPathIsNotNormalized()
+    #[Test]
+    public function regexPathIsNotNormalized(): void
     {
         $path = new Path('#valid/regex/../stuff#');
         $path->normalize();
-        static::assertSame('#valid/regex/../stuff#', $path->toString());
+        self::assertSame('#valid/regex/../stuff#', $path->toString());
     }
 
-    /**
-     * @test
-     */
-    public function normalizedPathDoesNotEndUpAsDoubleSlash()
+    #[Test]
+    public function normalizedPathDoesNotEndUpAsDoubleSlash(): void
     {
         $path = new Path('/foo/../');
         $path->normalize();
-        static::assertSame('/', $path->toString());
+        self::assertSame('/', $path->toString());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideAppendedPathData
-     */
+    #[DataProvider('provideAppendedPathData')]
+    #[Test]
     public function appendReturnsAppendedPathWithChildSettings(
         string $pathString,
         string $childString,
         string $newString,
         array $expect
-    ) {
+    ): void {
         $path = new Path($pathString);
         $child = new Path($childString);
 
         $newPath = $path->appendPath($child);
 
-        static::assertSame($newString, $newPath->toString());
-        static::assertNotSame($path, $newPath, 'appendPath returns new path instance');
+        self::assertSame($newString, $newPath->toString());
+        self::assertNotSame($path, $newPath, 'appendPath returns new path instance');
 
         $newPathStr = $newPath->toString();
-        static::assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
-        static::assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
-        static::assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
-        static::assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
-        static::assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
+        self::assertCount($expect['elements'], $newPath->getElements(), 'element count matches: '.$newPathStr);
+        self::assertSame($expect['absolute'], $newPath->isAbsolute(), 'absolute detection matches: '.$newPathStr);
+        self::assertSame($expect['directory'], $newPath->isDirectory(), 'directory detection matches: '.$newPathStr);
+        self::assertSame($expect['regex'], $newPath->isRegex(), 'regex detection matches: '.$newPathStr);
+        self::assertSame($expect['glob'], $newPath->isGlob(), 'glob detection matches: '.$newPathStr);
     }
 
-    public function provideAppendedPathData(): Iterator
+    public static function provideAppendedPathData(): Iterator
     {
         yield [
             '/foo/bar',
@@ -297,21 +284,18 @@ class PathTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideDirectoryPathData
-     */
-    public function getDirectoryReturnsNewPathInstanceContainingPathDirectory($pathString, $expectedDirectoryPath)
+    #[DataProvider('provideDirectoryPathData')]
+    #[Test]
+    public function getDirectoryReturnsNewPathInstanceContainingPathDirectory($pathString, mixed $expectedDirectoryPath): void
     {
         $path = new Path($pathString);
         $directory = $path->getDirectory();
 
-        static::assertSame($expectedDirectoryPath, $directory->toString());
-        static::assertNotSame($path, $directory);
+        self::assertSame($expectedDirectoryPath, $directory->toString());
+        self::assertNotSame($path, $directory);
     }
 
-    public function provideDirectoryPathData(): Iterator
+    public static function provideDirectoryPathData(): Iterator
     {
         yield [
             '/foo/bar',
@@ -335,25 +319,22 @@ class PathTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideFilePathData
-     */
-    public function getFileReturnsNewPathInstanceContainingPathFile($pathString, $expectedFilePath)
+    #[DataProvider('provideFilePathData')]
+    #[Test]
+    public function getFileReturnsNewPathInstanceContainingPathFile($pathString, $expectedFilePath): void
     {
         $path = new Path($pathString);
         $file = $path->getFile();
 
         if (null === $expectedFilePath) {
-            static::assertNull($file);
+            self::assertNull($file);
         } else {
-            static::assertSame($expectedFilePath, $file->toString());
+            self::assertSame($expectedFilePath, $file->toString());
         }
-        static::assertNotSame($path, $file);
+        self::assertNotSame($path, $file);
     }
 
-    public function provideFilePathData(): Iterator
+    public static function provideFilePathData(): Iterator
     {
         yield [
             '/foo/baz/bar',
@@ -381,32 +362,26 @@ class PathTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     */
-    public function getLastElementReturnsLastElement()
+    #[Test]
+    public function getLastElementReturnsLastElement(): void
     {
         $path = new Path('sample/path/string');
-        static::assertSame('string', $path->getLastElement()->getName());
+        self::assertSame('string', $path->getLastElement()->getName());
     }
 
-    /**
-     * @test
-     */
-    public function getLastElementReturnsNullForEmptyPath()
+    #[Test]
+    public function getLastElementReturnsNullForEmptyPath(): void
     {
         $path = new Path('/');
-        static::assertNull($path->getLastElement());
+        self::assertNull($path->getLastElement());
     }
 
-    /**
-     * @test
-     */
-    public function dropLastElementModifiesPathInstanceAndMakesItDirectory()
+    #[Test]
+    public function dropLastElementModifiesPathInstanceAndMakesItDirectory(): void
     {
         $path = new Path('sample/path/string');
         $path->dropLastElement();
-        static::assertSame('sample/path/', $path->toString());
-        static::assertTrue($path->isDirectory());
+        self::assertSame('sample/path/', $path->toString());
+        self::assertTrue($path->isDirectory());
     }
 }

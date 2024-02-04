@@ -15,13 +15,11 @@ class Page implements ReadablePage
     use PageSettingsTrait;
     use PageTaxonomyTrait;
 
-    public const SORTING_PREFIX_PATTERN = '/^[0-9]+\.(.*)/';
+    final public const SORTING_PREFIX_PATTERN = '/^\d+\.(.*)/';
 
-    public const TAXONOMY_TAG = 'tag';
-    public const TAXONOMY_CATEGORY = 'category';
-    public const TAXONOMY_AUTHOR = 'author';
-
-    protected string $name;
+    final public const TAXONOMY_TAG = 'tag';
+    final public const TAXONOMY_CATEGORY = 'category';
+    final public const TAXONOMY_AUTHOR = 'author';
     private ?ReadablePage $parent = null;
     private ?string $content = null;
 
@@ -33,10 +31,12 @@ class Page implements ReadablePage
     private ?Path $path = null;
     private ?Path $filesystemPath = null;
 
-    public function __construct(string $name, array $settings = [], ReadablePage $parent = null)
-    {
-        $this->name = $name;
-        $this->initSettings($settings, $name);
+    public function __construct(
+        protected string $name,
+        array $settings = [],
+        ReadablePage $parent = null,
+    ) {
+        $this->initSettings($settings, $this->name);
         $this->initParent($parent);
         $this->init();
     }
@@ -54,7 +54,7 @@ class Page implements ReadablePage
         $this->parent = $parent;
         $this->buildFilesystemPath();
         $this->buildPath();
-        if (null !== $this->parent) {
+        if ($this->parent instanceof ReadablePage) {
             $this->parent->addChild($this);
         }
     }
@@ -115,7 +115,7 @@ class Page implements ReadablePage
      */
     protected function buildPath(): void
     {
-        if (null === $this->parent) {
+        if (!$this->parent instanceof ReadablePage) {
             $this->path = new Path('/'.$this->getSlug());
         } else {
             $this->path = new Path(rtrim($this->parent->getPath()->toString(), '/').'/'.$this->getSlug());
@@ -127,7 +127,7 @@ class Page implements ReadablePage
      */
     protected function buildFilesystemPath(): void
     {
-        if (null === $this->parent) {
+        if (!$this->parent instanceof ReadablePage) {
             $this->filesystemPath = new Path('/'.$this->getName());
         } else {
             $this->filesystemPath = new Path(

@@ -13,10 +13,6 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
 {
     private const ALL_PAGES_CACHE_KEY = 'all_pages';
 
-    private StructureMapper $mapper;
-    private AdapterInterface $cache;
-    private bool $skipCache;
-
     /**
      * @var ReadablePage[]
      */
@@ -30,11 +26,11 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     /**
      * This is the main repository handling page loading and caching.
      */
-    public function __construct(StructureMapper $mapper, AdapterInterface $cache, bool $skipCache)
-    {
-        $this->mapper = $mapper;
-        $this->cache = $cache;
-        $this->skipCache = $skipCache;
+    public function __construct(
+        private readonly StructureMapper $mapper,
+        private readonly AdapterInterface $cache,
+        private readonly bool $skipCache,
+    ) {
     }
 
     /**
@@ -85,7 +81,7 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
             $this->flattenPages($this->pages);
 
             return true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return false;
         }
     }
@@ -94,7 +90,7 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     {
         try {
             $item = $this->cache->getItem(self::ALL_PAGES_CACHE_KEY);
-        } catch (PsrInvalidArgumentException $e) {
+        } catch (PsrInvalidArgumentException) {
             return;
         }
         $item->set($this->pages);

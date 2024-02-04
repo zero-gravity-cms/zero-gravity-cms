@@ -2,7 +2,6 @@
 
 namespace ZeroGravity\Cms\Path\Resolver;
 
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use ZeroGravity\Cms\Content\File;
@@ -14,15 +13,9 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
 {
     use MultiPathFindOneTrait;
 
-    private string $basePath;
-    private Filesystem $filesystem;
-    private FileFactory $fileFactory;
-
-    public function __construct(FileFactory $fileFactory)
-    {
-        $this->filesystem = new Filesystem();
-        $this->basePath = $fileFactory->getBasePath();
-        $this->fileFactory = $fileFactory;
+    public function __construct(
+        private readonly FileFactory $fileFactory
+    ) {
     }
 
     /**
@@ -54,7 +47,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
 
     private function preparePaths(Path &$path, Path &$parentPath = null): void
     {
-        if (null === $parentPath) {
+        if (!$parentPath instanceof Path) {
             $parentPath = new Path('');
         }
         $path->normalize($parentPath);
@@ -108,14 +101,14 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
      */
     public function get(Path $path, Path $parentPath = null): ?File
     {
-        if (null === $parentPath) {
+        if (!$parentPath instanceof Path) {
             $parentPath = new Path('');
         }
         $fullPath = $parentPath->appendPath($path);
         $fullPath->normalize();
 
         $trimmedPath = ltrim($fullPath->toString(), '/');
-        if ('.meta.yaml' === substr($trimmedPath, -10)) {
+        if (str_ends_with($trimmedPath, '.meta.yaml')) {
             return null;
         }
 
@@ -129,12 +122,12 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
 
     private function buildBaseDir(Path $parentPath = null): string
     {
-        if (null === $parentPath) {
-            return $this->basePath;
+        $basePath = $this->fileFactory->getBasePath();
+        if (!$parentPath instanceof Path) {
+            return $basePath;
         }
 
         $parentPath->normalize();
-        $basePath = $this->basePath;
         if ($parentPath->hasElements()) {
             $basePath .= '/'.ltrim($parentPath->toString(), '/');
         }

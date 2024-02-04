@@ -7,11 +7,9 @@ use ZeroGravity\Cms\Content\PageDiff;
 
 abstract class PageDiffEvent extends Event
 {
-    private PageDiff $diff;
-
-    public function __construct(PageDiff $diff)
-    {
-        $this->diff = $diff;
+    public function __construct(
+        private readonly PageDiff $diff,
+    ) {
     }
 
     public function getDiff(): PageDiff

@@ -3,7 +3,6 @@
 namespace ZeroGravity\Cms\Content\Finder;
 
 use Iterator;
-use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentTypeFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\DateRangeFilterIterator;
@@ -241,7 +240,7 @@ trait PageFinderSettingsTrait
     private function applySlugsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->slugs) || !empty($this->notSlugs)) {
-            $iterator = new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
+            return new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
         return $iterator;
@@ -250,7 +249,7 @@ trait PageFinderSettingsTrait
     private function applyTitlesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->titles) || !empty($this->notTitles)) {
-            $iterator = new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
+            return new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
         }
 
         return $iterator;
@@ -259,7 +258,7 @@ trait PageFinderSettingsTrait
     private function applyExtrasIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->extras)) {
-            $iterator = new ExtraFilterIterator($iterator, $this->extras);
+            return new ExtraFilterIterator($iterator, $this->extras);
         }
 
         return $iterator;
@@ -268,7 +267,7 @@ trait PageFinderSettingsTrait
     private function applySettingsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->settings)) {
-            $iterator = new SettingFilterIterator($iterator, $this->settings);
+            return new SettingFilterIterator($iterator, $this->settings);
         }
 
         return $iterator;
@@ -277,7 +276,7 @@ trait PageFinderSettingsTrait
     private function applyContentTypesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
-            $iterator = new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
+            return new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
         }
 
         return $iterator;
@@ -286,7 +285,7 @@ trait PageFinderSettingsTrait
     private function applyDatesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->dates)) {
-            $iterator = new DateRangeFilterIterator($iterator, $this->dates);
+            return new DateRangeFilterIterator($iterator, $this->dates);
         }
 
         return $iterator;

@@ -74,7 +74,7 @@ trait PageFinderFlagsTrait
         }
 
         if (null !== $this->visible) {
-            $iterator = new VisibleFilterIterator($iterator, $this->visible);
+            return new VisibleFilterIterator($iterator, $this->visible);
         }
 
         return $iterator;
@@ -83,7 +83,7 @@ trait PageFinderFlagsTrait
     private function applyPublishedIterator(Iterator $iterator): Iterator
     {
         if (null !== $this->published) {
-            $iterator = new PublishedFilterIterator($iterator, $this->published);
+            return new PublishedFilterIterator($iterator, $this->published);
         }
 
         return $iterator;

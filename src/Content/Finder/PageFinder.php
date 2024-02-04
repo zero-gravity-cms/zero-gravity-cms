@@ -33,7 +33,7 @@ final class PageFinder implements IteratorAggregate, Countable
     use PageFinderTaxonomyTrait;
 
     private ?int $limit = null;
-    private ?int $offset = null;
+    private int $offset = 0;
 
     /**
      * @var Page[][]
@@ -55,7 +55,7 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     public static function create(): PageFinder
     {
-        return new static();
+        return new self();
     }
 
     public function __construct()
@@ -86,7 +86,7 @@ final class PageFinder implements IteratorAggregate, Countable
     /**
      * Set a finder offset.
      */
-    public function offset(int $offset = null): self
+    public function offset(int $offset = 0): self
     {
         $this->offset = $offset;
 
@@ -168,7 +168,7 @@ final class PageFinder implements IteratorAggregate, Countable
         return $this;
     }
 
-    private function appendPageArrayIterator($iterator): Iterator
+    private function appendPageArrayIterator(iterable $iterator): Iterator
     {
         $pages = [];
         foreach ($iterator as $page) {
@@ -239,8 +239,8 @@ final class PageFinder implements IteratorAggregate, Countable
 
     private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->filters)) {
-            $iterator = new CustomFilterIterator($iterator, $this->filters);
+        if ([] !== $this->filters) {
+            return new CustomFilterIterator($iterator, $this->filters);
         }
 
         return $iterator;
@@ -248,7 +248,7 @@ final class PageFinder implements IteratorAggregate, Countable
 
     private function applyOffsetAndLimitIterator(Iterator $iterator): Iterator
     {
-        if (null !== $this->limit || null !== $this->offset) {
+        if (null !== $this->limit || $this->offset > 0) {
             $aggregate = new LimitAndOffsetIterator($iterator, $this->limit, $this->offset);
             $iterator = $aggregate->getIterator();
         }

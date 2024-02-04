@@ -12,39 +12,42 @@ final class PageSettings
 {
     private ?array $values = null;
 
-    private string $pageName;
-
-    public function __construct(array $values, string $pageName)
-    {
-        $this->pageName = $pageName;
+    public function __construct(
+        array $values,
+        private readonly string $pageName,
+    ) {
         $this->validate($values);
     }
 
     /**
      * Get a single setting value.
      */
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         return $this->values[$name];
     }
 
     /**
      * Get array copy of all settings.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      */
-    public function toArray(): array
+    public function toArray(bool $serialize = false): array
     {
-        return $this->values;
+        return $serialize ? $this->serialize($this->values) : $this->values;
     }
 
     /**
      * Get all values that wouldn't have been set by default.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      */
-    public function getNonDefaultValues(): array
+    public function getNonDefaultValues(bool $serialize = false): array
     {
         $defaults = (new self([], $this->pageName))->toArray();
 
         $nonDefaults = [];
-        foreach ($this->toArray() as $key => $value) {
+        foreach ($this->toArray($serialize) as $key => $value) {
             if (!array_key_exists($key, $defaults) || $defaults[$key] !== $value) {
                 $nonDefaults[$key] = $value;
             }
@@ -57,7 +60,7 @@ final class PageSettings
      * Resolve and validate page settings.
      * If everything was fine, assign them.
      */
-    public function validate(array $values): void
+    private function validate(array $values): void
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
@@ -131,9 +134,9 @@ final class PageSettings
 
     private function normalizeDates(OptionsResolver $resolver): void
     {
-        $normalizeDateTime = function (Options $options, $value) {
+        $normalizeDateTime = static function (Options $options, $value): ?DateTimeImmutable {
             if (null === $value) {
-                return $value;
+                return null;
             }
             if ($value instanceof DateTimeImmutable) {
                 return $value;
@@ -153,7 +156,7 @@ final class PageSettings
 
     private function normalizeTitle(OptionsResolver $resolver): void
     {
-        $normalizeTitle = function (Options $options, $value) {
+        $normalizeTitle = function (Options $options, $value): string {
             if (null !== $value) {
                 return (string) $value;
             }
@@ -169,7 +172,7 @@ final class PageSettings
 
     private function normalizeTaxonomy(OptionsResolver $resolver): void
     {
-        $normalizeTaxonomy = function (Options $options, $value) {
+        $normalizeTaxonomy = static function (Options $options, $value): array {
             if (null === $value) {
                 return [];
             }
@@ -177,6 +180,7 @@ final class PageSettings
             foreach ($value as $name => $taxonomy) {
                 $taxonomies[$name] = array_values((array) $taxonomy);
             }
+            ksort($taxonomies);
 
             return $taxonomies;
         };
@@ -185,7 +189,7 @@ final class PageSettings
 
     private function normalizeArrayValues(OptionsResolver $resolver): void
     {
-        $normalizeArray = function (Options $options, $value) {
+        $normalizeArray = static function (Options $options, $value) {
             if (null === $value) {
                 return [];
             }
@@ -195,5 +199,23 @@ final class PageSettings
         $resolver->setNormalizer('extra', $normalizeArray);
         $resolver->setNormalizer('child_defaults', $normalizeArray);
         $resolver->setNormalizer('file_aliases', $normalizeArray);
+    }
+
+    private function serialize(mixed $value): mixed
+    {
+        if (is_scalar($value)) {
+            return $value;
+        }
+        if (is_array($value)) {
+            return array_map(fn ($singleValue): mixed => $this->serialize($singleValue), $value);
+        }
+        if (null === $value) {
+            return null;
+        }
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        return (string) $value;
     }
 }

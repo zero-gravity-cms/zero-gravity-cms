@@ -21,8 +21,8 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
             'FilesystemMapper can only handle PageDiffs containing "%s" instances. '.
             'Classes used in PageDiff are "%s" and "%s".',
             WritableFilesystemPage::class,
-            get_class($diff->getOld()),
-            get_class($diff->getNew())
+            $diff->getOld()::class,
+            $diff->getNew()::class
         ));
     }
 

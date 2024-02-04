@@ -18,32 +18,28 @@ use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 final class ZeroGravityExtension extends AbstractExtension
 {
-    private ContentRepository $contentRepository;
-    private RouterPageSelector $pageSelector;
-    private FilterRegistry $filterRegistry;
-
-    public function __construct(ContentRepository $contentRepository, RouterPageSelector $pageSelector, FilterRegistry $filterRegistry)
-    {
-        $this->contentRepository = $contentRepository;
-        $this->pageSelector = $pageSelector;
-        $this->filterRegistry = $filterRegistry;
+    public function __construct(
+        private readonly ContentRepository $contentRepository,
+        private readonly RouterPageSelector $pageSelector,
+        private readonly FilterRegistry $filterRegistry,
+    ) {
     }
 
     public function getFilters(): array
     {
         return [
-            new TwigFilter('zg_filter', [$this, 'filterPages']),
-            new TwigFilter('zg_page_hash', [$this, 'getPageHash']),
+            new TwigFilter('zg_filter', $this->filterPages(...)),
+            new TwigFilter('zg_page_hash', $this->getPageHash(...)),
             new TwigFilter(
                 'zg_render_content',
-                [$this, 'renderPageContent'],
+                $this->renderPageContent(...),
                 [
                     'is_safe' => ['html'],
                 ]
             ),
             new TwigFilter(
                 'zg_render',
-                [$this, 'renderPage'],
+                $this->renderPage(...),
                 [
                     'is_safe' => ['html'],
                     'needs_environment' => true,
@@ -55,20 +51,20 @@ final class ZeroGravityExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('zg_page', [$this, 'getPage']),
-            new TwigFunction('zg_page_hash', [$this, 'getPageHash']),
-            new TwigFunction('zg_current_page', [$this, 'getCurrentPage']),
-            new TwigFunction('zg_filter', [$this, 'filterAllPages']),
+            new TwigFunction('zg_page', $this->getPage(...)),
+            new TwigFunction('zg_page_hash', $this->getPageHash(...)),
+            new TwigFunction('zg_current_page', $this->getCurrentPage(...)),
+            new TwigFunction('zg_filter', $this->filterAllPages(...)),
             new TwigFunction(
                 'zg_render_content',
-                [$this, 'renderPageContent'],
+                $this->renderPageContent(...),
                 [
                     'is_safe' => ['html'],
                 ]
             ),
             new TwigFunction(
                 'zg_render',
-                [$this, 'renderPage'],
+                $this->renderPage(...),
                 [
                     'is_safe' => ['html'],
                     'needs_environment' => true,
@@ -79,10 +75,10 @@ final class ZeroGravityExtension extends AbstractExtension
 
     public function getPage(string $path): ?ReadablePage
     {
-        if (0 === strpos($path, './')) {
+        if (str_starts_with($path, './')) {
             $currentPage = $this->pageSelector->getCurrentPage();
 
-            if (null !== $currentPage) {
+            if ($currentPage instanceof ReadablePage) {
                 $path = '/'.ltrim($currentPage->getPath().substr($path, 1), '/');
             }
         }
@@ -90,7 +86,7 @@ final class ZeroGravityExtension extends AbstractExtension
         return $this->contentRepository->getPage($path);
     }
 
-    public function getCurrentPage(): ?Page
+    public function getCurrentPage(): ?ReadablePage
     {
         return $this->pageSelector->getCurrentPage();
     }
@@ -105,7 +101,7 @@ final class ZeroGravityExtension extends AbstractExtension
      */
     public function getPageHash(ReadablePage $page = null): string
     {
-        if (null === $page) {
+        if (!$page instanceof ReadablePage) {
             return 'page_'.md5('');
         }
 
@@ -126,7 +122,7 @@ final class ZeroGravityExtension extends AbstractExtension
      */
     public function renderPage(Environment $environment, Page $page, array $context = []): ?string
     {
-        if (!empty($page->getContentTemplate())) {
+        if (null !== $page->getContentTemplate() && '' !== $page->getContentTemplate()) {
             $context['page'] = $page;
 
             return $environment->render($page->getContentTemplate(), $context);

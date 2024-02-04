@@ -14,16 +14,14 @@ use ZeroGravity\Cms\Content\Page;
  */
 final class DateRangeFilterIterator extends FilterIterator
 {
-    private array $comparators;
-
     /**
      * @param Iterator         $iterator    The Iterator to filter
      * @param DateComparator[] $comparators An array of DateComparator instances
      */
-    public function __construct(Iterator $iterator, array $comparators)
-    {
-        $this->comparators = $comparators;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly array $comparators
+    ) {
         parent::__construct($iterator);
     }
 

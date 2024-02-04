@@ -15,12 +15,12 @@ trait PageSettingsTrait
 
     abstract public function getParent(): ?ReadablePage;
 
-    private function initSettings(array $settings, string $name)
+    private function initSettings(array $settings, string $name): void
     {
         $this->settings = new PageSettings($settings, $name);
     }
 
-    public function getSetting(string $name)
+    public function getSetting(string $name): mixed
     {
         return $this->settings->get($name);
     }
@@ -48,9 +48,12 @@ trait PageSettingsTrait
         return $this->getSetting('content_type');
     }
 
-    public function getSettings(): array
+    /**
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     */
+    public function getSettings(bool $serialize = false): array
     {
-        return $this->settings->toArray();
+        return $this->settings->toArray($serialize);
     }
 
     /**
@@ -153,10 +156,7 @@ trait PageSettingsTrait
         return (string) $this->getSetting('controller');
     }
 
-    /**
-     * @param mixed|null $default
-     */
-    public function getExtra(string $name, $default = null)
+    public function getExtra(string $name, mixed $default = null)
     {
         $extra = $this->getExtraValues();
         if (array_key_exists($name, $extra)) {

@@ -4,6 +4,7 @@ namespace ZeroGravity\Cms\Filesystem;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Exception\FilesystemException;
@@ -12,21 +13,15 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
 final class PageFactory
 {
-    private EventDispatcherInterface $eventDispatcher;
-
-    private LoggerInterface $logger;
-
     /**
-     * @var Directory[]
+     * @var array<string, Directory>
      */
     private array $directories = [];
 
     public function __construct(
-        LoggerInterface $logger,
-        EventDispatcherInterface $eventDispatcher
+        private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
-        $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -43,7 +38,7 @@ final class PageFactory
             return null;
         }
 
-        if (null !== $parentPage) {
+        if ($parentPage instanceof Page) {
             $defaultSettings = $this->mergeSettings($defaultSettings, $parentPage->getChildDefaults());
         }
         $settings = $this->buildPageSettings($defaultSettings, $directory, $parentPage);
@@ -58,7 +53,7 @@ final class PageFactory
         $files = $directory->getFiles();
         foreach ($directory->getDirectories() as $subDirectory) {
             $subPage = $this->createPage($subDirectory, $convertMarkdown, $defaultSettings, $page);
-            if (null === $subPage) {
+            if (!$subPage instanceof Page) {
                 foreach ($subDirectory->getFilesRecursively() as $path => $file) {
                     $files[$subDirectory->getName().'/'.$path] = $file;
                 }
@@ -68,6 +63,11 @@ final class PageFactory
         $this->eventDispatcher->dispatch(new AfterPageCreate($page));
         $this->directories[$page->getPath()->toString()] = $directory;
 
+        $this->logger->debug("Created page '{$page->getTitle()}' ({$page->getPath()})", [
+            'parent' => $parentPage?->getPath(),
+            'settings' => $settings,
+        ]);
+
         return $page;
     }
 
@@ -76,8 +76,8 @@ final class PageFactory
         $settings = $directory->fetchPageSettings();
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();
 
-        if (null !== $defaultTemplate && !isset($settings['content_template'])) {
-            $parentPath = isset($parentPage) ? rtrim($parentPage->getFilesystemPath(), '/') : '';
+        if ($defaultTemplate instanceof File && !isset($settings['content_template'])) {
+            $parentPath = $parentPage instanceof Page ? rtrim($parentPage->getFilesystemPath(), '/') : '';
             $settings['content_template'] = sprintf('@ZeroGravity%s/%s/%s',
                 $parentPath,
                 $directory->getName(),

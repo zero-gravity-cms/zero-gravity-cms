@@ -2,7 +2,10 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Group;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -14,102 +17,82 @@ use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Filesystem\Directory;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 
-/**
- * @group directory
- */
+#[Group('directory')]
 class DirectoryTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function getPathReturnsEmptyPathWithoutParentPath()
+    #[Test]
+    public function getPathReturnsEmptyPathWithoutParentPath(): void
     {
         $path = $this->getValidPagesDir().'/01.yaml_only';
         $parentPath = null;
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        static::assertSame('', $dir->getPath());
+        self::assertSame('', $dir->getPath());
     }
 
-    /**
-     * @test
-     */
-    public function getPathReturnsPathWithAddedParentPath()
+    #[Test]
+    public function getPathReturnsPathWithAddedParentPath(): void
     {
         $path = $this->getValidPagesDir().'/01.yaml_only';
         $parentPath = 'some/path';
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
         $dir = new Directory(new SplFileInfo($path), $fileFactory, new NullLogger(), new EventDispatcher(), $parentPath);
 
-        static::assertSame('some/path/01.yaml_only', $dir->getPath());
+        self::assertSame('some/path/01.yaml_only', $dir->getPath());
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideInvalidDirectories
-     *
-     * @param string $path
-     */
-    public function invalidDirectoryDataCausesException($path)
+    #[DataProvider('provideInvalidDirectories')]
+    #[Test]
+    public function invalidDirectoryDataCausesException(string $path): void
     {
         $dir = $this->createParsedDirectoryFromPath($this->getPageFixtureDir().'/'.$path);
         $this->expectException(StructureException::class);
         $dir->validateFiles();
     }
 
-    public function provideInvalidDirectories(): Iterator
+    public static function provideInvalidDirectories(): Iterator
     {
         yield '2 markdown files' => ['invalid_pages/2_markdown_files'];
         yield '2 yaml files' => ['invalid_pages/2_yaml_files'];
         yield 'yaml and markdown basenames do not match' => ['invalid_pages/basenames_dont_match__markdown'];
     }
 
-    /**
-     * @test
-     */
-    public function getDefaultBasenameReturnsYamlBasenameIfPresent()
+    #[Test]
+    public function getDefaultBasenameReturnsYamlBasenameIfPresent(): void
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
-        static::assertSame('page', $dir->getDefaultBasename());
+        self::assertSame('page', $dir->getDefaultBasename());
     }
 
-    /**
-     * @test
-     */
-    public function getDefaultBasenameReturnsMarkdownBasenameIfPresent()
+    #[Test]
+    public function getDefaultBasenameReturnsMarkdownBasenameIfPresent(): void
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/02.markdown_only');
-        static::assertSame('page', $dir->getDefaultBasename());
+        self::assertSame('page', $dir->getDefaultBasename());
     }
 
-    /**
-     * @test
-     */
-    public function getDefaultBasenameTwigFileReturnsTwigFileIfMatchesDefaultBasename()
+    #[Test]
+    public function getDefaultBasenameTwigFileReturnsTwigFileIfMatchesDefaultBasename(): void
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
-        static::assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
-        static::assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
+        self::assertInstanceOf(File::class, $dir->getDefaultBasenameTwigFile());
+        self::assertSame('/name.html.twig', $dir->getDefaultBasenameTwigFile()->getPathname());
     }
 
     /**
-     * @test
-     *
-     * @dataProvider providePathsAndStrategies
-     *
-     * @param string $path
      * @param string $expectedStrategy
      */
-    public function contentStrategyIsDetectedCorrectly($path, $expectedStrategy)
+    #[DataProvider('providePathsAndStrategies')]
+    #[Test]
+    public function contentStrategyIsDetectedCorrectly(string $path, mixed $expectedStrategy): void
     {
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().$path);
 
-        static::assertSame($expectedStrategy, $dir->getContentStrategy());
+        self::assertSame($expectedStrategy, $dir->getContentStrategy());
     }
 
-    public function providePathsAndStrategies(): Iterator
+    public static function providePathsAndStrategies(): Iterator
     {
         yield '01.yaml_only' => [
             '/01.yaml_only',
@@ -137,10 +120,7 @@ class DirectoryTest extends BaseUnit
         ];
     }
 
-    /**
-     * @return Directory
-     */
-    private function createParsedDirectoryFromPath(string $path)
+    private function createParsedDirectoryFromPath(string $path): Directory
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $path);
 

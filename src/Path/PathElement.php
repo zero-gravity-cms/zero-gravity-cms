@@ -2,7 +2,9 @@
 
 namespace ZeroGravity\Cms\Path;
 
-final class PathElement
+use Stringable;
+
+final class PathElement implements Stringable
 {
     private string $name;
     private bool $isRegex = false;
@@ -48,6 +50,6 @@ final class PathElement
 
     public function __toString(): string
     {
-        return $this->getName();
+        return $this->name;
     }
 }

@@ -4,18 +4,11 @@ namespace ZeroGravity\Cms\Content\Finder\Tester;
 
 use ZeroGravity\Cms\Content\Page;
 
-final class TaxonomyTester
+final readonly class TaxonomyTester
 {
     public const OPERATOR_AND = 'AND';
     public const OPERATOR_OR = 'OR';
-
-    private string $name;
-    /**
-     * @var string[]
-     */
-    private array $values;
     private string $mode;
-    private bool $inverted;
 
     public static function has(string $name, array $values, ?string $mode): self
     {
@@ -27,12 +20,16 @@ final class TaxonomyTester
         return new self($name, $values, $mode, true);
     }
 
-    public function __construct(string $name, array $values, ?string $mode, bool $inverted)
-    {
-        $this->name = $name;
-        $this->values = $values;
+    /**
+     * @param string[] $values
+     */
+    public function __construct(
+        private string $name,
+        private array $values,
+        ?string $mode,
+        private bool $inverted,
+    ) {
         $this->mode = $mode ?? self::OPERATOR_AND;
-        $this->inverted = $inverted;
     }
 
     /**

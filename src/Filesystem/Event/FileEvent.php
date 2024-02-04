@@ -7,15 +7,11 @@ use ZeroGravity\Cms\Filesystem\Directory;
 
 abstract class FileEvent extends Event
 {
-    protected string $content;
-    private string $realPath;
-    private Directory $directory;
-
-    public function __construct(string $realPath, string $content, Directory $directory)
-    {
-        $this->realPath = $realPath;
-        $this->content = $content;
-        $this->directory = $directory;
+    public function __construct(
+        private readonly string $realPath,
+        protected string $content,
+        private readonly Directory $directory,
+    ) {
     }
 
     public function getRealPath(): string

@@ -3,10 +3,8 @@
 namespace ZeroGravity\Cms\Content\Finder;
 
 use Iterator;
-use Symfony\Cmf\Bundle\RoutingBundle\Tests\Fixtures\App\Document\Content;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\NameFilterIterator;
-use ZeroGravity\Cms\Content\Page;
 
 trait PageFinderContentTrait
 {
@@ -92,7 +90,7 @@ trait PageFinderContentTrait
     private function applyNamesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->names) || !empty($this->notNames)) {
-            $iterator = new NameFilterIterator($iterator, $this->names, $this->notNames);
+            return new NameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
         return $iterator;
@@ -101,7 +99,7 @@ trait PageFinderContentTrait
     private function applyContentIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contains) || !empty($this->notContains)) {
-            $iterator = new ContentFilterIterator($iterator, $this->contains, $this->notContains);
+            return new ContentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 
         return $iterator;

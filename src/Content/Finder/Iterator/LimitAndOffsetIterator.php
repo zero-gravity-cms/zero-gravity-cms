@@ -10,22 +10,16 @@ use Traversable;
 /**
  * SortableIterator applies a sort on a given Iterator.
  */
-final class LimitAndOffsetIterator implements IteratorAggregate
+final readonly class LimitAndOffsetIterator implements IteratorAggregate
 {
-    private Traversable $iterator;
-    private ?int $limit;
-    private int $offset;
-
     /**
      * @param Traversable $iterator The Iterator to filter
-     * @param int|null    $limit
-     * @param int|null    $offset
      */
-    public function __construct(Traversable $iterator, $limit, $offset)
-    {
-        $this->iterator = $iterator;
-        $this->limit = $limit;
-        $this->offset = (int) $offset;
+    public function __construct(
+        private Traversable $iterator,
+        private ?int $limit,
+        private int $offset,
+    ) {
     }
 
     public function getIterator(): Iterator

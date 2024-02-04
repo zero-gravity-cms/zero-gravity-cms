@@ -18,7 +18,7 @@ final class PathNormalizer
     public static function normalizePath(Path $path, Path $parentPath = null): void
     {
         $normalizedElements = [];
-        $parentPathElements = (null !== $parentPath) ? $parentPath->getElements() : [];
+        $parentPathElements = ($parentPath instanceof Path) ? $parentPath->getElements() : [];
 
         foreach ($path->getElements() as $element) {
             if (!$element->isParentReference()) {
@@ -36,7 +36,7 @@ final class PathNormalizer
             }
         }
 
-        if (null !== $parentPath) {
+        if ($parentPath instanceof Path) {
             $parentPath->setElements($parentPathElements);
         }
         $path->setElements($normalizedElements);

@@ -21,7 +21,7 @@ final class YamlMetadataLoader implements MetadataLoader
 
         try {
             $data = Yaml::parse(file_get_contents($metadataPath));
-        } catch (ParseException $e) {
+        } catch (ParseException) {
             $data = [];
         }
 

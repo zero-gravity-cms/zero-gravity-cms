@@ -9,11 +9,8 @@ use ArrayAccess;
  */
 final class Metadata implements ArrayAccess
 {
-    private array $values;
-
-    public function __construct(array $values)
+    public function __construct(private array $values)
     {
-        $this->values = $values;
     }
 
     public function getAll(): array
@@ -21,17 +18,14 @@ final class Metadata implements ArrayAccess
         return $this->values;
     }
 
-    public function setAll(array $values): array
+    public function setAll(array $values): self
     {
-        return $this->values = $values;
+        $this->values = $values;
+
+        return $this;
     }
 
-    /**
-     * @param mixed|null $default
-     *
-     * @return mixed|null
-     */
-    public function getValue(string $key, $default = null)
+    public function getValue(string $key, mixed $default = null): mixed
     {
         if (array_key_exists($key, $this->values)) {
             return $this->values[$key];
@@ -40,7 +34,7 @@ final class Metadata implements ArrayAccess
         return $default;
     }
 
-    public function setValue(string $key, $value): self
+    public function setValue(string $key, mixed $value): self
     {
         $this->values[$key] = $value;
 
@@ -52,7 +46,7 @@ final class Metadata implements ArrayAccess
         return array_key_exists($offset, $this->values);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->getValue($offset);
     }

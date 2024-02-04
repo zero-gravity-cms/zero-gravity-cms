@@ -13,15 +13,13 @@ use ZeroGravity\Cms\Content\Page;
  */
 final class VisibleFilterIterator extends FilterIterator
 {
-    private bool $visible;
-
     /**
      * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Iterator $iterator, bool $visible)
-    {
-        $this->visible = $visible;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly bool $visible,
+    ) {
         parent::__construct($iterator);
     }
 

@@ -19,12 +19,12 @@ trait MultiPathFindOneTrait
      */
     public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ?File
     {
-        $file = $this->get(clone $path, (null !== $parentPath) ? clone $parentPath : null);
+        $file = $this->get(clone $path, ($parentPath instanceof Path) ? clone $parentPath : null);
         if (null !== $file) {
             return $file;
         }
 
-        $files = $this->find(clone $path, (null !== $parentPath) ? clone $parentPath : null);
+        $files = $this->find(clone $path, ($parentPath instanceof Path) ? clone $parentPath : null);
         if (0 === count($files)) {
             return null;
         }

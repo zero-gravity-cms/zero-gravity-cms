@@ -4,15 +4,14 @@ namespace ZeroGravity\Cms\Path\Resolver;
 
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\File;
+use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Path\Path;
 
 final class PageResolver extends AbstractResolver
 {
-    private ContentRepository $contentRepository;
-
-    public function __construct(ContentRepository $contentRepository)
-    {
-        $this->contentRepository = $contentRepository;
+    public function __construct(
+        private readonly ContentRepository $contentRepository,
+    ) {
     }
 
     /**
@@ -22,24 +21,25 @@ final class PageResolver extends AbstractResolver
     {
         $pagePath = $path->getDirectory();
         $filePath = $path->getFile();
-        if (null === $filePath) {
+        if (!$filePath instanceof Path) {
             return null;
         }
-        $parentPath = $parentPath ? clone $parentPath : new Path('');
+        $parentPath = $parentPath instanceof Path ? clone $parentPath : new Path('');
 
         $fullPath = $parentPath->appendPath($pagePath);
         $fullPath->normalize();
+
         $searchPath = $fullPath->getDirectory();
 
         $page = $this->contentRepository->getPage('/'.trim($searchPath->toString(), '/'));
         $subPath = '';
-        while (null === $page && count($searchPath->getElements()) > 1) {
+        while (!$page instanceof ReadablePage && count($searchPath->getElements()) > 1) {
             $subPath = $searchPath->getLastElement().'/'.$subPath;
             $searchPath->dropLastElement();
             $page = $this->contentRepository->getPage('/'.trim($searchPath->toString(), '/'));
         }
 
-        if (null === $page) {
+        if (!$page instanceof ReadablePage) {
             return null;
         }
 

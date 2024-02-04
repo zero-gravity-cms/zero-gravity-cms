@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 
 class FileTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function fileHasVariousGetters()
+    #[Test]
+    public function fileHasVariousGetters(): void
     {
         $metadata = new Metadata([
             'alt_text' => 'Sample alt text',
@@ -19,35 +18,31 @@ class FileTest extends BaseUnit
 
         $file = new File('/foo/bar/baz/photo.jpg', '/filesystem/path/', $metadata, 'image');
 
-        static::assertSame($metadata, $file->getMetadata());
-        static::assertSame('image', $file->getType());
-        static::assertSame('photo.jpg', $file->getFilename());
-        static::assertSame('photo.jpg', $file->getBasename());
-        static::assertSame('photo', $file->getBasename('.jpg'));
-        static::assertSame('photo', $file->getDefaultBasename());
-        static::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
-        static::assertSame('jpg', $file->getExtension());
-        static::assertSame('/filesystem/path/foo/bar/baz/photo.jpg', $file->getFilesystemPathname());
+        self::assertSame($metadata, $file->getMetadata());
+        self::assertSame('image', $file->getType());
+        self::assertSame('photo.jpg', $file->getFilename());
+        self::assertSame('photo.jpg', $file->getBasename());
+        self::assertSame('photo', $file->getBasename('.jpg'));
+        self::assertSame('photo', $file->getDefaultBasename());
+        self::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
+        self::assertSame('jpg', $file->getExtension());
+        self::assertSame('/filesystem/path/foo/bar/baz/photo.jpg', $file->getFilesystemPathname());
 
         $file = new File('/foo/bar/baz/photo', '/filesystem/path/', $metadata, 'image');
-        static::assertSame('photo', $file->getDefaultBasename());
+        self::assertSame('photo', $file->getDefaultBasename());
     }
 
-    /**
-     * @test
-     */
-    public function pathnameAlwaysStartsWithSlash()
+    #[Test]
+    public function pathnameAlwaysStartsWithSlash(): void
     {
         $file = new File('foo/bar/baz/photo.jpg', '', new Metadata([]), 'image');
-        static::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
+        self::assertSame('/foo/bar/baz/photo.jpg', $file->getPathname());
     }
 
-    /**
-     * @test
-     */
-    public function toStringReturnsPathname()
+    #[Test]
+    public function toStringReturnsPathname(): void
     {
         $file = new File('/foo/bar/baz/photo.jpg', '/filesystem/path/', new Metadata([]), 'image');
-        static::assertSame('/foo/bar/baz/photo.jpg', (string) $file);
+        self::assertSame('/foo/bar/baz/photo.jpg', (string) $file);
     }
 }

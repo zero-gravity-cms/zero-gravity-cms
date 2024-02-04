@@ -16,7 +16,9 @@ define('C33S_ROBO_DIR', '.robo');
 
 $roboDir = C33S_ROBO_DIR;
 $previousWorkingDir = getcwd();
-(is_dir($roboDir) || mkdir($roboDir)) && chdir($roboDir);
+if (is_dir($roboDir) || mkdir($roboDir)) {
+    chdir($roboDir);
+}
 if (!is_file('composer.json')) {
     exec('composer init --no-interaction', $output, $resultCode);
     exec('composer require c33s/robofile --no-interaction', $output, $resultCode);
@@ -91,10 +93,8 @@ class RoboFile extends BaseRoboFile
             $this->abort();
         }
 
-        if (!$this->ciCheckPorts($this->portsToCheck)) {
-            if (!$this->confirmIfInteractive('Do you want to continue?')) {
-                $this->abort();
-            }
+        if (!$this->ciCheckPorts($this->portsToCheck) && !$this->confirmIfInteractive('Do you want to continue?')) {
+            $this->abort();
         }
 
         foreach (self::GLOBAL_COMPOSER_PACKAGES as $package => $version) {
@@ -112,7 +112,7 @@ class RoboFile extends BaseRoboFile
     public function check(string $arguments = ''): void
     {
         $this->_execPhp('php ./vendor/bin/rector process --dry-run');
-        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
+        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run {$arguments}");
     }
 
     /**
@@ -124,7 +124,7 @@ class RoboFile extends BaseRoboFile
     {
         if ($this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
             $this->_execPhp('php ./vendor/bin/rector process');
-            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose $arguments");
+            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose {$arguments}");
         } else {
             $this->abort();
         }
@@ -162,7 +162,7 @@ class RoboFile extends BaseRoboFile
     /**
      * (Re-)Generate test fixture images using identicon library.
      */
-    public function generateTestIdenticons()
+    public function generateTestIdenticons(): void
     {
         require_once __DIR__.'/vendor/autoload.php';
         $basePath = __DIR__.'/tests/Support/_data/page_fixtures/valid_pages/';
@@ -206,7 +206,7 @@ class RoboFile extends BaseRoboFile
                 $fs->mkdir($dir);
             }
 
-            echo "$path\n";
+            echo "{$path}\n";
 
             $data = $identicon
                 ->setValue($file)

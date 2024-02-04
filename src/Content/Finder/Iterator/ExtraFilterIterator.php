@@ -21,18 +21,13 @@ use ZeroGravity\Cms\Content\Page;
 final class ExtraFilterIterator extends FilterIterator
 {
     /**
-     * @var ExtraFilter[]
-     */
-    private array $extras;
-
-    /**
      * @param Iterator      $iterator The Iterator to filter
      * @param ExtraFilter[] $extras
      */
-    public function __construct(Iterator $iterator, array $extras)
-    {
-        $this->extras = $extras;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly array $extras,
+    ) {
         parent::__construct($iterator);
     }
 
@@ -82,7 +77,7 @@ final class ExtraFilterIterator extends FilterIterator
 
                 try {
                     return (new DateTime($value))->getTimestamp();
-                } catch (Exception $e) {
+                } catch (Exception) {
                     return null;
                 }
         }
@@ -93,22 +88,12 @@ final class ExtraFilterIterator extends FilterIterator
     private function getComparator(ExtraFilter $extraFilter): Comparator
     {
         $comparatorName = $extraFilter->comparator();
-        switch ($comparatorName) {
-            case ExtraFilter::COMPARATOR_STRING:
-                $class = StringComparator::class;
-                break;
-
-            case ExtraFilter::COMPARATOR_DATE:
-                $class = DateComparator::class;
-                break;
-
-            case ExtraFilter::COMPARATOR_NUMERIC:
-                $class = NumberComparator::class;
-                break;
-
-            default:
-                throw new InvalidArgumentException('Invalid comparator name: '.$comparatorName);
-        }
+        $class = match ($comparatorName) {
+            ExtraFilter::COMPARATOR_STRING => StringComparator::class,
+            ExtraFilter::COMPARATOR_DATE => DateComparator::class,
+            ExtraFilter::COMPARATOR_NUMERIC => NumberComparator::class,
+            default => throw new InvalidArgumentException('Invalid comparator name: '.$comparatorName),
+        };
 
         return new $class($extraFilter->value());
     }

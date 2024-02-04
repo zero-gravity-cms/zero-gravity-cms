@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Twig\Extension;
 
+use Codeception\Attribute\Group;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -16,14 +17,12 @@ use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Routing\RouterPageSelector;
 use ZeroGravity\Cms\Twig\Extension\ZeroGravityExtension;
 
-/**
- * @group twig
- */
+#[Group('twig')]
 class ZeroGravityExtensionTest extends BaseUnit
 {
     use TwigExtensionTestTrait;
 
-    public function getExtensions()
+    public function getExtensions(): array
     {
         $mapper = $this->getValidPagesFilesystemMapper();
         $repository = new ContentRepository($mapper, new ArrayAdapter(), false);
@@ -40,11 +39,11 @@ class ZeroGravityExtensionTest extends BaseUnit
         $filterRegistry = new FilterRegistry();
         $filterRegistry->addFilter(
             'filter-custom-children',
-            fn (PageFinder $pageFinder, array $filterOptions) => $pageFinder->contentType('custom-child')
+            static fn (PageFinder $pageFinder, array $filterOptions): PageFinder => $pageFinder->contentType('custom-child')
         );
         $filterRegistry->addFilter(
             'sort-path-desc',
-            fn (PageFinder $pageFinder, array $filterOptions) => $pageFinder->sort(fn (Page $a, Page $b) => $b->getPath() <=> $a->getPath())
+            static fn (PageFinder $pageFinder, array $filterOptions): PageFinder => $pageFinder->sort(static fn (Page $a, Page $b): int => $b->getPath() <=> $a->getPath())
         );
 
         return [
@@ -57,10 +56,8 @@ class ZeroGravityExtensionTest extends BaseUnit
      *
      * Unfortunately the helper module is not available inside data providers,
      * so we have to hard-code the path here.
-     *
-     * @return string
      */
-    protected function getFixturesDir()
+    protected function getFixturesDir(): string
     {
         return codecept_data_dir('twig_fixtures');
     }
@@ -68,7 +65,7 @@ class ZeroGravityExtensionTest extends BaseUnit
     /**
      * @return LoaderInterface[]
      */
-    protected function getTwigLoaders()
+    protected function getTwigLoaders(): array
     {
         $filesystemLoader = new FilesystemLoader();
         $filesystemLoader->addPath($this->getValidPagesDir(), 'ZeroGravity');

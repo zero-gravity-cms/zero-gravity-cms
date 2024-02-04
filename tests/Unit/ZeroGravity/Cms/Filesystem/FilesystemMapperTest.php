@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Codeception\Attribute\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -12,10 +14,8 @@ use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
 
 class FilesystemMapperTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function parserThrowsExceptionIfDirectoryDoesNotExist()
+    #[Test]
+    public function parserThrowsExceptionIfDirectoryDoesNotExist(): void
     {
         $path = $this->getPageFixtureDir().'/invalid_path';
         $fileFactory = $this->getDefaultFileFactory();
@@ -25,26 +25,21 @@ class FilesystemMapperTest extends BaseUnit
         $mapper->parse();
     }
 
-    /**
-     * @test
-     */
-    public function parserReturnsPagesIfContentIsValid()
+    #[Test]
+    public function parserReturnsPagesIfContentIsValid(): void
     {
         $path = $this->getValidPagesDir();
         $fileFactory = $this->getDefaultFileFactory();
         $mapper = new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         $pages = $mapper->parse();
-        static::assertContainsOnlyInstancesOf(Page::class, $pages);
-        static::assertCount(8, $pages);
+        self::assertContainsOnlyInstancesOf(Page::class, $pages);
+        self::assertCount(8, $pages);
     }
 
-    /**
-     * @test
-     *
-     * @group write
-     */
-    public function parserReturnsWritablePage()
+    #[Group('write')]
+    #[Test]
+    public function parserReturnsWritablePage(): void
     {
         $path = $this->getValidPagesDir();
         $fileFactory = $this->getDefaultFileFactory();
@@ -54,7 +49,7 @@ class FilesystemMapperTest extends BaseUnit
         $page = $pages['/yaml_only'];
 
         $writablePage = $mapper->getWritablePageInstance($page);
-        static::assertInstanceOf(WritableFilesystemPage::class, $writablePage);
-        static::assertSame('01.yaml_only', $writablePage->getName());
+        self::assertInstanceOf(WritableFilesystemPage::class, $writablePage);
+        self::assertSame('01.yaml_only', $writablePage->getName());
     }
 }

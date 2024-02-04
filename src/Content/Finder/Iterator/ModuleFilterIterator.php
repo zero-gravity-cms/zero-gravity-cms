@@ -13,15 +13,13 @@ use ZeroGravity\Cms\Content\Page;
  */
 final class ModuleFilterIterator extends FilterIterator
 {
-    private bool $module;
-
     /**
      * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Iterator $iterator, bool $module)
-    {
-        $this->module = $module;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly bool $module,
+    ) {
         parent::__construct($iterator);
     }
 

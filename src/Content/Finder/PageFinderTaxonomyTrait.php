@@ -109,7 +109,7 @@ trait PageFinderTaxonomyTrait
     private function applyTaxonomyIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->taxonomies) || !empty($this->notTaxonomies)) {
-            $iterator = new TaxonomiesFilterIterator($iterator, $this->taxonomies);
+            return new TaxonomiesFilterIterator($iterator, $this->taxonomies);
         }
 
         return $iterator;
