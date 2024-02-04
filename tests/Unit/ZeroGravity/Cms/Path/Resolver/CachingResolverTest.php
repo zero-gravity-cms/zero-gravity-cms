@@ -3,26 +3,28 @@
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
 use Cocur\Slugify\Slugify;
+use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Group;
 use Codeception\Stub;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
+use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
 use ZeroGravity\Cms\Path\Resolver\CachingResolver;
 use ZeroGravity\Cms\Path\Resolver\MultiPathResolver;
 use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 
-/**
- * @group resolver
- */
+#[Group('resolver')]
 class CachingResolverTest extends BaseUnit
 {
     /**
-     * @test
-     *
-     * @dataProvider provideMethods
+     * @param string|array<mixed> $expectedReturnValue
      */
-    public function methodIsCached(string $method, $expectedReturnValue, string $calledMethod = null): void
+    #[DataProvider('provideMethods')]
+    #[Test]
+    public function methodIsCached(string $method, string|array $expectedReturnValue, string $calledMethod = null): void
     {
         if (null === $calledMethod) {
             $calledMethod = $method;
@@ -33,7 +35,7 @@ class CachingResolverTest extends BaseUnit
         }
 
         $called = false;
-        $callback = function () use (&$called, $expectedReturnValue) {
+        $callback = static function () use (&$called, $expectedReturnValue): string|File|array {
             $called = true;
 
             // this is required for php-level return checks
@@ -47,54 +49,47 @@ class CachingResolverTest extends BaseUnit
         );
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
-        static::assertSame($expectedReturnValue, $result);
-        static::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
+        self::assertSame($expectedReturnValue, $result);
+        self::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
         $called = false;
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
-        static::assertSame($expectedReturnValue, $result);
-        static::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        self::assertSame($expectedReturnValue, $result);
+        self::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
 
         $result = $resolver->$method(new Path('b'), new Path('c'));
-        static::assertSame($expectedReturnValue, $result);
-        static::assertTrue($called, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
+        self::assertSame($expectedReturnValue, $result);
+        self::assertTrue($called, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
 
         // try without parent path
         $result = $resolver->$method(new Path('d'));
-        static::assertSame($expectedReturnValue, $result);
-        static::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
+        self::assertSame($expectedReturnValue, $result);
+        self::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
         $called = false;
 
         $result = $resolver->$method(new Path('d'));
-        static::assertSame($expectedReturnValue, $result);
-        static::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        self::assertSame($expectedReturnValue, $result);
+        self::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
     }
 
-    public function provideMethods(): Iterator
+    public static function provideMethods(): Iterator
     {
         yield 'get' => ['get', 'file'];
         yield 'find' => ['find', []];
         yield 'findOne' => ['findOne', 'file', 'get'];
     }
 
-    /**
-     * @param string $method
-     *
-     * @return MultiPathResolver
-     */
-    private function getWrappedResolver($method, callable $callback)
+    private function getWrappedResolver(string $method, callable $callback): MultiPathResolver
     {
         return Stub::makeEmpty(MultiPathResolver::class, [
             $method => $callback,
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function findReturnsEmptyArrayIfWrappedResolverIsSinglePathResolver()
+    #[Test]
+    public function findReturnsEmptyArrayIfWrappedResolverIsSinglePathResolver(): void
     {
         $wrappedResolver = Stub::makeEmpty(SinglePathResolver::class, []);
         $resolver = new CachingResolver(
@@ -104,13 +99,10 @@ class CachingResolverTest extends BaseUnit
         );
 
         $result = $resolver->find(new Path('a'), new Path('b'));
-        static::assertSame([], $result);
+        self::assertSame([], $result);
     }
 
-    /**
-     * @return ArrayAdapter
-     */
-    private function getCache()
+    private function getCache(): ArrayAdapter
     {
         return new ArrayAdapter(0, false);
     }

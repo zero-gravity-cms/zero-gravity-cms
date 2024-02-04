@@ -2,15 +2,18 @@
 
 namespace ZeroGravity\Cms\Content;
 
-final class PageDiff
-{
-    private WritablePage $old;
-    private WritablePage $new;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 
-    public function __construct(WritablePage $old, WritablePage $new)
-    {
-        $this->old = $old;
-        $this->new = $new;
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettings
+ */
+final readonly class PageDiff
+{
+    public function __construct(
+        private WritablePage $old,
+        private WritablePage $new,
+    ) {
     }
 
     public function getOld(): WritablePage
@@ -35,12 +38,16 @@ final class PageDiff
 
     public function settingsHaveChanged(): bool
     {
-        return $this->old->getSettings() != $this->new->getSettings();
+        return $this->old->getSettings(true) !== $this->new->getSettings(true);
     }
 
-    public function getNewNonDefaultSettings(): array
+    /**
+     * @return array<string, SettingValue>
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     */
+    public function getNewNonDefaultSettings(bool $serialize = false): array
     {
-        return $this->new->getNonDefaultSettings();
+        return $this->new->getNonDefaultSettings($serialize);
     }
 
     public function contentHasChanged(): bool

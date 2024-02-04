@@ -2,10 +2,13 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Menu;
 
+use Codeception\Attribute\Group;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Integration\Symfony\RoutingExtension;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -26,98 +29,80 @@ use ZeroGravity\Cms\Menu\Event\BeforeAddItem;
 use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 use ZeroGravity\Cms\Menu\KnpMenuProvider;
 
-/**
- * @group menu
- */
+#[Group('menu')]
 class KnpMenuProviderTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function menuProviderThrowsExceptionIfMenuDoesNotExist()
+    #[Test]
+    public function menuProviderThrowsExceptionIfMenuDoesNotExist(): void
     {
         $provider = $this->getProvider();
 
-        static::assertFalse($provider->has('invalid-menu-name'));
+        self::assertFalse($provider->has('invalid-menu-name'));
 
         $this->expectException(InvalidMenuNameException::class);
         $provider->get('invalid-menu-name');
     }
 
-    /**
-     * @test
-     */
-    public function menuProviderReturnsMenuIfExists()
+    #[Test]
+    public function menuProviderReturnsMenuIfExists(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        static::assertInstanceOf(ItemInterface::class, $rootItem);
+        self::assertInstanceOf(ItemInterface::class, $rootItem);
     }
 
-    /**
-     * @test
-     */
-    public function menuHasThreeItems()
+    #[Test]
+    public function menuHasThreeItems(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
-        static::assertCount(3, $rootItem->getChildren());
+        self::assertCount(3, $rootItem->getChildren());
     }
 
-    /**
-     * @test
-     */
-    public function itemHasTwoChildren()
+    #[Test]
+    public function itemHasTwoChildren(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        static::assertCount(2, $child->getChildren());
+        self::assertCount(2, $child->getChildren());
     }
 
-    /**
-     * @test
-     */
-    public function itemContainsPageSlug()
+    #[Test]
+    public function itemContainsPageSlug(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
-        static::assertSame('first-sibling', $child->getExtra('page_slug'));
+        self::assertSame('first-sibling', $child->getExtra('page_slug'));
     }
 
-    /**
-     * @test
-     */
-    public function itemHasCustomLabel()
+    #[Test]
+    public function itemHasCustomLabel(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        static::assertSame('custom second sibling label', $child->getLabel());
+        self::assertSame('custom second sibling label', $child->getLabel());
     }
 
-    /**
-     * @test
-     */
-    public function itemHasCustomExtraValue()
+    #[Test]
+    public function itemHasCustomExtraValue(): void
     {
         $provider = $this->getProvider();
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
-        static::assertSame('custom_value', $child->getExtra('custom_extra'));
+        self::assertSame('custom_value', $child->getExtra('custom_extra'));
     }
 
-    /**
-     * @test
-     */
-    public function itemUrisMatch()
+    #[Test]
+    public function itemUrisMatch(): void
     {
         $expectedItemUris = [
             '01.home' => '/home',
@@ -136,64 +121,52 @@ class KnpMenuProviderTest extends BaseUnit
 
         foreach ($expectedItemUris as $childName => $uri) {
             $child = $rootItem->getChild($childName);
-            static::assertInstanceOf(ItemInterface::class, $child);
-            static::assertSame($uri, $child->getUri());
+            self::assertInstanceOf(ItemInterface::class, $child);
+            self::assertSame($uri, $child->getUri());
 
             if (isset($expectedChildItemUris[$childName])) {
                 foreach ($expectedChildItemUris[$childName] as $subChildName => $subUri) {
                     $subChild = $child->getChild($subChildName);
-                    static::assertInstanceOf(ItemInterface::class, $subChild);
-                    static::assertSame($subUri, $subChild->getUri());
+                    self::assertInstanceOf(ItemInterface::class, $subChild);
+                    self::assertSame($subUri, $subChild->getUri());
                 }
             }
         }
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     *
-     * @group now
-     */
-    public function eventsAreDispatchedDuringBuild()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function eventsAreDispatchedDuringBuild(): void
     {
         $dispatcher = $this->createMock(EventDispatcher::class);
 
         $step = 0;
-        $callbackChain = function ($argument) use (&$step) {
+        $callbackChain = static function ($argument) use (&$step): bool {
             ++$step;
-
-            $beforeBuildMenuCallback = function ($argument) {
+            $beforeBuildMenuCallback = static function ($argument): bool {
                 if (!$argument instanceof BeforeBuildMenu) {
                     return false;
                 }
                 if ('zero-gravity' !== $argument->getMenuName()) {
                     return false;
                 }
-                if ('root' !== $argument->getRootItem()->getName()) {
-                    return false;
-                }
 
-                return true;
+                return 'root' === $argument->getRootItem()->getName();
             };
-            $beforeAddHomeItemCallback = function ($argument) {
+            $beforeAddHomeItemCallback = static function ($argument): bool {
                 if (!$argument instanceof BeforeAddItem) {
                     return false;
                 }
                 if ('root' !== $argument->getRootItem()->getName()) {
                     return false;
                 }
-                if ('Home' !== $argument->getItemToBeAdded()->getLabel()) {
-                    return false;
-                }
-                if ('root' !== $argument->getParentItem()->getName()) {
+                if ('Home' !== $argument->getItem()->getLabel()) {
                     return false;
                 }
 
-                return true;
+                return 'root' === $argument->getParentItem()->getName();
             };
-            $beforeAddHomeChildrenCallback = function ($argument) {
+            $beforeAddHomeChildrenCallback = static function ($argument): bool {
                 if (!$argument instanceof BeforeAddChildrenToItem) {
                     return false;
                 }
@@ -203,13 +176,10 @@ class KnpMenuProviderTest extends BaseUnit
                 if ('01.home' !== $argument->getItem()->getName()) {
                     return false;
                 }
-                if ('Home' !== $argument->getItem()->getLabel()) {
-                    return false;
-                }
 
-                return true;
+                return 'Home' === $argument->getItem()->getLabel();
             };
-            $afterAddHomeChildrenCallback = function ($argument) {
+            $afterAddHomeChildrenCallback = static function ($argument): bool {
                 if (!$argument instanceof AfterAddChildrenToItem) {
                     return false;
                 }
@@ -219,29 +189,23 @@ class KnpMenuProviderTest extends BaseUnit
                 if ('01.home' !== $argument->getItem()->getName()) {
                     return false;
                 }
-                if ('Home' !== $argument->getItem()->getLabel()) {
-                    return false;
-                }
 
-                return true;
+                return 'Home' === $argument->getItem()->getLabel();
             };
-            $afterAddSecondSubChildItemCallback = function ($argument) {
+            $afterAddSecondSubChildItemCallback = static function ($argument): bool {
                 if (!$argument instanceof AfterAddItem) {
                     return false;
                 }
                 if ('root' !== $argument->getRootItem()->getName()) {
                     return false;
                 }
-                if ('Second Child' !== $argument->getAddedItem()->getLabel()) {
-                    return false;
-                }
-                if ('First Sibling' !== $argument->getParentItem()->getLabel()) {
+                if ('Second Child' !== $argument->getItem()->getLabel()) {
                     return false;
                 }
 
-                return true;
+                return 'First Sibling' === $argument->getParentItem()->getLabel();
             };
-            $afterAddSecondItemChildrenCallback = function ($argument) {
+            $afterAddSecondItemChildrenCallback = static function ($argument): bool {
                 if (!$argument instanceof AfterAddChildrenToItem) {
                     return false;
                 }
@@ -251,75 +215,35 @@ class KnpMenuProviderTest extends BaseUnit
                 if ('First Sibling' !== $argument->getItem()->getLabel()) {
                     return false;
                 }
-                if (2 !== count($argument->getItem()->getChildren())) {
-                    return false;
-                }
 
-                return true;
+                return 2 === count($argument->getItem()->getChildren());
             };
 
-            switch ($step) {
-                case 1:
-                    return $beforeBuildMenuCallback($argument);
-                case 2:
-                    return $beforeAddHomeItemCallback($argument);
-                case 3:
-                    return $beforeAddHomeChildrenCallback($argument);
-
-                    // first item's children post-event
-                case 4:
-                    return $afterAddHomeChildrenCallback($argument);
-                case 5:
-                    return $argument instanceof AfterAddItem;
-
-                    // second item
-                case 6:
-                    return $argument instanceof BeforeAddItem;
-                case 7:
-                    return $argument instanceof BeforeAddChildrenToItem;
-
-                    // second item first child
-                case 8:
-                    return $argument instanceof BeforeAddItem;
-                case 9:
-                    return $argument instanceof BeforeAddChildrenToItem;
-                case 10:
-                    return $argument instanceof AfterAddChildrenToItem;
-                case 11:
-                    return $argument instanceof AfterAddItem;
-
-                    // second item second child
-                case 12:
-                    return $argument instanceof BeforeAddItem;
-                case 13:
-                    return $argument instanceof BeforeAddChildrenToItem;
-                case 14:
-                    return $argument instanceof AfterAddChildrenToItem;
-                case 15:
-                    return $afterAddSecondSubChildItemCallback($argument);
-
-                    // second item finished
-                case 16:
-                    return $afterAddSecondItemChildrenCallback($argument);
-                case 17:
-                    return $argument instanceof AfterAddItem;
-
-                    // third item
-                case 18:
-                    return $argument instanceof BeforeAddItem;
-                case 19:
-                    return $argument instanceof BeforeAddChildrenToItem;
-                case 20:
-                    return $argument instanceof AfterAddChildrenToItem;
-                case 21:
-                    return $argument instanceof AfterAddItem;
-
-                    // menu finished
-                case 22:
-                    return $argument instanceof AfterBuildMenu;
-            }
-
-            return true;
+            return match ($step) {
+                1 => $beforeBuildMenuCallback($argument),
+                2 => $beforeAddHomeItemCallback($argument),
+                3 => $beforeAddHomeChildrenCallback($argument),
+                4 => $afterAddHomeChildrenCallback($argument),
+                5 => $argument instanceof AfterAddItem,
+                6 => $argument instanceof BeforeAddItem,
+                7 => $argument instanceof BeforeAddChildrenToItem,
+                8 => $argument instanceof BeforeAddItem,
+                9 => $argument instanceof BeforeAddChildrenToItem,
+                10 => $argument instanceof AfterAddChildrenToItem,
+                11 => $argument instanceof AfterAddItem,
+                12 => $argument instanceof BeforeAddItem,
+                13 => $argument instanceof BeforeAddChildrenToItem,
+                14 => $argument instanceof AfterAddChildrenToItem,
+                15 => $afterAddSecondSubChildItemCallback($argument),
+                16 => $afterAddSecondItemChildrenCallback($argument),
+                17 => $argument instanceof AfterAddItem,
+                18 => $argument instanceof BeforeAddItem,
+                19 => $argument instanceof BeforeAddChildrenToItem,
+                20 => $argument instanceof AfterAddChildrenToItem,
+                21 => $argument instanceof AfterAddItem,
+                22 => $argument instanceof AfterBuildMenu,
+                default => true,
+            };
         };
 
         $dispatcher->expects(self::atLeast(15))
@@ -331,12 +255,9 @@ class KnpMenuProviderTest extends BaseUnit
         $provider->get('zero-gravity');
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
-    public function itemsCanBeChangedThroughEvents()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function itemsCanBeChangedThroughEvents(): void
     {
         $dispatcher = new EventDispatcher();
 
@@ -355,7 +276,7 @@ class KnpMenuProviderTest extends BaseUnit
 
     protected function getProvider(EventDispatcherInterface $dispatcher = null): KnpMenuProvider
     {
-        if (null === $dispatcher) {
+        if (!$dispatcher instanceof EventDispatcherInterface) {
             $dispatcher = new EventDispatcher();
         }
         $factory = $this->getMenuFactory();

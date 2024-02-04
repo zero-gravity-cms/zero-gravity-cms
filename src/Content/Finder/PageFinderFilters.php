@@ -2,10 +2,12 @@
 
 namespace ZeroGravity\Cms\Content\Finder;
 
+use Closure;
+
 interface PageFinderFilters
 {
     /**
-     * @return callable[]|PageFinderFilter[]
+     * @return array<string, callable|Closure|PageFinderFilter>
      */
     public function getFilters(): array;
 }

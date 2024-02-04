@@ -4,28 +4,41 @@ namespace ZeroGravity\Cms\Content;
 
 class FileTypeDetector
 {
-    public const EXTENSIONS = [
-        'yaml' => ['yml', 'yaml'],
-        'image' => ['jpg', 'jpeg', 'png', 'gif'],
-        'markdown' => ['md'],
-        'twig' => ['twig'],
-        'document' => ['pdf', 'docx', 'xlsx', 'txt'],
+    protected const EXTENSIONS = [
+        FileTypes::TYPE_DOCUMENT => [
+            'pdf',
+            'docx',
+            'xlsx',
+            'txt',
+        ],
+        FileTypes::TYPE_IMAGE => [
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+        ],
+        FileTypes::TYPE_MARKDOWN => [
+            'md',
+        ],
+        FileTypes::TYPE_TWIG => [
+            'twig',
+        ],
+        FileTypes::TYPE_YAML => [
+            'yml',
+            'yaml',
+        ],
     ];
 
-    public const TYPE_YAML = 'yaml';
-    public const TYPE_IMAGE = 'image';
-    public const TYPE_MARKDOWN = 'markdown';
-    public const TYPE_TWIG = 'twig';
-    public const TYPE_DOCUMENT = 'document';
-    public const TYPE_UNKNOWN = 'unknown';
-
+    /**
+     * @var array<string, string>
+     */
     protected array $extensionMap = [];
 
     public function __construct()
     {
-        foreach (self::EXTENSIONS as $type => $extensions) {
+        foreach (static::EXTENSIONS as $type => $extensions) {
             foreach ($extensions as $extension) {
-                $this->extensionMap[$extension] = $type;
+                $this->extensionMap[(string) $extension] = $type;
             }
         }
     }
@@ -40,6 +53,6 @@ class FileTypeDetector
     {
         $ext = mb_strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-        return $this->extensionMap[$ext] ?? self::TYPE_UNKNOWN;
+        return $this->extensionMap[$ext] ?? FileTypes::TYPE_UNKNOWN;
     }
 }

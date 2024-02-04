@@ -7,11 +7,9 @@ use ZeroGravity\Cms\Content\Page;
 
 final class AfterPageCreate extends Event
 {
-    private Page $page;
-
-    public function __construct(Page $page)
-    {
-        $this->page = $page;
+    public function __construct(
+        private readonly Page $page
+    ) {
     }
 
     public function getPage(): Page

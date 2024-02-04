@@ -16,7 +16,9 @@ define('C33S_ROBO_DIR', '.robo');
 
 $roboDir = C33S_ROBO_DIR;
 $previousWorkingDir = getcwd();
-(is_dir($roboDir) || mkdir($roboDir)) && chdir($roboDir);
+if (is_dir($roboDir) || mkdir($roboDir)) {
+    chdir($roboDir);
+}
 if (!is_file('composer.json')) {
     exec('composer init --no-interaction', $output, $resultCode);
     exec('composer require c33s/robofile --no-interaction', $output, $resultCode);
@@ -54,7 +56,9 @@ use Symfony\Component\Filesystem\Filesystem;
 class RoboFile extends BaseRoboFile
 {
     use C33sTasks;
-    use C33sExtraTasks;
+    use C33sExtraTasks {
+        check as _check;
+    }
 
     private const GLOBAL_COMPOSER_PACKAGES = [
     ];
@@ -91,10 +95,8 @@ class RoboFile extends BaseRoboFile
             $this->abort();
         }
 
-        if (!$this->ciCheckPorts($this->portsToCheck)) {
-            if (!$this->confirmIfInteractive('Do you want to continue?')) {
-                $this->abort();
-            }
+        if (!$this->ciCheckPorts($this->portsToCheck) && !$this->confirmIfInteractive('Do you want to continue?')) {
+            $this->abort();
         }
 
         foreach (self::GLOBAL_COMPOSER_PACKAGES as $package => $version) {
@@ -107,11 +109,25 @@ class RoboFile extends BaseRoboFile
     /**
      * Perform code-style checks.
      *
-     * @param string $arguments Optional path or other arguments
+     * @option fix Run auto-fixer before running checks
+     *
+     * @noinspection PhpParameterNameChangedDuringInheritanceInspection
      */
-    public function check(string $arguments = ''): void
-    {
-        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
+    public function check(
+        array $opts = [
+            'fix' => false,
+            'rector-args' => '',
+            'php-cs-fixer-args' => '',
+            'phpstan-args' => '',
+        ],
+    ): void {
+        if ($opts['fix']) {
+            $this->fix('', true);
+        }
+
+        $this->_execPhp("php ./vendor/bin/rector process --dry-run {$opts['rector-args']}");
+        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run {$opts['php-cs-fixer-args']}");
+        $this->_execPhp("php ./vendor/bin/phpstan analyse {$opts['phpstan-args']}");
     }
 
     /**
@@ -119,10 +135,11 @@ class RoboFile extends BaseRoboFile
      *
      * @param string $arguments Optional path or other arguments
      */
-    public function fix(string $arguments = ''): void
+    public function fix(string $arguments = '', bool $force = false): void
     {
-        if ($this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
-            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose $arguments");
+        if ($force || $this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
+            $this->_execPhp('php ./vendor/bin/rector process');
+            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose {$arguments}");
         } else {
             $this->abort();
         }
@@ -160,7 +177,7 @@ class RoboFile extends BaseRoboFile
     /**
      * (Re-)Generate test fixture images using identicon library.
      */
-    public function generateTestIdenticons()
+    public function generateTestIdenticons(): void
     {
         require_once __DIR__.'/vendor/autoload.php';
         $basePath = __DIR__.'/tests/Support/_data/page_fixtures/valid_pages/';
@@ -204,7 +221,7 @@ class RoboFile extends BaseRoboFile
                 $fs->mkdir($dir);
             }
 
-            echo "$path\n";
+            echo "{$path}\n";
 
             $data = $identicon
                 ->setValue($file)

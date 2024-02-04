@@ -7,7 +7,6 @@ use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\ReadablePageRepository;
 use ZeroGravity\Cms\Exception\InvalidMenuNameException;
@@ -18,30 +17,23 @@ use ZeroGravity\Cms\Menu\Event\BeforeAddChildrenToItem;
 use ZeroGravity\Cms\Menu\Event\BeforeAddItem;
 use ZeroGravity\Cms\Menu\Event\BeforeBuildMenu;
 
-class KnpMenuProvider implements MenuProviderInterface
+readonly class KnpMenuProvider implements MenuProviderInterface
 {
-    protected ReadablePageRepository $pageRepository;
-    protected EventDispatcherInterface $eventDispatcher;
-    protected FactoryInterface $factory;
-
     public function __construct(
-        ReadablePageRepository $pageRepository,
-        EventDispatcherInterface $eventDispatcher,
-        FactoryInterface $factory
+        protected ReadablePageRepository $pageRepository,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected FactoryInterface $factory,
     ) {
-        $this->pageRepository = $pageRepository;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->factory = $factory;
     }
 
     /**
      * Retrieves a menu by its name.
      *
-     * @param string $name
+     * @param array<string, mixed> $options
      *
-     * @throws InvalidArgumentException if the menu does not exists
+     * @throws InvalidArgumentException if the menu does not exist
      */
-    public function get($name, array $options = []): ItemInterface
+    public function get(string $name, array $options = []): ItemInterface
     {
         if (!$this->has($name)) {
             throw new InvalidMenuNameException($name);
@@ -53,9 +45,9 @@ class KnpMenuProvider implements MenuProviderInterface
     /**
      * Checks whether a menu exists in this provider.
      *
-     * @param string $name
+     * @param array<string, mixed> $options
      */
-    public function has($name, array $options = []): bool
+    public function has(string $name, array $options = []): bool
     {
         foreach ($this->pageRepository->getPageTree() as $page) {
             if ($this->pageHasItem($page, $name)) {
@@ -66,6 +58,9 @@ class KnpMenuProvider implements MenuProviderInterface
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function buildMenu(string $menuName, array $options = []): ItemInterface
     {
         $rootItem = $this->factory->createItem('root');
@@ -83,6 +78,8 @@ class KnpMenuProvider implements MenuProviderInterface
 
     /**
      * Adds item to the given parent item if page should have an item.
+     *
+     * @param array<string, mixed> $defaultOptions
      */
     protected function addPageItem(
         ReadablePage $page,
@@ -112,16 +109,14 @@ class KnpMenuProvider implements MenuProviderInterface
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 
-        $this->eventDispatcher->dispatch(new BeforeAddItem($menuName, $parent, $item));
-
+        $this->eventDispatcher->dispatch(new BeforeAddItem($menuName, $item, $parent));
         $parent->addChild($item);
         $this->eventDispatcher->dispatch(new BeforeAddChildrenToItem($menuName, $item));
         foreach ($page->getChildren() as $childPage) {
             $this->addPageItem($childPage, $item, $menuName, $defaultOptions);
         }
         $this->eventDispatcher->dispatch(new AfterAddChildrenToItem($menuName, $item));
-
-        $this->eventDispatcher->dispatch(new AfterAddItem($menuName, $parent, $item));
+        $this->eventDispatcher->dispatch(new AfterAddItem($menuName, $item, $parent));
     }
 
     protected function pageHasItem(ReadablePage $page, string $menuName): bool

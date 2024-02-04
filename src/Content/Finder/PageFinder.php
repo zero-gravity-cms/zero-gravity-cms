@@ -6,7 +6,7 @@ use AppendIterator;
 use ArrayIterator;
 use Closure;
 use Countable;
-use InvalidArgumentException;
+use Exception;
 use Iterator;
 use IteratorAggregate;
 use LogicException;
@@ -15,11 +15,12 @@ use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * This PageFinder implementation is heavily inspired by Symfony's Finder component and shares some of its code.
+ *
+ * @implements IteratorAggregate<string, ReadablePage>
  */
 final class PageFinder implements IteratorAggregate, Countable
 {
@@ -33,10 +34,10 @@ final class PageFinder implements IteratorAggregate, Countable
     use PageFinderTaxonomyTrait;
 
     private ?int $limit = null;
-    private ?int $offset = null;
+    private int $offset = 0;
 
     /**
-     * @var Page[][]
+     * @var array<array<string, ReadablePage>>
      */
     private array $pageLists = [];
 
@@ -46,7 +47,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private array $filters = [];
 
     /**
-     * @var Iterator[]
+     * @var array<Iterator<string, ReadablePage>>
      */
     private array $iterators = [];
 
@@ -55,7 +56,7 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     public static function create(): PageFinder
     {
-        return new static();
+        return new self();
     }
 
     public function __construct()
@@ -64,7 +65,7 @@ final class PageFinder implements IteratorAggregate, Countable
     }
 
     /**
-     * @param Page[]|ReadablePage[] $pages
+     * @param ReadablePage[] $pages
      */
     public function inPageList(array $pages): self
     {
@@ -86,7 +87,7 @@ final class PageFinder implements IteratorAggregate, Countable
     /**
      * Set a finder offset.
      */
-    public function offset(int $offset = null): self
+    public function offset(int $offset = 0): self
     {
         $this->offset = $offset;
 
@@ -94,7 +95,7 @@ final class PageFinder implements IteratorAggregate, Countable
     }
 
     /**
-     * @return Page[]
+     * @return array<string, ReadablePage>
      */
     public function toArray(): array
     {
@@ -129,7 +130,7 @@ final class PageFinder implements IteratorAggregate, Countable
      *
      * This method implements the IteratorAggregate interface.
      *
-     * @return Iterator|Page[] An iterator
+     * @return Iterator<string, ReadablePage>
      *
      * @throws LogicException if the in() method has not been called
      */
@@ -149,9 +150,11 @@ final class PageFinder implements IteratorAggregate, Countable
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @throws InvalidArgumentException when the given argument is not iterable
+     * @param IteratorAggregate<string, ReadablePage>|Iterator<string, ReadablePage>|iterable<ReadablePage>|ReadablePage $iterator
+     *
+     * @throws Exception
      */
-    public function append($iterator): self
+    public function append(IteratorAggregate|Iterator|iterable|ReadablePage $iterator): self
     {
         if ($iterator instanceof IteratorAggregate) {
             $this->iterators[] = $iterator->getIterator();
@@ -159,21 +162,24 @@ final class PageFinder implements IteratorAggregate, Countable
             $this->iterators[] = $iterator;
         } elseif (is_iterable($iterator)) {
             $this->iterators[] = $this->appendPageArrayIterator($iterator);
-        } elseif ($iterator instanceof Page) {
+        } elseif ($iterator instanceof ReadablePage) {
             $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);
-        } else {
-            throw new InvalidArgumentException('PageFinder::append() method wrong argument type.');
         }
 
         return $this;
     }
 
-    private function appendPageArrayIterator($iterator): Iterator
+    /**
+     * @param iterable<ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
+    private function appendPageArrayIterator(iterable $iterator): Iterator
     {
         $pages = [];
         foreach ($iterator as $page) {
-            Assert::isInstanceOf($page, Page::class);
-            /* @var $page Page */
+            Assert::isInstanceOf($page, ReadablePage::class);
+            /* @var $page ReadablePage */
             $pages[$page->getPath()->toString()] = $page;
         }
 
@@ -195,6 +201,9 @@ final class PageFinder implements IteratorAggregate, Countable
         throw new LogicException('You must call one of inPageList() or append() methods before iterating over a PageFinder.');
     }
 
+    /**
+     * @return Iterator<string, ReadablePage>
+     */
     private function buildIteratorFromPageListsAndIterators(): Iterator
     {
         $iterator = new AppendIterator();
@@ -209,6 +218,11 @@ final class PageFinder implements IteratorAggregate, Countable
         return $iterator;
     }
 
+    /**
+     * @param array<string, ReadablePage> $pageList
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function buildIteratorFromSinglePageList(array $pageList): Iterator
     {
         $mode = RecursiveIteratorIterator::SELF_FIRST;
@@ -237,20 +251,29 @@ final class PageFinder implements IteratorAggregate, Countable
         return $this->applyOffsetAndLimitIterator($iterator);
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->filters)) {
-            $iterator = new CustomFilterIterator($iterator, $this->filters);
+        if ([] !== $this->filters) {
+            return new CustomFilterIterator($iterator, $this->filters);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyOffsetAndLimitIterator(Iterator $iterator): Iterator
     {
-        if (null !== $this->limit || null !== $this->offset) {
-            $aggregate = new LimitAndOffsetIterator($iterator, $this->limit, $this->offset);
-            $iterator = $aggregate->getIterator();
+        if (null !== $this->limit || $this->offset > 0) {
+            return (new LimitAndOffsetIterator($iterator, $this->limit, $this->offset))->getIterator();
         }
 
         return $iterator;

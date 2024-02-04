@@ -8,43 +8,104 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use ZeroGravity\Cms\Content\Page;
 
+/**
+ * @phpstan-type TaxonomySettingValue array<string>
+ * @phpstan-type DateTimeSettingValue int|string|DateTimeInterface
+ * @phpstan-type SettingValue null|string|bool|DateTimeSettingValue|array<string, TaxonomySettingValue>|array<string, mixed>
+ * @phpstan-type SerializedSettingValue null|string|bool|int|array<string, TaxonomySettingValue>|array<string, mixed>
+ * @phpstan-type SettingValues array{
+ *      child_defaults: null|array<string, SettingValue>,
+ *      content_template: null|string,
+ *      content_type: string,
+ *      controller: string|null,
+ *      date: null|string|int|DateTimeInterface,
+ *      extra: array<string, mixed>,
+ *      file_aliases: array<string, string>,
+ *      layout_template: null|string,
+ *      menu_id: string|false,
+ *      menu_label: null|string,
+ *      modular: bool,
+ *      module: bool,
+ *      publish: bool,
+ *      publish_date: null|string|int|DateTimeInterface,
+ *      slug: string,
+ *      taxonomy: array<string, list<string>>,
+ *      title: null|string,
+ *      unpublish_date: null|string|int|DateTimeInterface,
+ *      visible: bool
+ * }
+ * @phpstan-type SerializedSettingValues array{
+ *      child_defaults: null|array<string, mixed>,
+ *      content_template: null|string,
+ *      content_type: string,
+ *      controller: string|null,
+ *      date: null|string,
+ *      extra: array<string, mixed>,
+ *      file_aliases: array<string, string>,
+ *      layout_template: null|string,
+ *      menu_id: string|false,
+ *      menu_label: null|string,
+ *      modular: bool,
+ *      module: bool,
+ *      publish: bool,
+ *      publish_date: null|string,
+ *      slug: string,
+ *      taxonomy: array<string, list<string>>,
+ *      title: null|string,
+ *      unpublish_date: null|string,
+ *      visible: bool
+ * }
+ */
 final class PageSettings
 {
+    /**
+     * @var SettingValues|null
+     */
     private ?array $values = null;
 
-    private string $pageName;
-
-    public function __construct(array $values, string $pageName)
-    {
-        $this->pageName = $pageName;
+    /**
+     * @param array<string, SettingValue> $values
+     */
+    public function __construct(
+        array $values,
+        private readonly string $pageName,
+    ) {
         $this->validate($values);
     }
 
     /**
      * Get a single setting value.
      */
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         return $this->values[$name];
     }
 
     /**
      * Get array copy of all settings.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
-    public function toArray(): array
+    public function toArray(bool $serialize = false): array
     {
-        return $this->values;
+        return $serialize ? $this->serialize($this->values) : $this->values;
     }
 
     /**
      * Get all values that wouldn't have been set by default.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
-    public function getNonDefaultValues(): array
+    public function getNonDefaultValues(bool $serialize = false): array
     {
         $defaults = (new self([], $this->pageName))->toArray();
 
         $nonDefaults = [];
-        foreach ($this->toArray() as $key => $value) {
+        foreach ($this->toArray($serialize) as $key => $value) {
             if (!array_key_exists($key, $defaults) || $defaults[$key] !== $value) {
                 $nonDefaults[$key] = $value;
             }
@@ -56,8 +117,10 @@ final class PageSettings
     /**
      * Resolve and validate page settings.
      * If everything was fine, assign them.
+     *
+     * @param array<string, SettingValue> $values
      */
-    public function validate(array $values): void
+    private function validate(array $values): void
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
@@ -79,46 +142,49 @@ final class PageSettings
     private function configureDefaults(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'child_defaults' => [],
+            'content_template' => null,
+            'content_type' => 'page',
             'controller' => null,
+            'date' => null,
             'extra' => [],
             'file_aliases' => [],
-            'modular' => false,
-            'module' => false,
-            'visible' => false,
+            'layout_template' => null,
             'menu_id' => 'zero-gravity',
             'menu_label' => null,
-            'date' => null,
+            'modular' => false,
+            'module' => false,
             'publish' => true,
             'publish_date' => null,
-            'unpublish_date' => null,
             'slug' => $this->pageName,
-            'layout_template' => null,
-            'content_template' => null,
-            'title' => null,
             'taxonomy' => [],
-            'content_type' => 'page',
-            'child_defaults' => [],
+            'title' => null,
+            'unpublish_date' => null,
+            'visible' => false,
         ]);
     }
 
     private function configureAllowedTypes(OptionsResolver $resolver): void
     {
-        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
+
         $resolver->setAllowedTypes('child_defaults', ['null', 'array']);
-        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
-        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
-        $resolver->setAllowedTypes('visible', 'bool');
-        $resolver->setAllowedTypes('modular', 'bool');
-        $resolver->setAllowedTypes('module', 'bool');
-        $resolver->setAllowedTypes('title', ['null', 'string']);
-        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_template', ['null', 'string']);
         $resolver->setAllowedTypes('content_type', 'string');
-
-        $dateTypes = ['null', 'string', 'int', DateTimeInterface::class];
-        $resolver->setAllowedTypes('publish_date', $dateTypes);
-        $resolver->setAllowedTypes('unpublish_date', $dateTypes);
+        $resolver->setAllowedTypes('controller', ['null', 'string']);
         $resolver->setAllowedTypes('date', $dateTypes);
+        $resolver->setAllowedTypes('extra', ['null', 'array']);
+        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
+        $resolver->setAllowedTypes('layout_template', ['null', 'string']);
+        $resolver->setAllowedTypes('menu_id', ['string', 'bool']);
+        $resolver->setAllowedTypes('menu_label', ['null', 'string']);
+        $resolver->setAllowedTypes('modular', 'bool');
+        $resolver->setAllowedTypes('module', 'bool');
+        $resolver->setAllowedTypes('publish_date', $dateTypes);
+        $resolver->setAllowedTypes('taxonomy', ['null', 'array']);
+        $resolver->setAllowedTypes('title', ['null', 'string']);
+        $resolver->setAllowedTypes('unpublish_date', $dateTypes);
+        $resolver->setAllowedTypes('visible', 'bool');
     }
 
     private function configureNormalizers(OptionsResolver $resolver): void
@@ -131,9 +197,9 @@ final class PageSettings
 
     private function normalizeDates(OptionsResolver $resolver): void
     {
-        $normalizeDateTime = function (Options $options, $value) {
+        $normalizeDateTime = static function (Options $options, $value): ?DateTimeImmutable {
             if (null === $value) {
-                return $value;
+                return null;
             }
             if ($value instanceof DateTimeImmutable) {
                 return $value;
@@ -153,7 +219,7 @@ final class PageSettings
 
     private function normalizeTitle(OptionsResolver $resolver): void
     {
-        $normalizeTitle = function (Options $options, $value) {
+        $normalizeTitle = function (Options $options, $value): string {
             if (null !== $value) {
                 return (string) $value;
             }
@@ -169,7 +235,7 @@ final class PageSettings
 
     private function normalizeTaxonomy(OptionsResolver $resolver): void
     {
-        $normalizeTaxonomy = function (Options $options, $value) {
+        $normalizeTaxonomy = static function (Options $options, $value): array {
             if (null === $value) {
                 return [];
             }
@@ -177,6 +243,7 @@ final class PageSettings
             foreach ($value as $name => $taxonomy) {
                 $taxonomies[$name] = array_values((array) $taxonomy);
             }
+            ksort($taxonomies);
 
             return $taxonomies;
         };
@@ -185,7 +252,7 @@ final class PageSettings
 
     private function normalizeArrayValues(OptionsResolver $resolver): void
     {
-        $normalizeArray = function (Options $options, $value) {
+        $normalizeArray = static function (Options $options, $value) {
             if (null === $value) {
                 return [];
             }
@@ -195,5 +262,23 @@ final class PageSettings
         $resolver->setNormalizer('extra', $normalizeArray);
         $resolver->setNormalizer('child_defaults', $normalizeArray);
         $resolver->setNormalizer('file_aliases', $normalizeArray);
+    }
+
+    private function serialize(mixed $value): mixed
+    {
+        if (is_scalar($value)) {
+            return $value;
+        }
+        if (is_array($value)) {
+            return array_map(fn ($singleValue): mixed => $this->serialize($singleValue), $value);
+        }
+        if (null === $value) {
+            return null;
+        }
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        return (string) $value;
     }
 }

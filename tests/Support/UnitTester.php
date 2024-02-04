@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use Codeception\Actor;
 use Codeception\Lib\Friend;
+use Tests\Support\_generated\UnitTesterActions;
 
 /**
  * Inherited Methods.
@@ -23,7 +24,7 @@ use Codeception\Lib\Friend;
  */
 class UnitTester extends Actor
 {
-    use _generated\UnitTesterActions;
+    use UnitTesterActions;
 
     /*
      * Define custom actions here

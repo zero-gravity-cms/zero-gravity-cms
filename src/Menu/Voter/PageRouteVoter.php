@@ -7,15 +7,13 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Voter\VoterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
-final class PageRouteVoter implements VoterInterface
+final readonly class PageRouteVoter implements VoterInterface
 {
-    private ?Request $request;
-
-    public function __construct(RequestStack $requestStack)
-    {
-        $this->request = $requestStack->getCurrentRequest();
+    public function __construct(
+        private RequestStack $requestStack,
+    ) {
     }
 
     /**
@@ -26,11 +24,12 @@ final class PageRouteVoter implements VoterInterface
      */
     public function matchItem(ItemInterface $item): ?bool
     {
-        if (null === $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+        if (!$request instanceof Request) {
             return null;
         }
-        $page = $this->request->attributes->get('page');
-        if (!$page instanceof Page) {
+        $page = $request->attributes->get('page');
+        if (!$page instanceof ReadablePage) {
             return null;
         }
 
@@ -39,6 +38,9 @@ final class PageRouteVoter implements VoterInterface
         return $this->matchRoutes($routes, $page->getPath()->toString());
     }
 
+    /**
+     * @param array<mixed> $routes
+     */
     private function matchRoutes(array $routes, string $pagePath): ?bool
     {
         foreach ($routes as $route) {

@@ -19,22 +19,22 @@ trait MultiPathFindOneTrait
      */
     public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ?File
     {
-        $file = $this->get(clone $path, (null !== $parentPath) ? clone $parentPath : null);
+        $file = $this->get(clone $path, ($parentPath instanceof Path) ? clone $parentPath : null);
         if (null !== $file) {
             return $file;
         }
 
-        $files = $this->find(clone $path, (null !== $parentPath) ? clone $parentPath : null);
+        $files = $this->find(clone $path, ($parentPath instanceof Path) ? clone $parentPath : null);
         if (0 === count($files)) {
             return null;
         }
         if (1 === count($files)) {
             return array_shift($files);
         }
-        if (count($files) > 1 && !$strict) {
-            return array_shift($files);
+        if ($strict) {
+            throw ResolverException::moreThanOneFileMatchingPattern($path->toString(), $files);
         }
 
-        throw ResolverException::moreThanOneFileMatchingPattern($path->toString(), $files);
+        return array_shift($files);
     }
 }

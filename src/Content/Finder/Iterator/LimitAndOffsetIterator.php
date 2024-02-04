@@ -5,29 +5,28 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 use ArrayIterator;
 use Iterator;
 use IteratorAggregate;
-use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * SortableIterator applies a sort on a given Iterator.
+ *
+ * @implements IteratorAggregate<string, ReadablePage>
  */
-final class LimitAndOffsetIterator implements IteratorAggregate
+final readonly class LimitAndOffsetIterator implements IteratorAggregate
 {
-    private Traversable $iterator;
-    private ?int $limit;
-    private int $offset;
-
     /**
-     * @param Traversable $iterator The Iterator to filter
-     * @param int|null    $limit
-     * @param int|null    $offset
+     * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Traversable $iterator, $limit, $offset)
-    {
-        $this->iterator = $iterator;
-        $this->limit = $limit;
-        $this->offset = (int) $offset;
+    public function __construct(
+        private Iterator $iterator,
+        private ?int $limit,
+        private int $offset,
+    ) {
     }
 
+    /**
+     * @return Iterator<string, ReadablePage>
+     */
     public function getIterator(): Iterator
     {
         $array = iterator_to_array($this->iterator, true);

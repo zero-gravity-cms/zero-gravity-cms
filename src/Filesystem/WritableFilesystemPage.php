@@ -11,13 +11,12 @@ final class WritableFilesystemPage extends Page implements WritablePage
 {
     use BasicWritablePageTrait;
 
-    private ?Directory $directory;
-
-    public function __construct(ReadablePage $page, Directory $directory = null)
-    {
-        $this->directory = $directory;
-        if (null !== $directory) {
-            $this->contentRaw = $directory->fetchPageContent(false);
+    public function __construct(
+        ReadablePage $page,
+        private readonly ?Directory $directory = null,
+    ) {
+        if ($this->directory instanceof Directory) {
+            $this->contentRaw = $this->directory->fetchPageContent(false);
         }
 
         parent::__construct($page->getName(), $page->getSettings(), $page->getParent());

@@ -2,47 +2,43 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Media;
 
+use Codeception\Attribute\DataProvider;
+use Codeception\Attribute\Group;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Media\MediaRepository;
+use ZeroGravity\Cms\Path\Path;
 
-/**
- * @group media
- */
+#[Group('media')]
 class MediaRepositoryTest extends BaseUnit
 {
-    /**
-     * @test
-     *
-     * @dataProvider provideValidMediaPaths
-     */
-    public function validPathReturnsFile($pathString): void
+    #[DataProvider('provideValidMediaPaths')]
+    #[Test]
+    public function validPathReturnsFile(Path|string $pathString): void
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
-        static::assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
+        self::assertInstanceOf(File::class, $mediaRepository->getFile($pathString));
     }
 
-    public function provideValidMediaPaths(): Iterator
+    public static function provideValidMediaPaths(): Iterator
     {
         yield ['01.yaml_only/file1.png'];
         yield ['01.yaml_only/file2.png'];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideInvalidMediaPaths
-     */
-    public function invalidPathReturnsNull($pathString): void
+    #[DataProvider('provideInvalidMediaPaths')]
+    #[Test]
+    public function invalidPathReturnsNull(Path|string $pathString): void
     {
         $mediaRepository = new MediaRepository($this->getValidPagesResolver());
 
-        static::assertNull($mediaRepository->getFile($pathString));
+        self::assertNull($mediaRepository->getFile($pathString));
     }
 
-    public function provideInvalidMediaPaths(): Iterator
+    public static function provideInvalidMediaPaths(): Iterator
     {
         yield ['01.yaml_only/file1.png.meta.yaml'];
         yield ['01.yaml_only/file4.png'];

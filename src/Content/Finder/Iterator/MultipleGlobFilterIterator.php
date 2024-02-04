@@ -4,12 +4,14 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * MultipleGlobFilterIterator is a regex filter iterator that allows glob expressions.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends MultiplePcreFilterIterator<string, ReadablePage>
  */
 abstract class MultipleGlobFilterIterator extends MultiplePcreFilterIterator
 {
@@ -23,7 +25,7 @@ abstract class MultipleGlobFilterIterator extends MultiplePcreFilterIterator
      *
      * @return string regexp corresponding to a given glob or regexp
      */
-    protected function toRegex($str): string
+    protected function toRegex(string $str): string
     {
         return $this->isRegex($str) ? $str : Glob::toRegex($str);
     }

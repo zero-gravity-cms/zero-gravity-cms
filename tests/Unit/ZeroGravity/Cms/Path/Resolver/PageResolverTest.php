@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path\Resolver;
 
+use Codeception\Attribute\DataProvider;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Path\Path;
@@ -10,23 +12,18 @@ use ZeroGravity\Cms\Path\Resolver\PageResolver;
 
 class PageResolverTest extends BaseUnit
 {
-    /**
-     * @test
-     *
-     * @dataProvider provideSingleFilePaths
-     *
-     * @param string $inPath
-     */
-    public function singleFilesAreResolvedByPath(string $path, $inPath, string $expectedPath)
+    #[DataProvider('provideSingleFilePaths')]
+    #[Test]
+    public function singleFilesAreResolvedByPath(string $path, ?string $inPath, string $expectedPath): void
     {
         $resolver = $this->getPageResolver();
         $file = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        static::assertInstanceOf(File::class, $file, "Page $path was found in $inPath");
-        static::assertSame($expectedPath, $file->getPathname());
+        self::assertInstanceOf(File::class, $file, "Page {$path} was found in {$inPath}");
+        self::assertSame($expectedPath, $file->getPathname());
     }
 
-    public function provideSingleFilePaths(): Iterator
+    public static function provideSingleFilePaths(): Iterator
     {
         yield [
             '/yaml_only/file2.png',
@@ -55,22 +52,17 @@ class PageResolverTest extends BaseUnit
         ];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideNonExistingPagePaths
-     *
-     * @param string $inPath
-     */
-    public function singlePagesThatAreNotFound(string $path, $inPath)
+    #[DataProvider('provideNonExistingPagePaths')]
+    #[Test]
+    public function singlePagesThatAreNotFound(string $path, ?string $inPath): void
     {
         $resolver = $this->getPageResolver();
         $pageFile = $resolver->get(new Path($path), null === $inPath ? null : new Path($inPath));
 
-        static::assertNull($pageFile);
+        self::assertNull($pageFile);
     }
 
-    public function provideNonExistingPagePaths(): Iterator
+    public static function provideNonExistingPagePaths(): Iterator
     {
         yield [
             '01.yaml_only',
@@ -84,12 +76,13 @@ class PageResolverTest extends BaseUnit
             '',
             null,
         ];
+        yield [
+            '_child1/this-does-not-exist.png',
+            'with_children/',
+        ];
     }
 
-    /**
-     * @return PageResolver
-     */
-    private function getPageResolver()
+    private function getPageResolver(): PageResolver
     {
         return new PageResolver($this->getDefaultContentRepository());
     }

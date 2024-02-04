@@ -3,6 +3,8 @@
 namespace Tests\Unit\ZeroGravity\Cms\Content;
 
 use Codeception\Stub;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -13,10 +15,8 @@ use ZeroGravity\Cms\Content\StructureMapper;
 
 class ContentRepositoryTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function pagesAreLoadedFromMapper()
+    #[Test]
+    public function pagesAreLoadedFromMapper(): void
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
@@ -30,31 +30,28 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
 
-        static::assertSame([
+        self::assertSame([
             $page1,
             $page2,
         ], $repo->getPageTree());
 
-        static::assertSame([
+        self::assertSame([
             '/page1' => $page1,
             '/page2' => $page2,
             '/page2/page3' => $page3,
         ], $repo->getAllPages());
 
-        static::assertSame($page3, $repo->getPage('/page2/page3'));
-        static::assertNull($repo->getPage('/does/not/exist'));
+        self::assertSame($page3, $repo->getPage('/page2/page3'));
+        self::assertNull($repo->getPage('/does/not/exist'));
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
-    public function writablePageIsLoadedFromMapper()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function writablePageIsLoadedFromMapper(): void
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
+        $mapper = $this->createMock(StructureMapper::class);
         $mapper->expects(static::once())
             ->method('getWritablePageInstance')
         ;
@@ -63,16 +60,13 @@ class ContentRepositoryTest extends BaseUnit
         $repo->getWritablePageInstance($page1);
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
-    public function newWritablePageIsLoadedFromMapper()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function newWritablePageIsLoadedFromMapper(): void
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
+        $mapper = $this->createMock(StructureMapper::class);
         $mapper->expects(static::once())
             ->method('getNewWritablePage')
             ->with($page1)
@@ -82,16 +76,13 @@ class ContentRepositoryTest extends BaseUnit
         $repo->getNewWritablePage($page1);
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
-    public function diffIsSavedThroughMapper()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function diffIsSavedThroughMapper(): void
     {
         $page1 = $this->createSimplePage('page1');
 
-        $mapper = $this->getMockBuilder(StructureMapper::class)->getMock();
+        $mapper = $this->createMock(StructureMapper::class);
 
         $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
         $old = $repo->getWritablePageInstance($page1);
@@ -106,10 +97,8 @@ class ContentRepositoryTest extends BaseUnit
         $repo->saveChanges($diff);
     }
 
-    /**
-     * @test
-     */
-    public function pagesAreCachedBetweenInstances()
+    #[Test]
+    public function pagesAreCachedBetweenInstances(): void
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
@@ -130,7 +119,7 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo2 = new ContentRepository($emptyMapper, $cache, false);
 
-        static::assertEquals([
+        self::assertEquals([
             '/page1' => $page1,
             '/page2' => $page2,
             '/page2/page3' => $page3,
@@ -138,13 +127,11 @@ class ContentRepositoryTest extends BaseUnit
 
         $repo3 = new ContentRepository($emptyMapper, $cache, false);
         $repo3->clearCache();
-        static::assertEquals([], $repo3->getAllPages(), 'After clearing the cache the empty result is loaded.');
+        self::assertSame([], $repo3->getAllPages(), 'After clearing the cache the empty result is loaded.');
     }
 
-    /**
-     * @test
-     */
-    public function pagesAreNotCachedIfSkipCacheIsSet()
+    #[Test]
+    public function pagesAreNotCachedIfSkipCacheIsSet(): void
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
@@ -164,15 +151,12 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo2 = new ContentRepository($emptyMapper, $cache, true);
 
-        static::assertEquals([], $repo2->getAllPages());
+        self::assertSame([], $repo2->getAllPages());
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
-    public function pagesAreLoadedIfCacheThrowsException()
+    #[Test]
+    #[DoesNotPerformAssertions]
+    public function pagesAreLoadedIfCacheThrowsException(): void
     {
         $page1 = $this->createSimplePage('page1');
         $page2 = $this->createSimplePage('page2');
@@ -197,10 +181,7 @@ class ContentRepositoryTest extends BaseUnit
         $repo->getAllPages();
     }
 
-    /**
-     * @return Page
-     */
-    private function createSimplePage($name, Page $parent = null)
+    private function createSimplePage(string $name, Page $parent = null): Page
     {
         return new Page($name, ['slug' => $name], $parent);
     }

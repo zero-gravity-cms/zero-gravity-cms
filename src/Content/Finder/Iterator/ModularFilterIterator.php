@@ -4,24 +4,25 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use FilterIterator;
 use Iterator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * ModularFilterIterator filters out pages that do not match the required modular state.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class ModularFilterIterator extends FilterIterator
 {
-    private bool $modular;
-
     /**
      * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Iterator $iterator, bool $modular)
-    {
-        $this->modular = $modular;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly bool $modular,
+    ) {
         parent::__construct($iterator);
     }
 

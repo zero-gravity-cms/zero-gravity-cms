@@ -8,6 +8,6 @@ class UnsafePathException extends InvalidArgumentException implements ZeroGravit
 {
     public static function pathNotAllowed(string $path): self
     {
-        return new static(sprintf('Path %s is unsafe, because it leaves the parent structure', $path));
+        return new self(sprintf('Path %s is unsafe, because it leaves the parent structure', $path));
     }
 }

@@ -1,0 +1,27 @@
+parameters:
+  level: 6
+  tmpDir: .robo/cache/phpstan
+  paths:
+    - src
+    - tests
+
+  excludePaths:
+    - tests/Support/_generated/*
+    - tests/Support/*Tester.php
+
+  ignoreErrors:
+    -
+      message: '#Call to function count\(\) on a separate line has no effect\.#'
+      path: tests/Unit/ZeroGravity/Cms/Content/Finder/PageFinderTest.php
+    -
+      message: '#Undefined variable: \$ret#'
+      path: tests/Unit/ZeroGravity/Cms/Test/TwigExtensionTestTrait.php
+    -
+      message: '/Parameter #1 \$iterator of class Symfony\\Component\\Finder\\Iterator\\DepthRangeFilterIterator constructor expects RecursiveIteratorIterator.*/'
+      path: src/Content/Finder/PageFinderDepthTrait.php
+    -
+      message: '/^Parameter #2 \$sortBy of class ZeroGravity\\Cms\\Content\\Finder\\Iterator\\SortableIterator constructor expects /'
+      path: tests/Unit/ZeroGravity/Cms/Content/Finder/Iterator/SortableIteratorTest.php
+    -
+      message: '/^If condition is always false.$/'
+      path: tests/Unit/ZeroGravity/Cms/Test/TwigExtensionTestTrait.php

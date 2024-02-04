@@ -3,10 +3,15 @@
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Filesystem\Directory;
 
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ */
 trait BasicWritablePageTrait
 {
     private ?string $contentRaw = null;
+    private readonly ?Directory $directory;
 
     /**
      * Set page name.
@@ -36,15 +41,22 @@ trait BasicWritablePageTrait
      */
     public function setContentRaw(string $contentRaw = null): void
     {
-        $this->contentRaw = str_replace("\r\n", "\n", $contentRaw);
+        $this->contentRaw = str_replace("\r\n", "\n", (string) $contentRaw);
     }
 
     /**
      * Set page settings as plain array.
+     *
+     * @param array<string, SettingValue> $settings
      */
     public function setSettings(array $settings): void
     {
         $this->settings = new PageSettings($settings, $this->getName());
         $this->buildPath();
+    }
+
+    public function getDirectory(): ?Directory
+    {
+        return $this->directory;
     }
 }

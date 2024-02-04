@@ -5,11 +5,21 @@ namespace ZeroGravity\Cms\Content\Finder;
 use Iterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use ZeroGravity\Cms\Content\Finder\Iterator\FileCountFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderFilesTrait
 {
+    /**
+     * @var list<NumberComparator>
+     */
     private array $numFiles = [];
+    /**
+     * @var list<NumberComparator>
+     */
     private array $numImages = [];
+    /**
+     * @var list<NumberComparator>
+     */
     private array $numDocuments = [];
 
     /**
@@ -17,15 +27,15 @@ trait PageFinderFilesTrait
      *
      * Usage:
      *
-     *   $finder->filesCount(2)      // Page contains exactly 2 files
+     *   $finder->filesCount('== 2')      // Page contains exactly 2 files
      *   $finder->filesCount('>= 2') // Page contains at least 2 files
      *   $finder->filesCount('< 3')  // Page contains no more than 2 files
      *
-     * @param string|int $numFiles The file count expression
+     * @param string|null $numFiles The file count expression
      *
      * @see NumberComparator
      */
-    public function numFiles($numFiles): self
+    public function numFiles(?string $numFiles): self
     {
         $this->numFiles[] = new NumberComparator($numFiles);
 
@@ -37,15 +47,15 @@ trait PageFinderFilesTrait
      *
      * Usage:
      *
-     *   $finder->imagesCount(2)      // Page contains exactly 2 images
+     *   $finder->imagesCount('== 2')      // Page contains exactly 2 images
      *   $finder->imagesCount('>= 2') // Page contains at least 2 images
      *   $finder->imagesCount('< 3')  // Page contains no more than 2 images
      *
-     * @param string|int $numImages The image count expression
+     * @param string|null $numImages The image count expression
      *
      * @see NumberComparator
      */
-    public function numImages($numImages): self
+    public function numImages(?string $numImages): self
     {
         $this->numImages[] = new NumberComparator($numImages);
 
@@ -57,25 +67,30 @@ trait PageFinderFilesTrait
      *
      * Usage:
      *
-     *   $finder->documentsCount(2)      // Page contains exactly 2 documents
+     *   $finder->documentsCount('== 2')      // Page contains exactly 2 documents
      *   $finder->documentsCount('>= 2') // Page contains at least 2 documents
      *   $finder->documentsCount('< 3')  // Page contains no more than 2 documents
      *
-     * @param string|int $numDocuments The document count expression
+     * @param string|null $numDocuments The document count expression
      *
      * @see NumberComparator
      */
-    public function numDocuments($numDocuments): self
+    public function numDocuments(?string $numDocuments): self
     {
         $this->numDocuments[] = new NumberComparator($numDocuments);
 
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyNumberOfFilesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numFiles)) {
-            $iterator = new FileCountFilterIterator(
+            return new FileCountFilterIterator(
                 $iterator,
                 $this->numFiles,
                 FileCountFilterIterator::MODE_FILES
@@ -85,10 +100,15 @@ trait PageFinderFilesTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyNumberOfImagesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numImages)) {
-            $iterator = new FileCountFilterIterator(
+            return new FileCountFilterIterator(
                 $iterator,
                 $this->numImages,
                 FileCountFilterIterator::MODE_IMAGES
@@ -98,10 +118,15 @@ trait PageFinderFilesTrait
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyNumberOfDocumentsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->numDocuments)) {
-            $iterator = new FileCountFilterIterator(
+            return new FileCountFilterIterator(
                 $iterator,
                 $this->numDocuments,
                 FileCountFilterIterator::MODE_DOCUMENTS

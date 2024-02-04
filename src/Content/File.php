@@ -2,24 +2,25 @@
 
 namespace ZeroGravity\Cms\Content;
 
+use Stringable;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 
 /**
  * This class represents a file relative to a content base dir.
  */
-final class File
+final readonly class File implements Stringable
 {
     private string $pathName;
     private string $baseDir;
-    private Metadata $metadata;
-    private string $type;
 
-    public function __construct(string $pathName, string $baseDir, Metadata $metadata, string $type)
-    {
+    public function __construct(
+        string $pathName,
+        string $baseDir,
+        private Metadata $metadata,
+        private string $type,
+    ) {
         $this->pathName = '/'.ltrim($pathName, '/');
         $this->baseDir = rtrim($baseDir, '/');
-        $this->metadata = $metadata;
-        $this->type = $type;
     }
 
     /**
@@ -60,7 +61,7 @@ final class File
     public function getDefaultBasename(): string
     {
         $extension = $this->getExtension();
-        if (!empty($extension)) {
+        if ('' !== $extension) {
             return $this->getBasename('.'.$extension);
         }
 
@@ -90,6 +91,6 @@ final class File
 
     public function __toString(): string
     {
-        return $this->getPathname();
+        return $this->pathName;
     }
 }

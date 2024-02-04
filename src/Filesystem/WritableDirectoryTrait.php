@@ -8,44 +8,42 @@ use LogicException;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
 use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
+/**
+ * @phpstan-import-type SerializedSettingValue from PageSettings
+ */
 trait WritableDirectoryTrait
 {
     /**
      * Save the given raw content to the filesystem.
      */
-    public function saveContent(string $newRawContent = null): void
+    public function saveContent(string $newRawContent): void
     {
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-                $this->updateMarkdown($newRawContent);
-                break;
-
-            default:
-                $this->createMarkdown($newRawContent);
-        }
+        match ($this->getContentStrategy()) {
+            self::CONTENT_STRATEGY_YAML_AND_MARKDOWN,
+            self::CONTENT_STRATEGY_MARKDOWN_ONLY => $this->updateMarkdown($newRawContent),
+            default => $this->createMarkdown($newRawContent),
+        };
     }
 
     /**
      * Save the given settings array to the filesystem.
+     *
+     * @param array<string, SerializedSettingValue> $newSettings
      */
     public function saveSettings(array $newSettings): void
     {
         $newYaml = $this->dumpSettingsToYaml($newSettings);
 
-        switch ($this->getContentStrategy()) {
-            case self::CONTENT_STRATEGY_YAML_ONLY:
-            case self::CONTENT_STRATEGY_MARKDOWN_ONLY:
-            case self::CONTENT_STRATEGY_YAML_AND_MARKDOWN:
-                $this->updateYaml($newYaml);
-                break;
-
-            default:
-                $this->createYaml($newYaml);
-        }
+        match ($this->getContentStrategy()) {
+            self::CONTENT_STRATEGY_YAML_ONLY,
+            self::CONTENT_STRATEGY_MARKDOWN_ONLY,
+            self::CONTENT_STRATEGY_YAML_AND_MARKDOWN => $this->updateYaml($newYaml),
+            default => $this->createYaml($newYaml),
+        };
     }
 
     /**
@@ -53,7 +51,7 @@ trait WritableDirectoryTrait
      */
     public function renameOrMove(string $newRealPath): void
     {
-        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to $newRealPath");
+        $this->logger->debug("Moving directory {$this->getFilesystemPathname()} to {$newRealPath}");
         $fs = new Filesystem();
         $fs->rename($this->getFilesystemPathname(), $newRealPath, false);
 
@@ -62,7 +60,7 @@ trait WritableDirectoryTrait
         $this->parseDirectories();
     }
 
-    private function updateMarkdown($newRawContent): void
+    private function updateMarkdown(string $newRawContent): void
     {
         $this->logger->debug("Updating markdown file in directory {$this->getPath()}");
         $document = $this->getFrontYAMLDocument(false);
@@ -70,16 +68,16 @@ trait WritableDirectoryTrait
             $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
             $newRawContent = <<<FRONTMATTER
 ---
-$yamlContent
+{$yamlContent}
 ---
-$newRawContent
+{$newRawContent}
 FRONTMATTER;
         }
 
         $this->writeFile($this->getMarkdownFile()->getFilesystemPathname(), $newRawContent);
     }
 
-    private function createMarkdown($newRawContent): void
+    private function createMarkdown(string $newRawContent): void
     {
         $this->logger->debug("Creating new markdown file in directory {$this->getPath()}");
         $path = sprintf('%s/%s.md',
@@ -91,7 +89,7 @@ FRONTMATTER;
         $this->parseFiles();
     }
 
-    private function updateYaml($newYaml): void
+    private function updateYaml(string $newYaml): void
     {
         $this->logger->debug("Updating YAML config in directory {$this->getPath()}");
         $file = $this->getYamlFile();
@@ -109,7 +107,7 @@ FRONTMATTER;
         $document = $this->getFrontYAMLDocument(false);
         $newYaml = <<<FRONTMATTER
 ---
-$newYaml
+{$newYaml}
 ---
 {$document->getContent()}
 FRONTMATTER;
@@ -117,7 +115,7 @@ FRONTMATTER;
         $this->writeFile($file->getFilesystemPathname(), $newYaml);
     }
 
-    private function createYaml($newYaml): void
+    private function createYaml(string $newYaml): void
     {
         $this->logger->debug("Creating new YAML config in directory {$this->getPath()}");
         $path = sprintf('%s/%s.yaml',
@@ -129,6 +127,9 @@ FRONTMATTER;
         $this->parseFiles();
     }
 
+    /**
+     * @param array<string, SerializedSettingValue> $settings
+     */
     private function dumpSettingsToYaml(array $settings): string
     {
         return Yaml::dump($settings, 4);

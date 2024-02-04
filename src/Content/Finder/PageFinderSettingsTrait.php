@@ -3,7 +3,6 @@
 namespace ZeroGravity\Cms\Content\Finder;
 
 use Iterator;
-use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use ZeroGravity\Cms\Content\Finder\Iterator\ContentTypeFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\DateRangeFilterIterator;
@@ -13,43 +12,44 @@ use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilter;
 use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\SlugFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\TitleFilterIterator;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderSettingsTrait
 {
     /**
-     * @var ExtraFilter[]
+     * @var list<ExtraFilter>
      */
     private array $extras = [];
     /**
-     * @var SettingFilter[]
+     * @var list<SettingFilter>
      */
     private array $settings = [];
     /**
-     * @var DateComparator[]
+     * @var list<DateComparator>
      */
     private array $dates = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $slugs = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notSlugs = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $titles = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notTitles = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $contentTypes = [];
     /**
-     * @var string[]
+     * @var list<string>
      */
     private array $notContentTypes = [];
 
@@ -62,7 +62,7 @@ trait PageFinderSettingsTrait
      *
      * @see ExtraFilterIterator
      */
-    public function extra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function extra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::has($name, $value, $comparator);
 
@@ -78,7 +78,7 @@ trait PageFinderSettingsTrait
      *
      * @see ExtraFilterIterator
      */
-    public function notExtra(string $name, $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function notExtra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::hasNot($name, $value, $comparator);
 
@@ -92,7 +92,7 @@ trait PageFinderSettingsTrait
      *
      * @see SettingFilterIterator
      */
-    public function setting(string $name, $value): self
+    public function setting(string $name, mixed $value): self
     {
         $this->settings[] = SettingFilter::has($name, $value);
 
@@ -106,7 +106,7 @@ trait PageFinderSettingsTrait
      *
      * @see SettingFilterIterator
      */
-    public function notSetting(string $name, $value): self
+    public function notSetting(string $name, mixed $value): self
     {
         $this->settings[] = SettingFilter::hasNot($name, $value);
 
@@ -238,55 +238,85 @@ trait PageFinderSettingsTrait
         return $this;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applySlugsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->slugs) || !empty($this->notSlugs)) {
-            $iterator = new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
+            return new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyTitlesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->titles) || !empty($this->notTitles)) {
-            $iterator = new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
+            return new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyExtrasIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->extras)) {
-            $iterator = new ExtraFilterIterator($iterator, $this->extras);
+            return new ExtraFilterIterator($iterator, $this->extras);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applySettingsIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->settings)) {
-            $iterator = new SettingFilterIterator($iterator, $this->settings);
+            return new SettingFilterIterator($iterator, $this->settings);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyContentTypesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
-            $iterator = new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
+            return new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
         }
 
         return $iterator;
     }
 
+    /**
+     * @param Iterator<string, ReadablePage> $iterator
+     *
+     * @return Iterator<string, ReadablePage>
+     */
     private function applyDatesIterator(Iterator $iterator): Iterator
     {
         if (!empty($this->dates)) {
-            $iterator = new DateRangeFilterIterator($iterator, $this->dates);
+            return new DateRangeFilterIterator($iterator, $this->dates);
         }
 
         return $iterator;

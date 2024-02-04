@@ -6,24 +6,17 @@ use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\Meta\MetadataLoader;
 use ZeroGravity\Cms\Exception\FilesystemException;
 
-final class FileFactory
+final readonly class FileFactory
 {
-    private FileTypeDetector $fileTypeDetector;
-
-    private MetadataLoader $metadataLoader;
-
-    private string $basePath;
-
-    public function __construct(FileTypeDetector $fileTypeDetector, MetadataLoader $metadataLoader, string $basePath)
-    {
+    public function __construct(
+        private FileTypeDetector $fileTypeDetector,
+        private MetadataLoader $metadataLoader,
+        private string $basePath,
+    ) {
         $fs = new Filesystem();
-        if (!$fs->exists($basePath) || !is_dir($basePath)) {
-            throw FilesystemException::contentDirectoryDoesNotExist($basePath);
+        if (!$fs->exists($this->basePath) || !is_dir($this->basePath)) {
+            throw FilesystemException::contentDirectoryDoesNotExist($this->basePath);
         }
-
-        $this->fileTypeDetector = $fileTypeDetector;
-        $this->metadataLoader = $metadataLoader;
-        $this->basePath = $basePath;
     }
 
     public function createFile(string $pathname): File

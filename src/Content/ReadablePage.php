@@ -4,18 +4,57 @@ namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Path\Path;
 
+/**
+ * This trait contains settings related methods (mostly getters) of the Page class.
+ * This helps to separate native properties from validated settings/options.
+ *
+ * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SettingValues from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValues from PageSettings
+ */
 interface ReadablePage
 {
     public function getContent(): ?string;
 
     /**
-     * @return File[]
+     * @return array<string, File>
      */
     public function getFiles(): array;
 
     public function getFile(string $filename): ?File;
+
+    /**
+     * Get representations for all available image files.
+     *
+     * @return array<string, File>
+     */
+    public function getImages(): array;
+
+    /**
+     * Get representations for all available document files.
+     *
+     * @return array<string, File>
+     */
+    public function getDocuments(): array;
+
+    /**
+     * Get single markdown file representation if available.
+     */
+    public function getMarkdownFile(): ?File;
+
+    /**
+     * Get single YAML file representation if available.
+     */
+    public function getYamlFile(): ?File;
+
+    /**
+     * Get single Twig file representation if available.
+     */
+    public function getTwigFile(): ?File;
 
     public function getPath(): Path;
 
@@ -27,20 +66,28 @@ interface ReadablePage
 
     /**
      * Get all setting values.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
-    public function getSettings(): array;
+    public function getSettings(bool $serialize = false): array;
 
     /**
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
+     *
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
-    public function getNonDefaultSettings(): array;
+    public function getNonDefaultSettings(bool $serialize = false): array;
 
     public function getChildren(): PageFinder;
 
     public function hasChildren(): bool;
 
-    public function getSetting(string $name);
+    public function getSetting(string $name): mixed;
 
     public function getSlug(): string;
 
@@ -55,28 +102,46 @@ interface ReadablePage
 
     /**
      * Get all defined taxonomy keys and values.
+     *
+     * @return array<string, list<string>>
      */
     public function getTaxonomies(): array;
 
     /**
      * Get values for a single taxonomy key.
+     *
+     * @return list<string>
      */
     public function getTaxonomy(string $name): array;
 
+    /**
+     * @return list<string>
+     */
     public function getTags(): array;
 
+    /**
+     * @return list<string>
+     */
     public function getCategories(): array;
 
+    /**
+     * @return list<string>
+     */
     public function getAuthors(): array;
 
     /**
      * Get default setting values for child pages.
+     *
+     * @return array<string, SettingValue>
      */
     public function getChildDefaults(): array;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExtraValues(): array;
 
-    public function getMenuId(): string;
+    public function getMenuId(): string|bool;
 
     public function getMenuLabel(): string;
 
@@ -112,10 +177,7 @@ interface ReadablePage
      */
     public function getController(): ?string;
 
-    /**
-     * @param mixed|null $default
-     */
-    public function getExtra(string $name, $default = null);
+    public function getExtra(string $name, mixed $default = null): mixed;
 
     /**
      * Get optional date information of this page.
@@ -134,7 +196,7 @@ interface ReadablePage
 
     /**
      * All the publishing settings are okay.
-     * By default these are:
+     * By default, these are:
      * - 'publish'
      * - 'publish_date'
      * - 'unpublish_date'.

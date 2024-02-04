@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Codeception\Attribute\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
@@ -17,30 +19,32 @@ use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Filesystem\FilesystemMapper;
 use ZeroGravity\Cms\Filesystem\YamlMetadataLoader;
 
-/**
- * @group write
- */
+#[Group('write')]
 class FilesystemMapperWritingTest extends BaseUnit
 {
     use TempDirTrait;
 
-    public function _before()
+    protected function _before(): void
     {
         $this->setupTempDir($this->getValidPagesDir());
     }
 
-    public function _after()
+    protected function _after(): void
     {
         $this->cleanupTempDir();
     }
 
-    /**
-     * @test
-     */
-    public function savingThrowsExceptionIfDiffDoesNotContainFilesystemPages()
+    #[Test]
+    public function savingThrowsExceptionIfDiffDoesNotContainFilesystemPages(): void
     {
         $oldPage = new class('page') extends Page implements WritablePage {
             use BasicWritablePageTrait;
+
+            public function __construct(string $name)
+            {
+                $this->directory = null;
+                parent::__construct($name);
+            }
         };
         $newPage = clone $oldPage;
         $diff = new PageDiff($oldPage, $newPage);
@@ -50,10 +54,8 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
     }
 
-    /**
-     * @test
-     */
-    public function savingThrowsExceptionIfNewNameAlreadyExists()
+    #[Test]
+    public function savingThrowsExceptionIfNewNameAlreadyExists(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
@@ -69,15 +71,13 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
     }
 
-    /**
-     * @test
-     */
-    public function contentIsSavedToExistingMarkdownFile()
+    #[Test]
+    public function contentIsSavedToExistingMarkdownFile(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
-        static::assertCount(3, $page->getFiles());
+        self::assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -89,19 +89,17 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        static::assertCount(3, $page->getFiles());
+        self::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        self::assertCount(3, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function contentIsSavedToExistingMarkdownFileWithFrontmatterYaml()
+    #[Test]
+    public function contentIsSavedToExistingMarkdownFileWithFrontmatterYaml(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
-        static::assertCount(1, $page->getFiles());
+        self::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -113,20 +111,18 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        static::assertSame("<p>This is the content of page 02.</p>\n<p>new <strong>raw</strong> content</p>", $page->getContent());
-        static::assertSame('value-kept-after-content-update', $page->getExtra('keep-value'));
-        static::assertCount(1, $page->getFiles());
+        self::assertSame("<p>This is the content of page 02.</p>\n<p>new <strong>raw</strong> content</p>", $page->getContent());
+        self::assertSame('value-kept-after-content-update', $page->getExtra('keep-value'));
+        self::assertCount(1, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function contentIsSavedToDirectoryContainingOnlyYamlFile()
+    #[Test]
+    public function contentIsSavedToDirectoryContainingOnlyYamlFile(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
-        static::assertCount(4, $page->getFiles());
+        self::assertCount(4, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -138,19 +134,17 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
 
-        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        static::assertCount(5, $page->getFiles());
+        self::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        self::assertCount(5, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function contentIsSavedToDirectoryContainingOnlyTwigFile()
+    #[Test]
+    public function contentIsSavedToDirectoryContainingOnlyTwigFile(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
-        static::assertCount(1, $page->getFiles());
+        self::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -162,19 +156,17 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        static::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
-        static::assertCount(2, $page->getFiles());
+        self::assertSame('<p>new <strong>raw</strong> content</p>', $page->getContent());
+        self::assertCount(2, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function settingsAreSavedToExistingYamlFile()
+    #[Test]
+    public function settingsAreSavedToExistingYamlFile(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
-        static::assertCount(3, $page->getFiles());
+        self::assertCount(3, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -190,20 +182,18 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        static::assertSame('new-value', $page->getExtra('new-key'));
-        static::assertCount(3, $page->getFiles());
+        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('new-value', $page->getExtra('new-key'));
+        self::assertCount(3, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function settingsAreSavedToExistingMarkdownFileWithFrontmatterYaml()
+    #[Test]
+    public function settingsAreSavedToExistingMarkdownFileWithFrontmatterYaml(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
-        static::assertCount(1, $page->getFiles());
+        self::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -219,20 +209,18 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        static::assertSame('new-value', $page->getExtra('new-key'));
-        static::assertCount(1, $page->getFiles());
+        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('new-value', $page->getExtra('new-key'));
+        self::assertCount(1, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function settingsAreSavedToDirectoryContainingOnlyTwigFile()
+    #[Test]
+    public function settingsAreSavedToDirectoryContainingOnlyTwigFile(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
-        static::assertCount(1, $page->getFiles());
+        self::assertCount(1, $page->getFiles());
 
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
@@ -248,15 +236,13 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        static::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
-        static::assertSame('new-value', $page->getExtra('new-key'));
-        static::assertCount(2, $page->getFiles());
+        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('new-value', $page->getExtra('new-key'));
+        self::assertCount(2, $page->getFiles());
     }
 
-    /**
-     * @test
-     */
-    public function pageCanBeRenamed()
+    #[Test]
+    public function pageCanBeRenamed(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
@@ -271,17 +257,15 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
 
-        static::assertArrayNotHasKey('/with_children', $pages);
-        static::assertArrayHasKey('/still_with_children', $pages);
+        self::assertArrayNotHasKey('/with_children', $pages);
+        self::assertArrayHasKey('/still_with_children', $pages);
 
         $page = $pages['/still_with_children'];
-        static::assertCount(2, $page->getChildren());
+        self::assertCount(2, $page->getChildren());
     }
 
-    /**
-     * @test
-     */
-    public function pageCanBeMovedToAnotherParent()
+    #[Test]
+    public function pageCanBeMovedToAnotherParent(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
@@ -298,21 +282,18 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
 
-        static::assertArrayNotHasKey('/with_children', $pages);
+        self::assertArrayNotHasKey('/with_children', $pages);
 
         $parent = $pages['/twig_only'];
-        static::assertArrayHasKey('/twig_only/moved_but_still_with_children', $parent->getChildren()->toArray());
+        self::assertArrayHasKey('/twig_only/moved_but_still_with_children', $parent->getChildren()->toArray());
 
         $page = $parent->getChildren()->toArray()['/twig_only/moved_but_still_with_children'];
-        static::assertCount(2, $page->getChildren());
+        self::assertCount(2, $page->getChildren());
     }
 
-    /**
-     * @test
-     *
-     * @group new
-     */
-    public function newPageCanBeSavedInRootDir()
+    #[Group('new')]
+    #[Test]
+    public function newPageCanBeSavedInRootDir(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
 
@@ -329,18 +310,15 @@ class FilesystemMapperWritingTest extends BaseUnit
 
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
-        static::assertArrayHasKey('/totally_new', $pages);
+        self::assertArrayHasKey('/totally_new', $pages);
         $page = $pages['/totally_new'];
-        static::assertSame('A totally new page!', $page->getTitle());
-        static::assertSame('<p>totally <strong>new</strong> content!</p>', $page->getContent());
+        self::assertSame('A totally new page!', $page->getTitle());
+        self::assertSame('<p>totally <strong>new</strong> content!</p>', $page->getContent());
     }
 
-    /**
-     * @test
-     *
-     * @group new
-     */
-    public function newPageCanBeSavedInAnotherPageDir()
+    #[Group('new')]
+    #[Test]
+    public function newPageCanBeSavedInAnotherPageDir(): void
     {
         $mapper = $this->getTempValidPagesFilesystemMapper();
         $pages = $mapper->parse();
@@ -360,14 +338,11 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper->saveChanges($diff);
         $pages = $mapper->parse();
         $page = $pages['/yaml_only'];
-        static::assertCount(1, $page->getChildren());
-        static::assertArrayHasKey('/yaml_only/totally_new', $page->getChildren()->toArray());
+        self::assertCount(1, $page->getChildren());
+        self::assertArrayHasKey('/yaml_only/totally_new', $page->getChildren()->toArray());
     }
 
-    /**
-     * @return FilesystemMapper
-     */
-    protected function getTempValidPagesFilesystemMapper()
+    protected function getTempValidPagesFilesystemMapper(): FilesystemMapper
     {
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->tempDir);
 

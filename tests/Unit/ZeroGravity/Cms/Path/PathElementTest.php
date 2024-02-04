@@ -2,34 +2,31 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Path;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Path\PathElement;
 
 class PathElementTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function doubleColonElementIsRegardedAsParent()
+    #[Test]
+    public function doubleColonElementIsRegardedAsParent(): void
     {
         $pathElement = new PathElement('foo');
-        static::assertFalse($pathElement->isParentReference());
+        self::assertFalse($pathElement->isParentReference());
 
         $pathElement = new PathElement('..');
-        static::assertTrue($pathElement->isParentReference());
+        self::assertTrue($pathElement->isParentReference());
     }
 
-    /**
-     * @test
-     */
-    public function regexElementIsNeverRecognizedAsGlob()
+    #[Test]
+    public function regexElementIsNeverRecognizedAsGlob(): void
     {
         $pathElement = new PathElement('/foo.*', true);
-        static::assertTrue($pathElement->isGlob());
-        static::assertFalse($pathElement->isRegex());
+        self::assertTrue($pathElement->isGlob());
+        self::assertFalse($pathElement->isRegex());
 
         $pathElement = new PathElement('/foo.*/', true);
-        static::assertFalse($pathElement->isGlob());
-        static::assertTrue($pathElement->isRegex());
+        self::assertFalse($pathElement->isGlob());
+        self::assertTrue($pathElement->isRegex());
     }
 }

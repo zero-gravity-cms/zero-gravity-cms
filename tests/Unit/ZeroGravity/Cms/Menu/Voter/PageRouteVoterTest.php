@@ -2,23 +2,21 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Menu\Voter;
 
+use Codeception\Attribute\Group;
 use InvalidArgumentException;
 use Knp\Menu\ItemInterface;
+use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Menu\Voter\PageRouteVoter;
 
-/**
- * @group v
- */
+#[Group('voter')]
 class PageRouteVoterTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function noMatchingIsDoneWithoutRequest()
+    #[Test]
+    public function noMatchingIsDoneWithoutRequest(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item->expects(static::never())
@@ -27,13 +25,11 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter(new RequestStack());
 
-        static::assertNull($voter->matchItem($item));
+        self::assertNull($voter->matchItem($item));
     }
 
-    /**
-     * @test
-     */
-    public function noMatchingIsDoneIfRequestDoesNotContainPage()
+    #[Test]
+    public function noMatchingIsDoneIfRequestDoesNotContainPage(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item->expects(static::never())
@@ -42,15 +38,14 @@ class PageRouteVoterTest extends BaseUnit
 
         $stack = new RequestStack();
         $stack->push(new Request());
+
         $voter = new PageRouteVoter($stack);
 
-        static::assertNull($voter->matchItem($item));
+        self::assertNull($voter->matchItem($item));
     }
 
-    /**
-     * @test
-     */
-    public function matchingIsDoneIfRequestContainsPage()
+    #[Test]
+    public function matchingIsDoneIfRequestContainsPage(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item->expects(static::atLeastOnce())
@@ -66,13 +61,11 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        static::assertNull($voter->matchItem($item));
+        self::assertNull($voter->matchItem($item));
     }
 
-    /**
-     * @test
-     */
-    public function invalidRouteConfigThrowsException()
+    #[Test]
+    public function invalidRouteConfigThrowsException(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item
@@ -94,10 +87,8 @@ class PageRouteVoterTest extends BaseUnit
         $voter->matchItem($item);
     }
 
-    /**
-     * @test
-     */
-    public function matchingUsingSingleStringRoute()
+    #[Test]
+    public function matchingUsingSingleStringRoute(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item
@@ -115,13 +106,11 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        static::assertTrue($voter->matchItem($item));
+        self::assertTrue($voter->matchItem($item));
     }
 
-    /**
-     * @test
-     */
-    public function matchingUsingRouteArray()
+    #[Test]
+    public function matchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item
@@ -142,13 +131,11 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        static::assertTrue($voter->matchItem($item));
+        self::assertTrue($voter->matchItem($item));
     }
 
-    /**
-     * @test
-     */
-    public function notMatchingUsingRouteArray()
+    #[Test]
+    public function notMatchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
         $item
@@ -169,6 +156,6 @@ class PageRouteVoterTest extends BaseUnit
 
         $voter = new PageRouteVoter($stack);
 
-        static::assertNull($voter->matchItem($item));
+        self::assertNull($voter->matchItem($item));
     }
 }

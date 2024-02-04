@@ -6,12 +6,12 @@ use Symfony\Component\Filesystem\Filesystem;
 
 trait TempDirTrait
 {
-    protected $tempDir;
+    protected ?string $tempDir = null;
 
     /**
      * Create temporary directory and optionally mirror the content of the given directory.
      */
-    protected function setupTempDir(string $copyDir = null)
+    protected function setupTempDir(string $copyDir = null): void
     {
         $this->tempDir = tempnam(sys_get_temp_dir(), 'zg_');
 
@@ -30,7 +30,7 @@ trait TempDirTrait
     /**
      * Remove temporary directory.
      */
-    protected function cleanupTempDir()
+    protected function cleanupTempDir(): void
     {
         if (null === $this->tempDir) {
             return;

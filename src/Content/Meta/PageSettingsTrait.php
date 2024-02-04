@@ -7,7 +7,12 @@ use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * This trait contains settings related methods (mostly getters) of the Page class.
- * This helps separating native properties from validated settings/options.
+ * This helps to separate native properties from validated settings/options.
+ *
+ * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SettingValues from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValues from PageSettings
  */
 trait PageSettingsTrait
 {
@@ -15,12 +20,15 @@ trait PageSettingsTrait
 
     abstract public function getParent(): ?ReadablePage;
 
-    private function initSettings(array $settings, string $name)
+    /**
+     * @param array<string, SettingValue> $settings
+     */
+    private function initSettings(array $settings, string $name): void
     {
         $this->settings = new PageSettings($settings, $name);
     }
 
-    public function getSetting(string $name)
+    public function getSetting(string $name): mixed
     {
         return $this->settings->get($name);
     }
@@ -48,18 +56,25 @@ trait PageSettingsTrait
         return $this->getSetting('content_type');
     }
 
-    public function getSettings(): array
+    /**
+     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
+     */
+    public function getSettings(bool $serialize = false): array
     {
-        return $this->settings->toArray();
+        return $this->settings->toArray($serialize);
     }
 
     /**
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
+     *
+     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
-    public function getNonDefaultSettings(): array
+    public function getNonDefaultSettings(bool $serialize = false): array
     {
-        $settings = $this->settings->getNonDefaultValues();
+        $settings = $this->settings->getNonDefaultValues($serialize);
         if (null === $this->getParent()) {
             return $settings;
         }
@@ -78,20 +93,25 @@ trait PageSettingsTrait
 
     /**
      * Get default setting values for child pages.
+     *
+     * @return array<string, SettingValue>
      */
     public function getChildDefaults(): array
     {
         return $this->getSetting('child_defaults');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExtraValues(): array
     {
         return (array) $this->getSetting('extra');
     }
 
-    public function getMenuId(): string
+    public function getMenuId(): string|bool
     {
-        return (string) $this->getSetting('menu_id');
+        return $this->getSetting('menu_id');
     }
 
     public function getMenuLabel(): string
@@ -153,10 +173,7 @@ trait PageSettingsTrait
         return (string) $this->getSetting('controller');
     }
 
-    /**
-     * @param mixed|null $default
-     */
-    public function getExtra(string $name, $default = null)
+    public function getExtra(string $name, mixed $default = null): mixed
     {
         $extra = $this->getExtraValues();
         if (array_key_exists($name, $extra)) {

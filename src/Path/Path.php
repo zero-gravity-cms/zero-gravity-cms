@@ -2,9 +2,10 @@
 
 namespace ZeroGravity\Cms\Path;
 
+use Stringable;
 use Webmozart\Assert\Assert;
 
-final class Path
+final class Path implements Stringable
 {
     private ?string $pathString = null;
     private bool $isAbsolute = false;
@@ -47,7 +48,7 @@ final class Path
 
     public function isRegex(): bool
     {
-        foreach ($this->getElements() as $element) {
+        foreach ($this->elements as $element) {
             if ($element->isRegex()) {
                 return true;
             }
@@ -62,7 +63,7 @@ final class Path
             return false;
         }
 
-        foreach ($this->getElements() as $element) {
+        foreach ($this->elements as $element) {
             if ($element->isGlob()) {
                 return true;
             }
@@ -95,12 +96,12 @@ final class Path
 
     public function hasElements(): bool
     {
-        return count($this->getElements()) > 0;
+        return count($this->elements) > 0;
     }
 
     public function isSingleElement(): bool
     {
-        return 1 === count($this->getElements());
+        return 1 === count($this->elements);
     }
 
     /**
@@ -167,12 +168,12 @@ final class Path
      */
     public function getFile(): ?self
     {
-        if ($this->isDirectory()) {
+        if ($this->isDirectory) {
             return null;
         }
 
         $lastElement = $this->getLastElement();
-        if (null === $lastElement) {
+        if (!$lastElement instanceof PathElement) {
             return null;
         }
 
@@ -230,12 +231,12 @@ final class Path
 
     private function initDefault(string $pathString): void
     {
-        $this->isAbsolute = (0 === strpos($pathString, '/'));
+        $this->isAbsolute = str_starts_with($pathString, '/');
         $this->isDirectory = (strlen($pathString) - 1 === strrpos($pathString, '/'));
 
-        $parts = array_filter(explode('/', $pathString), fn ($part) => !empty($part) && '.' !== $part);
+        $parts = array_filter(explode('/', $pathString), static fn ($part): bool => '' !== $part && '.' !== $part);
 
-        $this->elements = array_map(fn ($part) => $this->createElement($part), $parts);
+        $this->elements = array_map(fn ($part): PathElement => $this->createElement($part), $parts);
     }
 
     /**
@@ -259,9 +260,9 @@ final class Path
      */
     private function rebuildString(): void
     {
-        $path = $this->isAbsolute() ? '/' : '';
-        $path .= implode('/', $this->getElements());
-        $path .= $this->isDirectory() ? '/' : '';
+        $path = $this->isAbsolute ? '/' : '';
+        $path .= implode('/', $this->elements);
+        $path .= $this->isDirectory ? '/' : '';
         if ('//' === $path) {
             $path = '/';
         }

@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
-final class ExtraFilter
+use Webmozart\Assert\Assert;
+
+final readonly class ExtraFilter
 {
     public const COMPARATOR_STRING = 'string';
     public const COMPARATOR_DATE = 'date';
     public const COMPARATOR_NUMERIC = 'number';
-
-    private string $name;
-    private mixed $value;
-    private string $comparator;
-    private bool $inverted;
 
     public static function has(string $name, mixed $value, string $comparator = self::COMPARATOR_STRING): self
     {
@@ -25,12 +22,17 @@ final class ExtraFilter
         return new self($name, $value, $comparator, true);
     }
 
-    private function __construct(string $name, mixed $value, string $comparator, bool $inverted)
-    {
-        $this->name = $name;
-        $this->value = $value;
-        $this->comparator = $comparator;
-        $this->inverted = $inverted;
+    private function __construct(
+        private string $name,
+        private mixed $value,
+        private string $comparator,
+        private bool $inverted,
+    ) {
+        Assert::oneOf($this->comparator, [
+            self::COMPARATOR_DATE,
+            self::COMPARATOR_NUMERIC,
+            self::COMPARATOR_STRING,
+        ]);
     }
 
     public function name(): string

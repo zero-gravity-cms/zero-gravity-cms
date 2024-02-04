@@ -4,10 +4,14 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use ArrayIterator;
 use RecursiveIterator;
-use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @implements RecursiveIterator<string, ReadablePage>
+ *
+ * @extends  ArrayIterator<string, ReadablePage>
  */
 final class RecursivePageIterator extends ArrayIterator implements RecursiveIterator
 {
@@ -24,10 +28,10 @@ final class RecursivePageIterator extends ArrayIterator implements RecursiveIter
     /**
      * Returns an iterator for the current pages children.
      *
-     * @return RecursiveIterator an iterator for the current entry
+     * @return RecursiveIterator<string, ReadablePage> an iterator for the current entry
      */
     public function getChildren(): RecursiveIterator
     {
-        return new static($this->current()->getChildren()->toArray());
+        return new self($this->current()->getChildren()->toArray());
     }
 }

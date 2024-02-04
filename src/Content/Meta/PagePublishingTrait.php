@@ -11,7 +11,7 @@ use DateTimeImmutable;
  */
 trait PagePublishingTrait
 {
-    abstract public function getSetting(string $name);
+    abstract public function getSetting(string $name): mixed;
 
     /**
      * Get optional publishing date of this page.
@@ -31,7 +31,7 @@ trait PagePublishingTrait
 
     /**
      * All the publishing settings are okay.
-     * By default these are:
+     * By default, these are:
      * - 'publish'
      * - 'publish_date'
      * - 'unpublish_date'.
@@ -50,11 +50,8 @@ trait PagePublishingTrait
         if ($this->publishDateIsInFuture()) {
             return false;
         }
-        if ($this->unpublishDateIsInPast()) {
-            return false;
-        }
 
-        return true;
+        return !$this->unpublishDateIsInPast();
     }
 
     private function publishDateIsInFuture(): bool

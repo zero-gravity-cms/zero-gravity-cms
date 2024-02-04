@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Filesystem;
 
+use Codeception\Attribute\DataProvider;
 use Iterator;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Exception\UnsafePathException;
 use ZeroGravity\Cms\Path\Path;
@@ -10,20 +12,17 @@ use ZeroGravity\Cms\Path\PathNormalizer;
 
 class PathNormalizerTest extends BaseUnit
 {
-    /**
-     * @test
-     *
-     * @dataProvider provideValidPaths
-     */
-    public function validPathIsNormalized(string $path, string $resolvedPath)
+    #[DataProvider('provideValidPaths')]
+    #[Test]
+    public function validPathIsNormalized(string $path, string $resolvedPath): void
     {
         $path = new Path($path);
         PathNormalizer::normalizePath($path);
 
-        static::assertSame($resolvedPath, $path->toString());
+        self::assertSame($resolvedPath, $path->toString());
     }
 
-    public function provideValidPaths(): Iterator
+    public static function provideValidPaths(): Iterator
     {
         yield ['foo/bar/file.ext', 'foo/bar/file.ext'];
         yield ['foo/bar///file.ext', 'foo/bar/file.ext'];
@@ -34,12 +33,9 @@ class PathNormalizerTest extends BaseUnit
         yield ['', ''];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideInvalidPaths
-     */
-    public function invalidPathThrowsException(string $path)
+    #[DataProvider('provideInvalidPaths')]
+    #[Test]
+    public function invalidPathThrowsException(string $path): void
     {
         $path = new Path($path);
 
@@ -47,29 +43,26 @@ class PathNormalizerTest extends BaseUnit
         PathNormalizer::normalizePath($path);
     }
 
-    public function provideInvalidPaths(): Iterator
+    public static function provideInvalidPaths(): Iterator
     {
         yield ['../file.ext'];
         yield ['foo/bar/../../../file.ext'];
         yield ['foo/bar/../../../foo/bar/file.ext'];
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider providePathsWithInPath
-     */
-    public function validPathAndParentPathIsNormalized(string $path, string $parentPath, string $resolvedPath, string $resolvedParentPath)
+    #[DataProvider('providePathsWithInPath')]
+    #[Test]
+    public function validPathAndParentPathIsNormalized(string $path, string $parentPath, string $resolvedPath, string $resolvedParentPath): void
     {
         $path = new Path($path);
         $parentPath = new Path($parentPath);
         PathNormalizer::normalizePath($path, $parentPath);
 
-        static::assertSame($resolvedPath, $path->toString());
-        static::assertSame($resolvedParentPath, $parentPath->toString());
+        self::assertSame($resolvedPath, $path->toString());
+        self::assertSame($resolvedParentPath, $parentPath->toString());
     }
 
-    public function providePathsWithInPath(): Iterator
+    public static function providePathsWithInPath(): Iterator
     {
         yield [
             'foo/bar/file.ext',

@@ -7,6 +7,7 @@ use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\FileFactory;
+use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Content\ReadablePage;
@@ -19,37 +20,31 @@ use ZeroGravity\Cms\Filesystem\Event\AfterPageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
-final class FilesystemMapper implements StructureMapper
+/**
+ * @phpstan-import-type SettingValue from PageSettings
+ */
+final readonly class FilesystemMapper implements StructureMapper
 {
-    private FileFactory $fileFactory;
-    private string $path;
-    private bool $convertMarkdown;
-    private array $defaultPageSettings;
-    private LoggerInterface $logger;
-    private EventDispatcherInterface $eventDispatcher;
     private PageFactory $pageFactory;
 
+    /**
+     * @param array<string, SettingValue> $defaultPageSettings
+     */
     public function __construct(
-        FileFactory $fileFactory,
-        string $path,
-        bool $convertMarkdown,
-        array $defaultPageSettings,
-        LoggerInterface $logger,
-        EventDispatcherInterface $eventDispatcher
+        private FileFactory $fileFactory,
+        private string $path,
+        private bool $convertMarkdown,
+        private array $defaultPageSettings,
+        private LoggerInterface $logger,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->fileFactory = $fileFactory;
-        $this->path = $path;
-        $this->convertMarkdown = $convertMarkdown;
-        $this->defaultPageSettings = $defaultPageSettings;
-        $this->logger = $logger;
-        $this->eventDispatcher = $eventDispatcher;
         $this->pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
     }
 
     /**
      * Parse any content source for all Page data and return Page tree as array containing base nodes.
      *
-     * @return Page[]
+     * @return array<string, Page>
      *
      * @throws ZeroGravityException|FilesystemException
      */
@@ -64,7 +59,7 @@ final class FilesystemMapper implements StructureMapper
         foreach ($directory->getDirectories() as $subDir) {
             $page = $this->pageFactory->createPage($subDir, $this->convertMarkdown, $this->defaultPageSettings);
 
-            if (null !== $page) {
+            if ($page instanceof Page) {
                 $pages[$page->getPath()->toString()] = $page;
             }
         }
@@ -114,7 +109,7 @@ final class FilesystemMapper implements StructureMapper
         /* @var $directory Directory */
         $directory = $diff->getNew()->getDirectory();
         $isNew = false;
-        if (null === $directory) {
+        if (!$directory instanceof Directory) {
             $isNew = true;
             $directory = $this->createDirectoryForNewPage($diff);
         }
@@ -156,7 +151,7 @@ final class FilesystemMapper implements StructureMapper
     /**
      * @throws ZeroGravityException
      */
-    private function logAndThrow(ZeroGravityException $exception): void
+    private function logAndThrow(ZeroGravityException $exception): never
     {
         $this->logger->error($exception->getMessage());
 
@@ -166,7 +161,7 @@ final class FilesystemMapper implements StructureMapper
     private function createDirectoryForNewPage(PageDiff $diff): Directory
     {
         $realPath = $this->path.$diff->getNewFilesystemPath();
-        $parentPath = $diff->getNew()->getParent() ? $diff->getNew()->getParent()->getFilesystemPath() : '';
+        $parentPath = $diff->getNew()->getParent() instanceof ReadablePage ? $diff->getNew()->getParent()->getFilesystemPath() : '';
 
         $fs = new Filesystem();
         $fs->mkdir($realPath);
@@ -174,10 +169,13 @@ final class FilesystemMapper implements StructureMapper
         return $this->createDirectory($realPath, $parentPath);
     }
 
+    /**
+     * @return array<string, SettingValue>
+     */
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
     {
-        $settings = $diff->getNewNonDefaultSettings();
-        if (null !== $diff->getNew()->getParent()) {
+        $settings = $diff->getNewNonDefaultSettings(true);
+        if ($diff->getNew()->getParent() instanceof ReadablePage) {
             return $settings;
         }
 

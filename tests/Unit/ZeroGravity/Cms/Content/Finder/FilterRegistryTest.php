@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Content\Finder;
 
-use DateTime;
+use Codeception\Attribute\Group;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Finder\FilterRegistry;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -10,27 +12,11 @@ use ZeroGravity\Cms\Content\Finder\PageFinderFilter;
 use ZeroGravity\Cms\Content\Finder\PageFinderFilters;
 use ZeroGravity\Cms\Exception\FilterException;
 
-/**
- * @group filter
- */
+#[Group('filter')]
 class FilterRegistryTest extends BaseUnit
 {
-    /**
-     * @test
-     */
-    public function throwsExceptionIfNotValidType(): void
-    {
-        $registry = new FilterRegistry();
-
-        $this->expectException(FilterException::class);
-        $registry->addFilter('somename', new DateTime());
-    }
-
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
+    #[Test]
+    #[DoesNotPerformAssertions]
     public function allowsPageFinderFilterToBeAdded(): void
     {
         $registry = new FilterRegistry();
@@ -38,37 +24,33 @@ class FilterRegistryTest extends BaseUnit
         $registry->addFilter('somename', $filter);
     }
 
-    /**
-     * @test
-     *
-     * @doesNotPerformAssertions
-     */
+    #[Test]
+    #[DoesNotPerformAssertions]
     public function allowsCallableToBeAdded(): void
     {
         $registry = new FilterRegistry();
-        $filter = function () {};
+        $filter = static function (): void {
+        };
         $registry->addFilter('somename', $filter);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionIfFilterAlreadyExists(): void
     {
         $registry = new FilterRegistry();
-        $registry->addFilter('somename', function () {});
+        $registry->addFilter('somename', static function (): void {
+        });
 
         $this->expectException(FilterException::class);
-        $registry->addFilter('somename', function () {});
+        $registry->addFilter('somename', static function (): void {
+        });
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function callableFilterWillBeApplied(): void
     {
-        $filter = $this->getMockBuilder(MockFilter::class)->getMock();
-        $filter->expects(static::once())
+        $filter = $this->createMock(MockFilter::class);
+        $filter->expects($this->once())
             ->method('myMethod')
             ->willReturnArgument(0)
         ;
@@ -80,19 +62,17 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        static::assertSame($pageFinder, $resultFinder);
+        self::assertSame($pageFinder, $resultFinder);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function pageFinderFilterInstanceWillBeApplied(): void
     {
         $filter = $this->getMockBuilder(PageFinderFilter::class)
             ->onlyMethods(['apply'])
             ->getMock()
         ;
-        $filter->expects(static::once())
+        $filter->expects($this->once())
             ->method('apply')
             ->willReturnArgument(0)
         ;
@@ -104,12 +84,10 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        static::assertSame($pageFinder, $resultFinder);
+        self::assertSame($pageFinder, $resultFinder);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function throwsExceptionIfFilterToApplyDoesNotExist(): void
     {
         $registry = new FilterRegistry();
@@ -119,18 +97,16 @@ class FilterRegistryTest extends BaseUnit
         $registry->applyFilter($pageFinder, 'somename', []);
     }
 
-    /**
-     * @test
-     */
+    #[Test]
     public function pageFinderFiltersObjectCanBeRegisteredAndApplied(): void
     {
-        $filter = fn (PageFinder $finder) => $finder;
+        $filter = static fn (PageFinder $finder): PageFinder => $finder;
 
         $filters = $this->getMockBuilder(PageFinderFilters::class)
             ->onlyMethods(['getFilters'])
             ->getMock()
         ;
-        $filters->expects(static::once())
+        $filters->expects($this->once())
             ->method('getFilters')
             ->willReturn(['somename' => $filter])
         ;
@@ -142,6 +118,6 @@ class FilterRegistryTest extends BaseUnit
         $options = ['some' => 'option'];
         $resultFinder = $registry->applyFilter($pageFinder, 'somename', $options);
 
-        static::assertSame($pageFinder, $resultFinder);
+        self::assertSame($pageFinder, $resultFinder);
     }
 }

@@ -6,12 +6,15 @@ use FilterIterator;
 use InvalidArgumentException;
 use Iterator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * FileCountFilterIterator filters out pages that do not contain the given number of files.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class FileCountFilterIterator extends FilterIterator
 {
@@ -19,20 +22,15 @@ final class FileCountFilterIterator extends FilterIterator
     public const MODE_IMAGES = 'images';
     public const MODE_DOCUMENTS = 'documents';
 
-    private array $comparators = [];
-
-    private string $mode;
-
     /**
      * @param Iterator           $iterator    The Iterator to filter
      * @param NumberComparator[] $comparators An array of DateComparator instances
-     * @param string             $mode
      */
-    public function __construct(Iterator $iterator, array $comparators, $mode = self::MODE_FILES)
-    {
-        $this->comparators = $comparators;
-        $this->mode = $mode;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly array $comparators,
+        private readonly string $mode = self::MODE_FILES,
+    ) {
         parent::__construct($iterator);
     }
 
@@ -43,19 +41,12 @@ final class FileCountFilterIterator extends FilterIterator
      */
     public function accept(): bool
     {
-        switch ($this->mode) {
-            case self::MODE_FILES:
-                $count = count($this->current()->getFiles());
-                break;
-            case self::MODE_IMAGES:
-                $count = count($this->current()->getImages());
-                break;
-            case self::MODE_DOCUMENTS:
-                $count = count($this->current()->getDocuments());
-                break;
-            default:
-                throw new InvalidArgumentException('Unknown file count mode: '.$this->mode);
-        }
+        $count = match ($this->mode) {
+            self::MODE_FILES => count($this->current()->getFiles()),
+            self::MODE_IMAGES => count($this->current()->getImages()),
+            self::MODE_DOCUMENTS => count($this->current()->getDocuments()),
+            default => throw new InvalidArgumentException('Unknown file count mode: '.$this->mode),
+        };
 
         foreach ($this->comparators as $compare) {
             if (!$compare->test($count)) {

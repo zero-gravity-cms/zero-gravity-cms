@@ -12,23 +12,23 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
 {
     public static function contentDirectoryDoesNotExist(string $path): self
     {
-        return new static(sprintf('Cannot parse filesystem. Page content directory "%s" does not exist', $path));
+        return new self(sprintf('Cannot parse filesystem. Page content directory "%s" does not exist', $path));
     }
 
     public static function unsupportedWritablePageClass(PageDiff $diff): self
     {
-        return new static(sprintf(
+        return new self(sprintf(
             'FilesystemMapper can only handle PageDiffs containing "%s" instances. '.
             'Classes used in PageDiff are "%s" and "%s".',
             WritableFilesystemPage::class,
-            get_class($diff->getOld()),
-            get_class($diff->getNew())
+            $diff->getOld()::class,
+            $diff->getNew()::class
         ));
     }
 
     public static function cannotFindDirectoryForPage(ReadablePage $page): self
     {
-        return new static(sprintf(
+        return new self(sprintf(
             'Cannot find directory for Page instance with path "%s".',
             $page->getPath()->toString()
         ));
@@ -36,7 +36,7 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
 
     public static function missingMarkdownFile(Directory $directory): self
     {
-        return new static(sprintf(
+        return new self(sprintf(
             'Directory %s does not contain the requested markdown file.',
             $directory->getPath()
         ));

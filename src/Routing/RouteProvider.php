@@ -8,19 +8,15 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Traversable;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\ReadablePageRepository;
 
-final class RouteProvider implements RouteProviderInterface
+final readonly class RouteProvider implements RouteProviderInterface
 {
-    private ReadablePageRepository $repository;
-    private string $defaultController;
-
-    public function __construct(ReadablePageRepository $repository, string $defaultController)
-    {
-        $this->repository = $repository;
-        $this->defaultController = $defaultController;
+    public function __construct(
+        private ReadablePageRepository $repository,
+        private string $defaultController
+    ) {
     }
 
     /**
@@ -67,7 +63,7 @@ final class RouteProvider implements RouteProviderInterface
     public function getRouteByName(string $name): Route
     {
         $page = $this->repository->getPage($name);
-        if (null === $page) {
+        if (!$page instanceof ReadablePage) {
             throw new RouteNotFoundException(sprintf('Cannot find zerogravity page route with name %s', $name));
         }
 
@@ -92,11 +88,11 @@ final class RouteProvider implements RouteProviderInterface
      * that the DynamicRouter will only call this method once per
      * DynamicRouter::getRouteCollection() call.
      *
-     * @param array|null $names The list of names to retrieve, In case of null,
-     *                          the provider will determine what routes to return
+     * @param list<string>|null $names The list of names to retrieve, In case of null,
+     *                                 the provider will determine what routes to return
      *
-     * @return Route[] Iterable list with the keys being the names from the
-     *                 $names array
+     * @return array<Route>|Traversable<Route> Iterable list with the keys being the names from the
+     *                                         $names array
      */
     public function getRoutesByNames(array $names = null): Traversable|array
     {
@@ -115,7 +111,10 @@ final class RouteProvider implements RouteProviderInterface
         return $routes;
     }
 
-    private function extractPageRoutes(Page $page): array
+    /**
+     * @return list<Route>
+     */
+    private function extractPageRoutes(ReadablePage $page): array
     {
         $routes = [
             new Route($page->getPath()->toString(), [

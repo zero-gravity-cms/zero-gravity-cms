@@ -2,8 +2,11 @@
 
 namespace Tests\Unit\ZeroGravity\Cms\Test;
 
+use Codeception\Attribute\DataProvider;
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\Constraint\Exception as FrameworkConstraintException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use ReflectionProperty;
@@ -18,6 +21,9 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 use Twig\TwigTest;
 
+use const E_USER_DEPRECATED;
+use const PHP_VERSION_ID;
+
 /**
  * This was copied and adapted from Twig\Test\IntegrationTestCase.
  *
@@ -25,23 +31,22 @@ use Twig\TwigTest;
  */
 trait TwigExtensionTestTrait
 {
-    /**
-     * @return string
-     */
-    abstract protected function getFixturesDir();
+    abstract protected function getFixturesDir(): string;
 
     /**
-     * @return RuntimeLoaderInterface[]
+     * @return LoaderInterface[]
      */
-    protected function getRuntimeLoaders()
-    {
-        return [];
-    }
+    abstract protected function getTwigLoaders(): array;
 
     /**
      * @return ExtensionInterface[]
      */
-    protected function getExtensions()
+    abstract protected function getExtensions(): array;
+
+    /**
+     * @return RuntimeLoaderInterface[]
+     */
+    protected function getRuntimeLoaders(): array
     {
         return [];
     }
@@ -49,7 +54,7 @@ trait TwigExtensionTestTrait
     /**
      * @return TwigFilter[]
      */
-    protected function getTwigFilters()
+    protected function getTwigFilters(): array
     {
         return [];
     }
@@ -57,7 +62,7 @@ trait TwigExtensionTestTrait
     /**
      * @return TwigFunction[]
      */
-    protected function getTwigFunctions()
+    protected function getTwigFunctions(): array
     {
         return [];
     }
@@ -65,47 +70,36 @@ trait TwigExtensionTestTrait
     /**
      * @return TwigTest[]
      */
-    protected function getTwigTests()
+    protected function getTwigTests(): array
     {
         return [];
     }
 
     /**
-     * @return LoaderInterface[]
+     * @param array<string, string>          $templates
+     * @param array<int, array<int, string>> $outputs
      */
-    protected function getTwigLoaders()
-    {
-        return [];
-    }
-
-    /**
-     * @dataProvider getTests
-     */
-    public function testIntegration($file, $message, $condition, $templates, $exception, $outputs)
+    #[Test]
+    #[DataProvider('getTests')]
+    public function testIntegration(string $file, string $message, ?string $condition, array $templates, false $exception, array $outputs): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs);
     }
 
-    // /**
-    //  * @dataProvider getLegacyTests
-    //  * @group legacy
-    //  */
-    // public function testLegacyIntegration($file, $message, $condition, $templates, $exception, $outputs)
-    // {
-    //     $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs);
-    // }
-
-    public function getTests($name, $legacyTests = false)
+    /**
+     * @return mixed[][]
+     */
+    public function getTests(?string $name, bool $legacyTests = false): array
     {
         $fixturesDir = realpath($this->getFixturesDir());
         $tests = [];
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fixturesDir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if (!preg_match('/\.test$/', $file)) {
+            if (!preg_match('/\.test$/', (string) $file)) {
                 continue;
             }
 
-            if ($legacyTests xor false !== strpos($file->getRealpath(), '.legacy.test')) {
+            if ($legacyTests xor str_contains($file->getRealpath(), '.legacy.test')) {
                 continue;
             }
 
@@ -124,18 +118,18 @@ trait TwigExtensionTestTrait
                 $exception = false;
                 preg_match_all('/--DATA--(.*?)(?:--CONFIG--(.*?))?--EXPECT--(.*?)(?=\-\-DATA\-\-|$)/s', $test, $outputs, PREG_SET_ORDER);
             } else {
-                throw new InvalidArgumentException(sprintf('Test "%s" is not valid.', str_replace($fixturesDir.'/', '', $file)));
+                throw new InvalidArgumentException(sprintf('Test "%s" is not valid.', str_replace($fixturesDir.'/', '', (string) $file)));
             }
 
             while (isset($tests[$message])) {
                 $message .= '.';
             }
-            $tests[$message] = [str_replace($fixturesDir.'/', '', $file), $message, $condition, $templates, $exception, $outputs];
+            $tests[$message] = [str_replace($fixturesDir.'/', '', (string) $file), $message, $condition, $templates, $exception, $outputs];
         }
         if (!$legacyTests) {
             return $tests;
         }
-        if (!empty($tests)) {
+        if ([] !== $tests) {
             return $tests;
         }
 
@@ -143,21 +137,20 @@ trait TwigExtensionTestTrait
         return [['not', '-', '', [], '', []]];
     }
 
-    // public function getLegacyTests()
-    // {
-    //     return $this->getTests('testLegacyIntegration', true);
-    // }
-
-    protected function doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs)
+    /**
+     * @param array<string, string>          $templates
+     * @param array<int, array<int, string>> $outputs
+     */
+    protected function doIntegrationTest(string $file, string $message, ?string $condition, array $templates, false $exception, array $outputs, string $deprecation = ''): void
     {
-        if (!$outputs) {
-            self::markTestSkipped('no legacy tests to run');
+        if ([] === $outputs) {
+            $this->markTestSkipped('no tests to run');
         }
 
         if ($condition) {
             eval('$ret = '.$condition.';');
             if (!$ret) {
-                self::markTestSkipped($condition);
+                $this->markTestSkipped($condition);
             }
         }
 
@@ -171,7 +164,7 @@ trait TwigExtensionTestTrait
             $config = array_merge([
                 'cache' => false,
                 'strict_variables' => true,
-            ], $match[2] ? eval($match[2].';') : []);
+            ], '' !== $match[2] && '0' !== $match[2] ? eval($match[2].';') : []);
             $twig = new Environment($loader, $config);
             $twig->addGlobal('global', 'global');
             foreach ($this->getRuntimeLoaders() as $runtimeLoader) {
@@ -197,41 +190,55 @@ trait TwigExtensionTestTrait
             // avoid using the same PHP class name for different cases
             $p = new ReflectionProperty($twig, 'templateClassPrefix');
             $p->setAccessible(true);
-            $p->setValue($twig, '__TwigTemplate_'.hash('sha256', uniqid(random_int(0, mt_getrandmax()), true), false).'_');
+            $p->setValue($twig, '__TwigTemplate_'.hash(PHP_VERSION_ID < 80100 ? 'sha256' : 'xxh128', uniqid((string) mt_rand(), true), false).'_');
 
+            $deprecations = [];
             try {
+                $prevHandler = set_error_handler(static function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$prevHandler): bool {
+                    if (E_USER_DEPRECATED === $type) {
+                        $deprecations[] = $msg;
+
+                        return true;
+                    }
+
+                    return $prevHandler ? $prevHandler($type, $msg, $file, $line, $context) : false;
+                });
+
                 $template = $twig->load('index.twig');
             } catch (Exception $e) {
-                if (false !== $exception) {
+                if ($exception) {
                     $message = $e->getMessage();
-                    static::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $message)));
-                    $last = substr($message, strlen($message) - 1);
-                    static::assertTrue('.' === $last || '?' === $last, $message, 'Exception message must end with a dot or a question mark.');
+                    $this->assertSame(trim((string) $exception), trim(sprintf('%s: %s', $e::class, $message)));
+                    $last = substr($message, \strlen($message) - 1);
+                    $this->assertTrue('.' === $last || '?' === $last, 'Exception message must end with a dot or a question mark.');
 
                     return;
                 }
 
-                throw new Error(sprintf('%s: %s', get_class($e), $e->getMessage()), -1, $file, $e);
+                throw new Error(sprintf('%s: %s', $e::class, $e->getMessage()), -1, null, $e);
+            } finally {
+                restore_error_handler();
             }
+
+            $this->assertSame($deprecation, implode("\n", $deprecations));
 
             try {
                 $output = trim($template->render(eval($match[1].';')), "\n ");
             } catch (Exception $e) {
-                if (false !== $exception) {
-                    static::assertSame(trim($exception), trim(sprintf('%s: %s', get_class($e), $e->getMessage())));
+                if ($exception) {
+                    $this->assertSame(trim((string) $exception), trim(sprintf('%s: %s', $e::class, $e->getMessage())));
 
                     return;
                 }
 
-                $e = new Error(sprintf('%s: %s', get_class($e), $e->getMessage()), -1, $file, $e);
+                $e = new Error(sprintf('%s: %s', $e::class, $e->getMessage()), -1, null, $e);
 
-                $output = trim(sprintf('%s: %s', get_class($e), $e->getMessage()));
+                $output = trim(sprintf('%s: %s', $e::class, $e->getMessage()));
             }
 
-            if (false !== $exception) {
-                [$class] = explode(':', $exception);
-                $constraintClass = class_exists(\PHPUnit\Framework\Constraint\Exception::class) ? \PHPUnit\Framework\Constraint\Exception::class : 'PHPUnit_Framework_Constraint_Exception';
-                static::assertThat(null, new $constraintClass($class));
+            if ($exception) {
+                [$class] = explode(':', (string) $exception);
+                $this->assertThat(null, new FrameworkConstraintException($class));
             }
 
             $expected = trim($match[3], "\n ");
@@ -240,18 +247,21 @@ trait TwigExtensionTestTrait
                 printf("Compiled templates that failed on case %d:\n", $i + 1);
 
                 foreach (array_keys($templates) as $name) {
-                    echo "Template: $name\n";
+                    echo "Template: {$name}\n";
                     echo $twig->compile($twig->parse($twig->tokenize($twig->getLoader()->getSourceContext($name))));
                 }
             }
-            static::assertEquals($expected, $output, $message.' (in '.$file.')');
+            $this->assertEquals($expected, $output, $message.' (in '.$file.')');
         }
     }
 
-    protected static function parseTemplates($test)
+    /**
+     * @return mixed[]
+     */
+    protected static function parseTemplates(?string $test): array
     {
         $templates = [];
-        preg_match_all('/--TEMPLATE(?:\((.*?)\))?--(.*?)(?=\-\-TEMPLATE|$)/s', $test, $matches, PREG_SET_ORDER);
+        preg_match_all('/--TEMPLATE(?:\((.*?)\))?--(.*?)(?=\-\-TEMPLATE|$)/s', (string) $test, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $templates[$match[1] ?: 'index.twig'] = $match[2];
         }

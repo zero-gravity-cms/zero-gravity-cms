@@ -4,24 +4,25 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use FilterIterator;
 use Iterator;
-use ZeroGravity\Cms\Content\Page;
+use Traversable;
+use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
  * PublishedFilterIterator filters out pages that do not match the required published state.
  *
- * @method Page current()
+ * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Traversable<string, ReadablePage>>
  */
 final class PublishedFilterIterator extends FilterIterator
 {
-    private bool $published;
-
     /**
      * @param Iterator $iterator The Iterator to filter
      */
-    public function __construct(Iterator $iterator, bool $published)
-    {
-        $this->published = $published;
-
+    public function __construct(
+        Iterator $iterator,
+        private readonly bool $published,
+    ) {
         parent::__construct($iterator);
     }
 

@@ -9,8 +9,6 @@ abstract class AbstractResolver implements SinglePathResolver
 {
     /**
      * Try moving pattern parts into parent path because globs don't work with paths.
-     *
-     * @param Path|null $parentPath
      */
     protected function moveNonGlobsToParent(Path $path, Path $parentPath): void
     {
