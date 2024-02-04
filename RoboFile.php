@@ -111,6 +111,7 @@ class RoboFile extends BaseRoboFile
      */
     public function check(string $arguments = ''): void
     {
+        $this->_execPhp('php ./vendor/bin/rector process --dry-run');
         $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run $arguments");
     }
 
@@ -122,6 +123,7 @@ class RoboFile extends BaseRoboFile
     public function fix(string $arguments = ''): void
     {
         if ($this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
+            $this->_execPhp('php ./vendor/bin/rector process');
             $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose $arguments");
         } else {
             $this->abort();
