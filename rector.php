@@ -2,133 +2,101 @@
 
 declare(strict_types=1);
 
-use Rector\Core\Configuration\Option;
-use Rector\DeadCode\Rector\Assign\RemoveUnusedVariableAssignRector;
-use Rector\DeadCode\Rector\Class_\RemoveUnusedDoctrineEntityMethodAndPropertyRector;
-use Rector\DeadCode\Rector\ClassConst\RemoveUnusedClassConstantRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveDelegatingParentCallRector;
-use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedParameterRector;
-use Rector\DeadCode\Rector\MethodCall\RemoveDefaultArgumentValueRector;
-use Rector\DeadCode\Rector\Property\RemoveSetterOnlyPropertyAndMethodCallRector;
-use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
-use Rector\EarlyReturn\Rector\Foreach_\ChangeNestedForeachIfsToEarlyContinueRector;
-use Rector\EarlyReturn\Rector\If_\ChangeAndIfToEarlyReturnRector;
-use Rector\EarlyReturn\Rector\If_\ChangeIfElseValueAssignToEarlyReturnRector;
-use Rector\EarlyReturn\Rector\If_\ChangeNestedIfsToEarlyReturnRector;
-use Rector\EarlyReturn\Rector\If_\RemoveAlwaysElseRector;
-use Rector\Php56\Rector\FunctionLike\AddDefaultValueForUndefinedVariableRector;
-use Rector\Php70\Rector\MethodCall\ThisCallOnStaticMethodToStaticCallRector;
-use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
+use Rector\CodeQuality\Rector\Class_\InlineConstructorDefaultToPropertyRector;
+use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
+use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
+use Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector;
+use Rector\Config\RectorConfig;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
+use Rector\PHPUnit\Rector\Class_\PreferPHPUnitSelfCallRector;
+use Rector\PHPUnit\Set\PHPUnitSetList;
+use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Rector\Symfony\Set\SymfonySetList;
+use Rector\ValueObject\PhpVersion;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    // get parameters
-    $parameters = $containerConfigurator->parameters();
+return RectorConfig::configure()
+    ->withPhpVersion(PhpVersion::PHP_82)
+    ->withImportNames(
+        importNames: true,
+        importDocBlockNames: true,
+        importShortClasses: true,
+        removeUnusedImports: true,
+    )
+    ->withCache('.robo/cache/rector')
 
-    // paths to refactor; solid alternative to CLI arguments
-    $parameters->set(Option::PATHS,
-        [
-            __DIR__.'/src',
-            __DIR__.'/tests/unit',
-        ]
-    );
+    ->withParallel(180, 16, 3)
+    // ->withoutParallel()
+    // ->withMemoryLimit('4096M')
 
-    $parameters->set(Option::AUTOLOAD_PATHS,
-        []
-    );
+    ->withPaths([
+        __DIR__.'/RoboFile.php',
+        __DIR__.'/src',
+        __DIR__.'/tests/Unit',
+    ])
 
-    // auto import fully qualified class names? [default: false]
-    $parameters->set(Option::AUTO_IMPORT_NAMES, true);
-    // skip root namespace classes, like \DateTime or \Exception [default: true]
-    // $parameters->set(Option::IMPORT_SHORT_CLASSES, true);
-    // skip classes used in PHP DocBlocks, like in /** @var \Some\Class */ [default: true]
-    // $parameters->set(Option::IMPORT_DOC_BLOCKS, false);
+    ->withSets([
+        LevelSetList::UP_TO_PHP_82,
+        // SymfonySetList::SYMFONY_28,
+        // SymfonySetList::SYMFONY_30,
+        // SymfonySetList::SYMFONY_31,
+        // SymfonySetList::SYMFONY_32,
+        // SymfonySetList::SYMFONY_33,
+        // SymfonySetList::SYMFONY_34,
+        // SymfonySetList::SYMFONY_40,
+        // SymfonySetList::SYMFONY_41,
+        // SymfonySetList::SYMFONY_42,
+        // SymfonySetList::SYMFONY_43,
+        // SymfonySetList::SYMFONY_44,
+        // SymfonySetList::SYMFONY_50,
+        // SymfonySetList::SYMFONY_51,
+        // SymfonySetList::SYMFONY_52,
+        // SymfonySetList::SYMFONY_53,
+        // SymfonySetList::SYMFONY_54,
+        // SymfonySetList::SYMFONY_60,
+        // SymfonySetList::SYMFONY_61,
+        // SymfonySetList::SYMFONY_62,
+        // SymfonySetList::SYMFONY_63,
+        SymfonySetList::SYMFONY_64,
+        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
+        SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
+        // TwigSetList::TWIG_112,
+        // TwigSetList::TWIG_127,
+        // TwigSetList::TWIG_134,
+        // TwigSetList::TWIG_140,
+        // TwigSetList::TWIG_20,
+        // TwigSetList::TWIG_240,
+        // TwigSetList::TWIG_UNDERSCORE_TO_NAMESPACE,
+        // PHPUnitSetList::PHPUNIT_40,
+        // PHPUnitSetList::PHPUNIT_50,
+        // PHPUnitSetList::PHPUNIT_60,
+        // PHPUnitSetList::PHPUNIT_70,
+        PHPUnitSetList::PHPUNIT_80,
+        PHPUnitSetList::PHPUNIT_90,
+        PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::PHPUNIT_CODE_QUALITY,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
 
-    // $parameters->set(Option::ENABLE_CACHE, true);
+        SetList::CODE_QUALITY,
+        SetList::CODING_STYLE,
+        SetList::DEAD_CODE,
+        SetList::EARLY_RETURN,
+        SetList::INSTANCEOF,
+        SetList::PRIVATIZATION,
+        SetList::TYPE_DECLARATION,
+    ])
 
-    // Define what rule sets will be applied
-    $parameters->set(Option::SETS, [
-        // SetList::DEAD_CODE,
-        // SetList::PHP_52,
-        // SetList::PHP_53,
-        // SetList::PHP_54,
-        // SetList::PHP_55,
-        // SetList::PHP_56,
-        // SetList::PHP_70,
-        // SetList::PHP_71,
-        // SetList::PHP_72,
-        // SetList::PHP_73,
-        // SetList::PHP_74,
-        // SetList::SYMFONY_28,
-        // SetList::SYMFONY_30,
-        // SetList::SYMFONY_31,
-        // SetList::SYMFONY_32,
-        // SetList::SYMFONY_33,
-        // SetList::SYMFONY_34,
-        // SetList::SYMFONY_40,
-        // SetList::SYMFONY_41,
-        // SetList::SYMFONY_42,
-        // SetList::SYMFONY_43,
-        // SetList::SYMFONY_44,
-        // SetList::TWIG_112,
-        // SetList::TWIG_127,
-        // SetList::TWIG_134,
-        // SetList::TWIG_140,
-        // SetList::TWIG_20,
-        // SetList::TWIG_240,
-        // SetList::SYMFONY_CONSTRUCTOR_INJECTION,
-        // SetList::PHPUNIT_40,
-        // SetList::PHPUNIT_50,
-        // SetList::PHPUNIT_60,
-        // SetList::PHPUNIT_70,
-        // SetList::PHPUNIT_75,
-        // SetList::PHPUNIT_80,
-        // SetList::PHPUNIT_YIELD_DATA_PROVIDER,
-        // SetList::PHPUNIT_SPECIFIC_METHOD,
-        // SetList::PHPUNIT_CODE_QUALITY,
-        // SetList::PHPUNIT_EXCEPTION,
-        // SetList::PHPUNIT_MOCK,
-        // SetList::PHPUNIT80_DMS,
-    ]);
+    ->withRules([
+        InlineConstructorDefaultToPropertyRector::class,
+        PreferPHPUnitSelfCallRector::class,
+    ])
 
-    // is your PHP version different from the one your refactor to? [default: your PHP version]
-    // $parameters->set(Option::PHP_VERSION_FEATURES, '7.4');
+    ->withSkip([
+        CountArrayToEmptyArrayComparisonRector::class,
+        EncapsedStringsToSprintfRector::class,
+        NewlineAfterStatementRector::class,
 
-    $parameters->set(Option::SKIP, [
-        // skip new entities on demand to prevent rector from messing up our field trait imports
-        // __DIR__.'/src/App/Entity',
-        // __DIR__.'/src/App/Routing/EntityRoutingHelper.php',
-
-        /**************** SetList::DEAD_CODE *****************/
-        RemoveUnusedParameterRector::class,
-        RemoveUnusedDoctrineEntityMethodAndPropertyRector::class,
-
-        // happens not that often but if it does it's actually useful
-        RemoveDefaultArgumentValueRector::class,
-        // unsafe for now
-        RemoveSetterOnlyPropertyAndMethodCallRector::class,
-        // mainly targets commands, not that useful here
-        RemoveDelegatingParentCallRector::class,
-        // some constants are used in twig templates. needs manual checks
-        RemoveUnusedClassConstantRector::class,
-        // enable later, but requires service re-wiring
-        RemoveUnusedPrivatePropertyRector::class,
-    ]);
-
-    // $parameters->set(Option::SYMFONY_CONTAINER_XML_PATH_PARAMETER, __DIR__.'/var/cache/dev/AppApp_KernelDevDebugContainer.xml');
-
-    // get services (needed for register a single rule)
-    $services = $containerConfigurator->services();
-
-    // register a single rule
-    // $services->set(ChangeAndIfToEarlyReturnRector::class);
-    // $services->set(ChangeNestedForeachIfsToEarlyContinueRector::class);
-    // $services->set(ChangeIfElseValueAssignToEarlyReturnRector::class);
-    // $services->set(ChangeNestedIfsToEarlyReturnRector::class);
-    // $services->set(RemoveAlwaysElseRector::class);
-    // $services->set(RemoveUnusedVariableAssignRector::class);
-    // $services->set(AddDefaultValueForUndefinedVariableRector::class);
-    // $services->set(StaticCallOnNonStaticToInstanceCallRector::class);
-    // $services->set(ThisCallOnStaticMethodToStaticCallRector::class);
-};
+        // using self instead of this
+        PreferPHPUnitThisCallRector::class,
+    ])
+;
