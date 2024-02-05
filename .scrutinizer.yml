@@ -1,7 +1,7 @@
 build:
     dependencies:
         before:
-            - 'wget https://github.com/consolidation/Robo/releases/download/1.1.5/robo.phar'
+            - 'wget https://github.com/consolidation/robo/releases/download/4.0.4/robo.phar'
             -
                 command: 'php robo.phar init --no-interaction'
                 environment:
