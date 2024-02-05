@@ -2,6 +2,7 @@ image: endava/php:8.2.15
 
 stages:
   - test
+  - reporting
 
 variables:
   COMPOSER_HOME: .composer
@@ -78,6 +79,18 @@ test_matrix:
     when: always
     paths:
       - tests/_output/
+
+coveralls_upload:
+  stage: reporting
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  cache:
+    - !reference [ .caches, robo ]
+
+  script:
+    - if [[ ! -f .robo/bin/php-coveralls.phar ]]; then wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.7.0/php-coveralls.phar -O .robo/bin/php-coveralls.phar; fi
+    - php .robo/bin/php-coveralls.phar
+
 
 ####################################################################################################
 #  ____ _               _
