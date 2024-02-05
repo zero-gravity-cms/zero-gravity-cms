@@ -88,8 +88,8 @@ coveralls_upload:
     - !reference [ .caches, robo ]
 
   script:
-    - if [[ ! -f .robo/bin/php-coveralls.phar ]]; then wget https://github.com/php-coveralls/php-coveralls/releases/download/v2.7.0/php-coveralls.phar -O .robo/bin/php-coveralls.phar; fi
-    - php .robo/bin/php-coveralls.phar
+    - curl -sL https://coveralls.io/coveralls-linux.tar.gz | tar -xz
+    - ./coveralls
 
 
 ####################################################################################################
