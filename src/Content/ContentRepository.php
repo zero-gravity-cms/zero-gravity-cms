@@ -98,6 +98,8 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     }
 
     /**
+     * Recursively collect all pages and their children into a single array.
+     *
      * @param ReadablePage[] $pages
      */
     private function flattenPages(array $pages): void

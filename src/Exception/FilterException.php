@@ -11,8 +11,15 @@ class FilterException extends RuntimeException implements ZeroGravityException
         return new self(sprintf('Another filter called %s already exists', $name));
     }
 
-    public static function filterDoesNotExist(string $name): self
+    /**
+     * @param list<string> $existingFilters
+     */
+    public static function filterDoesNotExist(string $name, array $existingFilters): self
     {
-        return new self(sprintf('There is no page finder filter called %s', $name));
+        return new self(sprintf(
+            'There is no page finder filter called %s. Available filter names are: %s',
+            $name,
+            implode(', ', $existingFilters),
+        ));
     }
 }

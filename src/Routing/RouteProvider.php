@@ -94,7 +94,7 @@ final readonly class RouteProvider implements RouteProviderInterface
      * @return array<Route>|Traversable<Route> Iterable list with the keys being the names from the
      *                                         $names array
      */
-    public function getRoutesByNames(array $names = null): Traversable|array
+    public function getRoutesByNames(array $names = null): iterable
     {
         $pages = $this->repository->getAllPages();
         if (is_array($names)) {

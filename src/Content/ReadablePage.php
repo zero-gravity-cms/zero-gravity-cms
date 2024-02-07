@@ -195,11 +195,13 @@ interface ReadablePage
     public function getUnpublishDate(): ?DateTimeImmutable;
 
     /**
-     * All the publishing settings are okay.
-     * By default, these are:
-     * - 'publish'
-     * - 'publish_date'
-     * - 'unpublish_date'.
+     * A page is considered published if the following criteria are met:
+     *
+     * - 'publish' flag is true (default)
+     * - 'publish_date' is either null or in the past
+     * - 'unpublish_date' is either null or in the future
+     *
+     * The parent's publishing state is not taken into account!
      */
     public function isPublished(): bool;
 }
