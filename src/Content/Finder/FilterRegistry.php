@@ -11,9 +11,9 @@ use ZeroGravity\Cms\Exception\FilterException;
 final class FilterRegistry
 {
     /**
-     * @var PageFinderFilter[]|callable[]
+     * @var array<string, PageFinderFilter|callable|Closure>
      */
-    private ?array $filters = null;
+    private array $filters = [];
 
     public function addFilters(PageFinderFilters $filters): void
     {
@@ -37,7 +37,7 @@ final class FilterRegistry
     public function applyFilter(PageFinder $pageFinder, string $filterName, array $filterOptions): PageFinder
     {
         if (!isset($this->filters[$filterName])) {
-            throw FilterException::filterDoesNotExist($filterName);
+            throw FilterException::filterDoesNotExist($filterName, array_keys($this->filters));
         }
 
         if ($this->filters[$filterName] instanceof PageFinderFilter) {
