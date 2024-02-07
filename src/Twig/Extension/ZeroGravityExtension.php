@@ -31,7 +31,7 @@ final class ZeroGravityExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('zg_filter', $this->filterPages(...)),
+            new TwigFilter('zg_filter', $this->applyCustomFilter(...)),
             new TwigFilter('zg_page_hash', $this->getPageHash(...)),
             new TwigFilter(
                 'zg_render_content',
@@ -58,9 +58,9 @@ final class ZeroGravityExtension extends AbstractExtension
     {
         return [
             new TwigFunction('zg_page', $this->getPage(...)),
+            new TwigFunction('zg_pages', $this->findPages(...)),
             new TwigFunction('zg_page_hash', $this->getPageHash(...)),
             new TwigFunction('zg_current_page', $this->getCurrentPage(...)),
-            new TwigFunction('zg_filter', $this->filterAllPages(...)),
             new TwigFunction(
                 'zg_render_content',
                 $this->renderPageContent(...),
@@ -79,6 +79,9 @@ final class ZeroGravityExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * Get a single page by path. If the path starts with "./", it will be appended to the current page, thus returning a child page if found.
+     */
     public function getPage(string $path): ?ReadablePage
     {
         if (str_starts_with($path, './')) {
@@ -92,15 +95,20 @@ final class ZeroGravityExtension extends AbstractExtension
         return $this->contentRepository->getPage($path);
     }
 
+    /**
+     * Fetch the current page instance from the request if available.
+     */
     public function getCurrentPage(): ?ReadablePage
     {
         return $this->pageSelector->getCurrentPage();
     }
 
     /**
+     * Apply a filter from the custom filterRegistry to the given page finder.
+     *
      * @param array<string, mixed> $filterOptions
      */
-    public function filterPages(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
+    public function applyCustomFilter(PageFinder $pageFinder, string $filterName, array $filterOptions = []): PageFinder
     {
         return $this->filterRegistry->applyFilter($pageFinder, $filterName, $filterOptions);
     }
@@ -118,13 +126,11 @@ final class ZeroGravityExtension extends AbstractExtension
     }
 
     /**
-     * @param array<string, mixed> $filterOptions
+     * Get a PageFinder instance, covering all published pages by default.
      */
-    public function filterAllPages(string $filterName, array $filterOptions = []): PageFinder
+    public function findPages(): PageFinder
     {
-        $pageFinder = $this->contentRepository->getPageFinder();
-
-        return $this->filterPages($pageFinder, $filterName, $filterOptions);
+        return $this->contentRepository->getPageFinder();
     }
 
     /**

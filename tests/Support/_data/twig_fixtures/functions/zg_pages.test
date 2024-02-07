@@ -1,0 +1,28 @@
+--TEST--
+'zg_pages' function
+--TEMPLATE--
+{% for page in zg_pages() %}
+{{ page.filesystemPath }}
+{% endfor %}
+<br>
+{% for child in zg_pages()|zg_filter('filter-custom-children') %}
+{{ child.filesystemPath }}
+{% endfor %}
+--DATA--
+return array()
+--EXPECT--
+/01.yaml_only
+/02.markdown_only
+/03.yaml_and_markdown_and_twig
+/04.with_children
+/04.with_children/_child1
+/04.with_children/_child2
+/05.twig_only
+/06.yaml_and_twig
+/06.yaml_and_twig/01.child1
+/06.yaml_and_twig/02.child2
+/07.not_published/01.child1
+/no_sorting_prefix
+<br>
+/06.yaml_and_twig/01.child1
+/06.yaml_and_twig/02.child2
