@@ -13,21 +13,21 @@
     "require": {
         "php": ">=8.2",
         "cocur/slugify": "^4.0",
-        "liip/imagine-bundle": "^2.0",
         "mnapoli/front-yaml": "^2.0",
-        "symfony-cmf/routing-bundle": "^3.0",
-        "symfony/cache": "^6.0|^7.0",
-        "symfony/finder": "^6.0|^7.0",
-        "twig/twig": "^2.7|^3.5"
+        "symfony/cache": "^5.4|^6.0|^7.0",
+        "symfony/finder": "^5.4|^6.0|^7.0",
+        "webmozart/assert": "^1.10"
     },
     "require-dev": {
         "codeception/codeception": "^5.0",
         "codeception/stub": "^4.1",
+        "liip/imagine-bundle": "^2.0",
         "knplabs/knp-menu": "^3.0",
         "phpstan/phpstan": "^1.10",
         "rector/rector": "^0.19.6",
+        "symfony-cmf/routing": "^3.0",
         "symfony/var-dumper": "^6.0|^7.0",
-        "webmozart/assert": "^1.11"
+        "twig/twig": "^2.7|^3.5"
     },
     "autoload": {
         "psr-4": {
@@ -38,6 +38,11 @@
         "psr-4": {
             "Tests\\": "tests/"
         }
+    },
+    "suggest": {
+        "liip/imagine-bundle": "^2.0",
+        "symfony-cmf/routing": "^3.0",
+        "twig/twig": "^2.7|^3.5"
     },
     "config": {
         "sort-packages": true,
