@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Menu\Voter\PageRouteVoter;
+use ZeroGravity\Cms\Routing\RouterPageSelector;
 
 #[Group('voter')]
 class PageRouteVoterTest extends BaseUnit
@@ -19,11 +20,11 @@ class PageRouteVoterTest extends BaseUnit
     public function noMatchingIsDoneWithoutRequest(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item->expects(static::never())
+        $item->expects($this->never())
             ->method('getExtra')
         ;
 
-        $voter = new PageRouteVoter(new RequestStack());
+        $voter = $this->buildVoter();
 
         self::assertNull($voter->matchItem($item));
     }
@@ -32,14 +33,11 @@ class PageRouteVoterTest extends BaseUnit
     public function noMatchingIsDoneIfRequestDoesNotContainPage(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item->expects(static::never())
+        $item->expects($this->never())
             ->method('getExtra')
         ;
 
-        $stack = new RequestStack();
-        $stack->push(new Request());
-
-        $voter = new PageRouteVoter($stack);
+        $voter = $this->buildVoter(new Request());
 
         self::assertNull($voter->matchItem($item));
     }
@@ -48,18 +46,14 @@ class PageRouteVoterTest extends BaseUnit
     public function matchingIsDoneIfRequestContainsPage(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item->expects(static::atLeastOnce())
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
         ;
 
         $page = new Page('test', ['slug' => 'test'], null);
 
-        $request = new Request();
-        $request->attributes->set('page', $page);
-        $stack = new RequestStack();
-        $stack->push($request);
-
-        $voter = new PageRouteVoter($stack);
+        $request = $this->buildPageRequest($page);
+        $voter = $this->buildVoter($request);
 
         self::assertNull($voter->matchItem($item));
     }
@@ -76,12 +70,8 @@ class PageRouteVoterTest extends BaseUnit
 
         $page = new Page('test', ['slug' => 'test'], null);
 
-        $request = new Request();
-        $request->attributes->set('page', $page);
-        $stack = new RequestStack();
-        $stack->push($request);
-
-        $voter = new PageRouteVoter($stack);
+        $request = $this->buildPageRequest($page);
+        $voter = $this->buildVoter($request);
 
         $this->expectException(InvalidArgumentException::class);
         $voter->matchItem($item);
@@ -99,12 +89,8 @@ class PageRouteVoterTest extends BaseUnit
 
         $page = new Page('test', ['slug' => 'test'], null);
 
-        $request = new Request();
-        $request->attributes->set('page', $page);
-        $stack = new RequestStack();
-        $stack->push($request);
-
-        $voter = new PageRouteVoter($stack);
+        $request = $this->buildPageRequest($page);
+        $voter = $this->buildVoter($request);
 
         self::assertTrue($voter->matchItem($item));
     }
@@ -124,12 +110,8 @@ class PageRouteVoterTest extends BaseUnit
 
         $page = new Page('test', ['slug' => 'test'], null);
 
-        $request = new Request();
-        $request->attributes->set('page', $page);
-        $stack = new RequestStack();
-        $stack->push($request);
-
-        $voter = new PageRouteVoter($stack);
+        $request = $this->buildPageRequest($page);
+        $voter = $this->buildVoter($request);
 
         self::assertTrue($voter->matchItem($item));
     }
@@ -149,13 +131,27 @@ class PageRouteVoterTest extends BaseUnit
 
         $page = new Page('test', ['slug' => 'another-slug'], null);
 
-        $request = new Request();
-        $request->attributes->set('page', $page);
-        $stack = new RequestStack();
-        $stack->push($request);
-
-        $voter = new PageRouteVoter($stack);
+        $request = $this->buildPageRequest($page);
+        $voter = $this->buildVoter($request);
 
         self::assertNull($voter->matchItem($item));
+    }
+
+    private function buildVoter(Request $request = null): PageRouteVoter
+    {
+        $stack = new RequestStack();
+        if ($request instanceof Request) {
+            $stack->push($request);
+        }
+
+        return new PageRouteVoter(new RouterPageSelector($stack));
+    }
+
+    private function buildPageRequest(Page $page): Request
+    {
+        $request = new Request();
+        $request->attributes->set('_route_params', ['_zg_page' => $page]);
+
+        return $request;
     }
 }
