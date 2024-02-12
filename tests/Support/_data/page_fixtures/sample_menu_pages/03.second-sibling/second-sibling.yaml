@@ -1,3 +1,4 @@
+modular: true
 menu_label: custom second sibling label
 extra:
     menu_item_options:
