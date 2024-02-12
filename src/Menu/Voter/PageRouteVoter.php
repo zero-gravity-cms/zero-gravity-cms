@@ -5,14 +5,17 @@ namespace ZeroGravity\Cms\Menu\Voter;
 use InvalidArgumentException;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Voter\VoterInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use ZeroGravity\Cms\Content\ReadablePage;
+use ZeroGravity\Cms\Routing\RouterPageSelector;
 
+/**
+ * This voter checks for routes provided by the CMF RouteProvider. These will include
+ * page details that can be extracted by the RouterPageSelector.
+ */
 final readonly class PageRouteVoter implements VoterInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private RouterPageSelector $pageSelector,
     ) {
     }
 
@@ -24,11 +27,7 @@ final readonly class PageRouteVoter implements VoterInterface
      */
     public function matchItem(ItemInterface $item): ?bool
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if (!$request instanceof Request) {
-            return null;
-        }
-        $page = $request->attributes->get('page');
+        $page = $this->pageSelector->getCurrentPage();
         if (!$page instanceof ReadablePage) {
             return null;
         }

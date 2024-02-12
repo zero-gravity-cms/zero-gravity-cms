@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
- * Determine current page based on routing.
+ * Determine current page based on routing. Use this to extract page information from CMF routes.
  */
 final readonly class RouterPageSelector
 {

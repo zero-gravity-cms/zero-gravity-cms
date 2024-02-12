@@ -246,7 +246,7 @@ class KnpMenuProviderTest extends BaseUnit
             };
         };
 
-        $dispatcher->expects(self::atLeast(15))
+        $dispatcher->expects($this->atLeast(15))
             ->method('dispatch')
             ->with(self::callback($callbackChain))
         ;
