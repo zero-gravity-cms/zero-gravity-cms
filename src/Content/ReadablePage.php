@@ -151,19 +151,21 @@ interface ReadablePage
     public function isVisible(): bool;
 
     /**
-     * Page is considered a modular page, not a content page, e.g. for holding addressable sub content.
-     * Modular pages will be hidden from menus.
+     * Page is considered a modular page, not a regular content page.
+     * Modular pages are designated to contain a collection of sub content or "module" pages.
      */
     public function isModular(): bool;
 
     /**
-     * Page is considered a modular snippet, not a standalone page.
-     * This is usually achieved by prefixing the directory with an underscore.
+     * Page is considered a snippet to be embedded in a "modular" page.
+     * This is achieved automatically by prefixing the directory with an underscore.
+     *
+     * Module pages will be hidden from menus.
      */
     public function isModule(): bool;
 
     /**
-     * Get custom template to embed this page in.
+     * Get custom template to embed this page's content in.
      */
     public function getLayoutTemplate(): ?string;
 
