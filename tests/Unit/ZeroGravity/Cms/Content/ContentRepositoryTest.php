@@ -52,7 +52,7 @@ class ContentRepositoryTest extends BaseUnit
         $page1 = $this->createSimplePage('page1');
 
         $mapper = $this->createMock(StructureMapper::class);
-        $mapper->expects(static::once())
+        $mapper->expects($this->once())
             ->method('getWritablePageInstance')
         ;
 
@@ -67,7 +67,7 @@ class ContentRepositoryTest extends BaseUnit
         $page1 = $this->createSimplePage('page1');
 
         $mapper = $this->createMock(StructureMapper::class);
-        $mapper->expects(static::once())
+        $mapper->expects($this->once())
             ->method('getNewWritablePage')
             ->with($page1)
         ;
@@ -89,7 +89,7 @@ class ContentRepositoryTest extends BaseUnit
         $new = clone $old;
         $diff = new PageDiff($old, $new);
 
-        $mapper->expects(static::once())
+        $mapper->expects($this->once())
             ->method('saveChanges')
             ->with($diff)
         ;
@@ -172,7 +172,7 @@ class ContentRepositoryTest extends BaseUnit
             ->onlyMethods(['getItem'])
             ->getMock()
         ;
-        $cache->expects(self::atLeast(1))
+        $cache->expects($this->atLeast(1))
             ->method('getItem')
             ->willThrowException(new InvalidArgumentException())
         ;

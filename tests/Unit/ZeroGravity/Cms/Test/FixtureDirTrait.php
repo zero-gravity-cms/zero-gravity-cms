@@ -44,7 +44,7 @@ trait FixtureDirTrait
     /**
      * Get a FileFactory instance leading to the valid pages fixture dir.
      */
-    public function getDefaultFileFactory(): FileFactory
+    protected function getDefaultFileFactory(): FileFactory
     {
         return new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->getValidPagesDir());
     }
