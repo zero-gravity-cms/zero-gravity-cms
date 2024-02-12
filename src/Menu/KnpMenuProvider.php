@@ -121,6 +121,6 @@ readonly class KnpMenuProvider implements MenuProviderInterface
 
     protected function pageHasItem(ReadablePage $page, string $menuName): bool
     {
-        return !$page->isModular() && $page->isVisible() && $page->getMenuId() === $menuName;
+        return !$page->isModule() && $page->isVisible() && $page->getMenuId() === $menuName;
     }
 }
