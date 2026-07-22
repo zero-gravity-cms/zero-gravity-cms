@@ -14,8 +14,9 @@ final class Metadata implements ArrayAccess
     /**
      * @param array<string, mixed> $values
      */
-    public function __construct(private array $values)
-    {
+    public function __construct(
+        private array $values,
+    ) {
     }
 
     /**

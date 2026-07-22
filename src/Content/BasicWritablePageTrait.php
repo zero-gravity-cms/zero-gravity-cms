@@ -11,6 +11,7 @@ use ZeroGravity\Cms\Filesystem\Directory;
 trait BasicWritablePageTrait
 {
     private ?string $contentRaw = null;
+
     private readonly ?Directory $directory;
 
     /**
@@ -23,7 +24,7 @@ trait BasicWritablePageTrait
         $this->buildFilesystemPath();
     }
 
-    public function setParent(ReadablePage $parent = null): void
+    public function setParent(?ReadablePage $parent = null): void
     {
         $this->initParent($parent);
     }
@@ -39,7 +40,7 @@ trait BasicWritablePageTrait
     /**
      * Set raw (un-processed) markdown content.
      */
-    public function setContentRaw(string $contentRaw = null): void
+    public function setContentRaw(?string $contentRaw = null): void
     {
         $this->contentRaw = str_replace("\r\n", "\n", (string) $contentRaw);
     }

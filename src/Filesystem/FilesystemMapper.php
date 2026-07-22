@@ -36,7 +36,7 @@ final readonly class FilesystemMapper implements StructureMapper
         private bool $convertMarkdown,
         private array $defaultPageSettings,
         private LoggerInterface $logger,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
     ) {
         $this->pageFactory = new PageFactory($this->logger, $this->eventDispatcher);
     }
@@ -90,7 +90,7 @@ final readonly class FilesystemMapper implements StructureMapper
     /**
      * @return WritableFilesystemPage
      */
-    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
+    public function getNewWritablePage(?ReadablePage $parentPage = null): WritablePage
     {
         return new WritableFilesystemPage(new Page('', [], $parentPage));
     }
@@ -191,7 +191,7 @@ final readonly class FilesystemMapper implements StructureMapper
         return $settings;
     }
 
-    private function createDirectory(string $path, string $parentPath = null): Directory
+    private function createDirectory(string $path, ?string $parentPath = null): Directory
     {
         return new Directory(
             new SplFileInfo($path),

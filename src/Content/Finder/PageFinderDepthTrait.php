@@ -4,7 +4,6 @@ namespace ZeroGravity\Cms\Content\Finder;
 
 use Iterator;
 use RecursiveIteratorIterator;
-use Symfony\Component\Finder\Comparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
@@ -13,7 +12,7 @@ use ZeroGravity\Cms\Content\ReadablePage;
 trait PageFinderDepthTrait
 {
     /**
-     * @var list<Comparator\NumberComparator>
+     * @var list<NumberComparator>
      */
     private array $depths = [];
 

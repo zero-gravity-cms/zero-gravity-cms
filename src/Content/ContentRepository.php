@@ -169,7 +169,7 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     /**
      * Get new writable page instance.
      */
-    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage
+    public function getNewWritablePage(?ReadablePage $parentPage = null): WritablePage
     {
         return $this->mapper->getNewWritablePage($parentPage);
     }

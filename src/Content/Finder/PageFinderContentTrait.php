@@ -13,14 +13,17 @@ trait PageFinderContentTrait
      * @var list<string>
      */
     private array $names = [];
+
     /**
      * @var list<string>
      */
     private array $notNames = [];
+
     /**
      * @var list<string>
      */
     private array $contains = [];
+
     /**
      * @var list<string>
      */

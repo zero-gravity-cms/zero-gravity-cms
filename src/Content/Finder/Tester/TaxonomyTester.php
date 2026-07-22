@@ -7,7 +7,9 @@ use ZeroGravity\Cms\Content\ReadablePage;
 final readonly class TaxonomyTester
 {
     public const OPERATOR_AND = 'AND';
+
     public const OPERATOR_OR = 'OR';
+
     private string $mode;
 
     /**

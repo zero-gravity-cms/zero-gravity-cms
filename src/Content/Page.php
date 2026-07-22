@@ -25,9 +25,13 @@ class Page implements ReadablePage
     final public const SORTING_PREFIX_PATTERN = '/^\d+\.(.*)/';
 
     final public const TAXONOMY_TAG = 'tag';
+
     final public const TAXONOMY_CATEGORY = 'category';
+
     final public const TAXONOMY_AUTHOR = 'author';
+
     private ReadablePage|Page|null $parent = null;
+
     private ?string $content = null;
 
     /**
@@ -36,6 +40,7 @@ class Page implements ReadablePage
     private array $children = [];
 
     private ?Path $path = null;
+
     private ?Path $filesystemPath = null;
 
     /**
@@ -44,7 +49,7 @@ class Page implements ReadablePage
     public function __construct(
         protected string $name,
         array $settings = [],
-        ReadablePage $parent = null,
+        ?ReadablePage $parent = null,
     ) {
         $this->initSettings($settings, $this->name);
         $this->initParent($parent);
@@ -59,7 +64,7 @@ class Page implements ReadablePage
     /**
      * Set parent page and initialize all dependent values.
      */
-    protected function initParent(ReadablePage|self $parent = null): void
+    protected function initParent(ReadablePage|self|null $parent = null): void
     {
         $this->parent = $parent;
         $this->buildFilesystemPath();
@@ -74,7 +79,7 @@ class Page implements ReadablePage
         return $this->parent;
     }
 
-    public function setContent(string $content = null): void
+    public function setContent(?string $content = null): void
     {
         $this->content = $content;
     }

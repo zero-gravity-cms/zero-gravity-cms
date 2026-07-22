@@ -79,10 +79,7 @@ class RoboFile extends BaseRoboFile
     {
         $this->stopOnFail(true);
         $this->_prepareCiModules([
-            'composer' => '2.6.6',
-            'php-cs-fixer' => 'v3.48.0',
-            'phpstan' => '1.10.56',
-            'phpcs' => '3.7.2',
+            'composer' => '2.8.5',
         ]);
     }
 
@@ -126,7 +123,7 @@ class RoboFile extends BaseRoboFile
         }
 
         $this->_execPhp("php ./vendor/bin/rector process --dry-run {$opts['rector-args']}");
-        $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose --dry-run {$opts['php-cs-fixer-args']}");
+        $this->_execPhp("php ./{$this->dir()}/vendor/bin/php-cs-fixer fix --verbose --dry-run {$opts['php-cs-fixer-args']}");
         $this->_execPhp("php ./vendor/bin/phpstan analyse {$opts['phpstan-args']}");
     }
 
@@ -139,7 +136,7 @@ class RoboFile extends BaseRoboFile
     {
         if ($force || $this->confirmIfInteractive('Do you really want to run php-cs-fixer on your source code?')) {
             $this->_execPhp('php ./vendor/bin/rector process');
-            $this->_execPhp("php ./{$this->dir()}/bin/php-cs-fixer.phar fix --verbose {$arguments}");
+            $this->_execPhp("php ./{$this->dir()}/vendor/bin/php-cs-fixer fix --verbose {$arguments}");
         } else {
             $this->abort();
         }

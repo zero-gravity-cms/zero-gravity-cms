@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Twig\Extension;
 
+use Override;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -28,6 +31,7 @@ final class ZeroGravityExtension extends AbstractExtension
     /**
      * @return list<TwigFilter>
      */
+    #[Override]
     public function getFilters(): array
     {
         return [
@@ -54,6 +58,7 @@ final class ZeroGravityExtension extends AbstractExtension
     /**
      * @return list<TwigFunction>
      */
+    #[Override]
     public function getFunctions(): array
     {
         return [
@@ -116,7 +121,7 @@ final class ZeroGravityExtension extends AbstractExtension
     /**
      * This can be used to generate an ID attribute-safe representation of a page path.
      */
-    public function getPageHash(ReadablePage $page = null): string
+    public function getPageHash(?ReadablePage $page = null): string
     {
         if (!$page instanceof ReadablePage) {
             return 'page_'.md5('');

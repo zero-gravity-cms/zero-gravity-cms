@@ -9,7 +9,9 @@ use Webmozart\Assert\Assert;
 final readonly class ExtraFilter
 {
     public const COMPARATOR_STRING = 'string';
+
     public const COMPARATOR_DATE = 'date';
+
     public const COMPARATOR_NUMERIC = 'number';
 
     public static function has(string $name, mixed $value, string $comparator = self::COMPARATOR_STRING): self

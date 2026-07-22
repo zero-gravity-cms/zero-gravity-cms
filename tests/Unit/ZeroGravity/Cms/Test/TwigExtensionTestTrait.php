@@ -9,7 +9,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Constraint\Exception as FrameworkConstraintException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
-use ReflectionProperty;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Extension\ExtensionInterface;
@@ -22,7 +21,6 @@ use Twig\TwigFunction;
 use Twig\TwigTest;
 
 use const E_USER_DEPRECATED;
-use const PHP_VERSION_ID;
 
 /**
  * This was copied and adapted from Twig\Test\IntegrationTestCase.
@@ -81,7 +79,7 @@ trait TwigExtensionTestTrait
      */
     #[Test]
     #[DataProvider('getTests')]
-    public function testIntegration(string $file, string $message, ?string $condition, array $templates, false $exception, array $outputs): void
+    public function testIntegration(string $file, string $message, ?string $condition, array $templates, false|string $exception, array $outputs): void
     {
         $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs);
     }
@@ -141,7 +139,7 @@ trait TwigExtensionTestTrait
      * @param array<string, string>          $templates
      * @param array<int, array<int, string>> $outputs
      */
-    protected function doIntegrationTest(string $file, string $message, ?string $condition, array $templates, false $exception, array $outputs, string $deprecation = ''): void
+    protected function doIntegrationTest(string $file, string $message, ?string $condition, array $templates, false|string $exception, array $outputs, string $deprecation = ''): void
     {
         if ([] === $outputs) {
             $this->markTestSkipped('no tests to run');
@@ -187,11 +185,6 @@ trait TwigExtensionTestTrait
                 $twig->addFunction($function);
             }
 
-            // avoid using the same PHP class name for different cases
-            $p = new ReflectionProperty($twig, 'templateClassPrefix');
-            $p->setAccessible(true);
-            $p->setValue($twig, '__TwigTemplate_'.hash(PHP_VERSION_ID < 80100 ? 'sha256' : 'xxh128', uniqid((string) mt_rand(), true), false).'_');
-
             $deprecations = [];
             try {
                 $prevHandler = set_error_handler(static function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$prevHandler): bool {
@@ -208,7 +201,7 @@ trait TwigExtensionTestTrait
             } catch (Exception $e) {
                 if ($exception) {
                     $message = $e->getMessage();
-                    $this->assertSame(trim((string) $exception), trim(sprintf('%s: %s', $e::class, $message)));
+                    $this->assertSame(trim($exception), trim(sprintf('%s: %s', $e::class, $message)));
                     $last = substr($message, \strlen($message) - 1);
                     $this->assertTrue('.' === $last || '?' === $last, 'Exception message must end with a dot or a question mark.');
 
@@ -226,7 +219,7 @@ trait TwigExtensionTestTrait
                 $output = trim($template->render(eval($match[1].';')), "\n ");
             } catch (Exception $e) {
                 if ($exception) {
-                    $this->assertSame(trim((string) $exception), trim(sprintf('%s: %s', $e::class, $e->getMessage())));
+                    $this->assertSame(trim($exception), trim(sprintf('%s: %s', $e::class, $e->getMessage())));
 
                     return;
                 }
@@ -237,7 +230,7 @@ trait TwigExtensionTestTrait
             }
 
             if ($exception) {
-                [$class] = explode(':', (string) $exception);
+                [$class] = explode(':', $exception);
                 $this->assertThat(null, new FrameworkConstraintException($class));
             }
 

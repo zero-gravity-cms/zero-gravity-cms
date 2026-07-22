@@ -223,7 +223,7 @@ class SortableIteratorTest extends BaseUnit
         new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
-    private function getFinder(): ?PageFinder
+    private function getFinder(): PageFinder
     {
         return clone $this->finderPrototype;
     }

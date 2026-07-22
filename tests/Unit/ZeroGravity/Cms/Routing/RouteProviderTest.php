@@ -56,7 +56,7 @@ class RouteProviderTest extends BaseUnit
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
-        $routes = $routeProvider->getRoutesByNames(null);
+        $routes = $routeProvider->getRoutesByNames();
         self::assertCount(3, $routes);
         self::assertContainsOnlyInstancesOf(Route::class, $routes);
     }
@@ -92,7 +92,7 @@ class RouteProviderTest extends BaseUnit
         return new ContentRepository($mapper, $cache, false);
     }
 
-    private function createSimplePage(string $name, Page $parent = null): Page
+    private function createSimplePage(string $name, ?Page $parent = null): Page
     {
         return new Page($name, ['slug' => $name], $parent);
     }

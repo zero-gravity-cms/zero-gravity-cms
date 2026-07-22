@@ -8,16 +8,16 @@ use ZeroGravity\Cms\Path\Path;
 
 trait MultiPathFindOneTrait
 {
-    abstract public function find(Path $path, Path $parentPath = null): array;
+    abstract public function find(Path $path, ?Path $parentPath = null): array;
 
-    abstract public function get(Path $path, Path $parentPath = null): ?File;
+    abstract public function get(Path $path, ?Path $parentPath = null): ?File;
 
     /**
      * Find a single matching file.
      *
      * @param bool $strict Accept only 1 found file, throw ResolverException if more than 1
      */
-    public function findOne(Path $path, Path $parentPath = null, bool $strict = true): ?File
+    public function findOne(Path $path, ?Path $parentPath = null, bool $strict = true): ?File
     {
         $file = $this->get(clone $path, ($parentPath instanceof Path) ? clone $parentPath : null);
         if (null !== $file) {

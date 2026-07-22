@@ -10,7 +10,7 @@ variables:
   SYMFONY_DEPRECATIONS_HELPER: 'weak'
 
   PHP_MEMORY_LIMIT: 1024M
-  PHP_XDEBUG_MODE: 'on'
+  PHP_XDEBUG_MODE: 'coverage'
   PHP_XDEBUG_EXTENSION_PATH: 'xdebug.so'
 
 .caches:

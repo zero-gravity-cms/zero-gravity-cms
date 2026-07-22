@@ -85,7 +85,7 @@ readonly class KnpMenuProvider implements MenuProviderInterface
         ReadablePage $page,
         ItemInterface $parent,
         string $menuName,
-        array $defaultOptions
+        array $defaultOptions,
     ): void {
         if (!$this->pageHasItem($page, $menuName)) {
             return;

@@ -8,7 +8,9 @@ use Webmozart\Assert\Assert;
 final class Path implements Stringable
 {
     private ?string $pathString = null;
+
     private bool $isAbsolute = false;
+
     private bool $isDirectory = false;
 
     /**
@@ -27,7 +29,7 @@ final class Path implements Stringable
     /**
      * Resolve relative reference ('../') in this path.
      */
-    public function normalize(self $parentPath = null): void
+    public function normalize(?self $parentPath = null): void
     {
         if ($this->isRegex()) {
             return;
@@ -236,7 +238,7 @@ final class Path implements Stringable
 
         $parts = array_filter(explode('/', $pathString), static fn ($part): bool => '' !== $part && '.' !== $part);
 
-        $this->elements = array_map(fn ($part): PathElement => $this->createElement($part), $parts);
+        $this->elements = array_map($this->createElement(...), $parts);
     }
 
     /**

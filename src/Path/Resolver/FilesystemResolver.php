@@ -14,7 +14,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
     use MultiPathFindOneTrait;
 
     public function __construct(
-        private readonly FileFactory $fileFactory
+        private readonly FileFactory $fileFactory,
     ) {
     }
 
@@ -23,7 +23,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
      *
      * @return File[]
      */
-    public function find(Path $path, Path $parentPath = null): array
+    public function find(Path $path, ?Path $parentPath = null): array
     {
         /* @var $parentPath Path */
         $this->preparePaths($path, $parentPath);
@@ -45,7 +45,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         return $this->doFind($finder, $parentPath);
     }
 
-    private function preparePaths(Path &$path, Path &$parentPath = null): void
+    private function preparePaths(Path &$path, ?Path &$parentPath = null): void
     {
         if (!$parentPath instanceof Path) {
             $parentPath = new Path('');
@@ -99,7 +99,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ?File
+    public function get(Path $path, ?Path $parentPath = null): ?File
     {
         if (!$parentPath instanceof Path) {
             $parentPath = new Path('');
@@ -120,7 +120,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         return $this->fileFactory->createFile('/'.$trimmedPath);
     }
 
-    private function buildBaseDir(Path $parentPath = null): string
+    private function buildBaseDir(?Path $parentPath = null): string
     {
         $basePath = $this->fileFactory->getBasePath();
         if (!$parentPath instanceof Path) {

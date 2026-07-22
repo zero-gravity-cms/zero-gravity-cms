@@ -24,7 +24,7 @@ class CachingResolverTest extends BaseUnit
      */
     #[DataProvider('provideMethods')]
     #[Test]
-    public function methodIsCached(string $method, string|array $expectedReturnValue, string $calledMethod = null): void
+    public function methodIsCached(string $method, string|array $expectedReturnValue, ?string $calledMethod = null): void
     {
         if (null === $calledMethod) {
             $calledMethod = $method;

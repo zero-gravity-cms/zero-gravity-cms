@@ -644,7 +644,7 @@ class PageFinderTest extends BaseUnit
         self::assertCount(24, $finder);
     }
 
-    private function getFinder(): ?PageFinder
+    private function getFinder(): PageFinder
     {
         return clone $this->finderPrototype;
     }

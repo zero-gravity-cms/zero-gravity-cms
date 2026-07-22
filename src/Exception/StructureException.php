@@ -28,7 +28,7 @@ class StructureException extends RuntimeException implements ZeroGravityExceptio
     public static function yamlAndMarkdownFilesMismatch(
         SplFileInfo $directory,
         File $yamlFile,
-        File $markdownFile
+        File $markdownFile,
     ): self {
         return new self(sprintf(
             'Directory %s contains a YAML and a markdown file, but the basenames do not match: %s vs %s',

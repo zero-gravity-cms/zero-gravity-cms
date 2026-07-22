@@ -29,7 +29,7 @@ class PageFactoryTest extends BaseUnit
         $pageFactory = new PageFactory(new NullLogger(), new EventDispatcher());
 
         $dir = $this->createParsedDirectoryFromPath($this->getPageFixtureDir().'/invalid_pages/no_data');
-        $page = $pageFactory->createPage($dir, false, [], null);
+        $page = $pageFactory->createPage($dir, false, []);
 
         self::assertNull($page);
     }
@@ -41,7 +41,7 @@ class PageFactoryTest extends BaseUnit
         $pageFactory = new PageFactory(new NullLogger(), new EventDispatcher());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/'.$path);
-        $page = $pageFactory->createPage($dir, false, [], null);
+        $page = $pageFactory->createPage($dir, false, []);
 
         self::assertInstanceOf(Page::class, $page);
     }
@@ -63,7 +63,7 @@ class PageFactoryTest extends BaseUnit
         $pageFactory = new PageFactory(new NullLogger(), new EventDispatcher());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
-        $page = $pageFactory->createPage($dir, false, [], null);
+        $page = $pageFactory->createPage($dir, false, []);
 
         self::assertSame('testtitle', $page->getTitle());
     }
@@ -77,7 +77,7 @@ class PageFactoryTest extends BaseUnit
         $page = $pageFactory->createPage($dir, false, [
             'title' => 'defaulttitle',
             'menu_id' => 'defaultmenu',
-        ], null);
+        ]);
 
         self::assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
         self::assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
@@ -89,7 +89,7 @@ class PageFactoryTest extends BaseUnit
         $pageFactory = new PageFactory(new NullLogger(), new EventDispatcher());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
-        $page = $pageFactory->createPage($dir, false, [], null);
+        $page = $pageFactory->createPage($dir, false, []);
 
         self::assertSame([
             'page.yaml',
@@ -123,8 +123,8 @@ class PageFactoryTest extends BaseUnit
         $pageFactory = new PageFactory(new NullLogger(), new EventDispatcher());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
-        $page1 = $pageFactory->createPage($dir, false, [], null);
-        $page2 = $pageFactory->createPage($dir, false, [], null);
+        $page1 = $pageFactory->createPage($dir, false, []);
+        $page2 = $pageFactory->createPage($dir, false, []);
 
         self::assertEquals($page1, $page2);
     }

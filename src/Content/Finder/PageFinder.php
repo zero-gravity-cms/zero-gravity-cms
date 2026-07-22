@@ -34,6 +34,7 @@ final class PageFinder implements IteratorAggregate, Countable
     use PageFinderTaxonomyTrait;
 
     private ?int $limit = null;
+
     private int $offset = 0;
 
     /**
@@ -77,7 +78,7 @@ final class PageFinder implements IteratorAggregate, Countable
     /**
      * Set a finder limit.
      */
-    public function limit(int $limit = null): self
+    public function limit(?int $limit = null): self
     {
         $this->limit = $limit;
 

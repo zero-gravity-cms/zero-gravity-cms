@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Path\Resolver;
 
 use Symfony\Component\Finder\Glob;

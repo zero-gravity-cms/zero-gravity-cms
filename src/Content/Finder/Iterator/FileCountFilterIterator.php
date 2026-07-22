@@ -19,7 +19,9 @@ use ZeroGravity\Cms\Content\ReadablePage;
 final class FileCountFilterIterator extends FilterIterator
 {
     public const MODE_FILES = 'files';
+
     public const MODE_IMAGES = 'images';
+
     public const MODE_DOCUMENTS = 'documents';
 
     /**

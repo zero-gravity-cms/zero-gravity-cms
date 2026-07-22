@@ -12,8 +12,11 @@ use ZeroGravity\Cms\Content\ReadablePage;
 trait PageFinderFlagsTrait
 {
     private ?bool $published = null;
+
     private ?bool $modular = null;
+
     private ?bool $module = null;
+
     private ?bool $visible = null;
 
     /**
