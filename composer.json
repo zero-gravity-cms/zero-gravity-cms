@@ -12,7 +12,6 @@
     "require": {
         "php": ">=8.2",
         "cocur/slugify": "^4.0",
-        "ergebnis/composer-normalize": "^2.52",
         "mnapoli/front-yaml": "^2.0",
         "symfony/cache": "^6.4 || ^7.0 || ^8.0",
         "symfony/finder": "^6.4 || ^7.0 || ^8.0",
@@ -21,6 +20,7 @@
     "require-dev": {
         "codeception/codeception": "^5.0",
         "codeception/stub": "^4.1",
+        "ergebnis/composer-normalize": "^2.52",
         "knplabs/knp-menu": "^3.0",
         "liip/imagine-bundle": "^2.0",
         "phpstan/phpstan": "^2.2",
