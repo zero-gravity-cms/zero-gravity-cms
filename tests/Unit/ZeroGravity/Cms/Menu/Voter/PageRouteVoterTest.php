@@ -62,7 +62,7 @@ class PageRouteVoterTest extends BaseUnit
     public function invalidRouteConfigThrowsException(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([['invalid' => 'array']])
@@ -81,7 +81,7 @@ class PageRouteVoterTest extends BaseUnit
     public function matchingUsingSingleStringRoute(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn('/test')
@@ -99,7 +99,7 @@ class PageRouteVoterTest extends BaseUnit
     public function matchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([
@@ -120,7 +120,7 @@ class PageRouteVoterTest extends BaseUnit
     public function notMatchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([

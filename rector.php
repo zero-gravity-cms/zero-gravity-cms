@@ -7,6 +7,7 @@ use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector;
 use Rector\Config\RectorConfig;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitSelfCallRector;
+use Rector\PHPUnit\PHPUnit120\Rector\CallLike\CreateStubOverCreateMockArgRector;
 use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
 
 return RectorConfig::configure()
@@ -45,12 +46,14 @@ return RectorConfig::configure()
     ->withAttributesSets(all: true)
     ->withRules([
         PreferPHPUnitSelfCallRector::class,
+        CreateStubOverCreateMockArgRector::class,
     ])
 
     ->withSkip([
         CountArrayToEmptyArrayComparisonRector::class,
         EncapsedStringsToSprintfRector::class,
         NewlineAfterStatementRector::class,
+
         // incompatible with Sf 6.4
         PushRequestToRequestStackConstructorRector::class,
     ])
