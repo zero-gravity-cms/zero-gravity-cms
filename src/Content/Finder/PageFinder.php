@@ -10,6 +10,7 @@ use Exception;
 use Iterator;
 use IteratorAggregate;
 use LogicException;
+use RecursiveIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
@@ -34,6 +35,7 @@ final class PageFinder implements IteratorAggregate, Countable
     use PageFinderTaxonomyTrait;
 
     private ?int $limit = null;
+
     private int $offset = 0;
 
     /**
@@ -77,7 +79,7 @@ final class PageFinder implements IteratorAggregate, Countable
     /**
      * Set a finder limit.
      */
-    public function limit(int $limit = null): self
+    public function limit(?int $limit = null): self
     {
         $this->limit = $limit;
 
@@ -226,6 +228,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private function buildIteratorFromSinglePageList(array $pageList): Iterator
     {
         $mode = RecursiveIteratorIterator::SELF_FIRST;
+        /** @var RecursiveIteratorIterator<RecursiveIterator<string, ReadablePage>> $iterator */
         $iterator = new RecursiveIteratorIterator(new RecursivePageIterator($pageList), $mode);
 
         $iterator = $this->applyDepthsIterator($iterator);

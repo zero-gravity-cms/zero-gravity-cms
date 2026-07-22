@@ -50,7 +50,7 @@ class PageRouteVoterTest extends BaseUnit
             ->method('getExtra')
         ;
 
-        $page = new Page('test', ['slug' => 'test'], null);
+        $page = new Page('test', ['slug' => 'test']);
 
         $request = $this->buildPageRequest($page);
         $voter = $this->buildVoter($request);
@@ -62,13 +62,13 @@ class PageRouteVoterTest extends BaseUnit
     public function invalidRouteConfigThrowsException(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([['invalid' => 'array']])
         ;
 
-        $page = new Page('test', ['slug' => 'test'], null);
+        $page = new Page('test', ['slug' => 'test']);
 
         $request = $this->buildPageRequest($page);
         $voter = $this->buildVoter($request);
@@ -81,13 +81,13 @@ class PageRouteVoterTest extends BaseUnit
     public function matchingUsingSingleStringRoute(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn('/test')
         ;
 
-        $page = new Page('test', ['slug' => 'test'], null);
+        $page = new Page('test', ['slug' => 'test']);
 
         $request = $this->buildPageRequest($page);
         $voter = $this->buildVoter($request);
@@ -99,7 +99,7 @@ class PageRouteVoterTest extends BaseUnit
     public function matchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([
@@ -108,7 +108,7 @@ class PageRouteVoterTest extends BaseUnit
             ])
         ;
 
-        $page = new Page('test', ['slug' => 'test'], null);
+        $page = new Page('test', ['slug' => 'test']);
 
         $request = $this->buildPageRequest($page);
         $voter = $this->buildVoter($request);
@@ -120,7 +120,7 @@ class PageRouteVoterTest extends BaseUnit
     public function notMatchingUsingRouteArray(): void
     {
         $item = $this->createMock(ItemInterface::class);
-        $item
+        $item->expects($this->atLeastOnce())
             ->method('getExtra')
             ->with('routes')
             ->willReturn([
@@ -129,7 +129,7 @@ class PageRouteVoterTest extends BaseUnit
             ])
         ;
 
-        $page = new Page('test', ['slug' => 'another-slug'], null);
+        $page = new Page('test', ['slug' => 'another-slug']);
 
         $request = $this->buildPageRequest($page);
         $voter = $this->buildVoter($request);
@@ -137,7 +137,7 @@ class PageRouteVoterTest extends BaseUnit
         self::assertNull($voter->matchItem($item));
     }
 
-    private function buildVoter(Request $request = null): PageRouteVoter
+    private function buildVoter(?Request $request = null): PageRouteVoter
     {
         $stack = new RequestStack();
         if ($request instanceof Request) {

@@ -1,80 +1,125 @@
-image: endava/php:8.2.15
-
 stages:
-  - test
+  - check-and-test
   - reporting
 
 variables:
   COMPOSER_HOME: .composer
   COMPOSER_NO_INTERACTION: '1'
   SYMFONY_DEPRECATIONS_HELPER: 'weak'
+  PHP_VERSION: 'default'
+  SYMFONY_VERSION: 'default'
 
   PHP_MEMORY_LIMIT: 1024M
-  PHP_XDEBUG_MODE: 'on'
+  PHP_XDEBUG_MODE: 'coverage'
   PHP_XDEBUG_EXTENSION_PATH: 'xdebug.so'
 
+# -----------------------------------------------------------------------------
+# Cache templates
+# -----------------------------------------------------------------------------
 .caches:
   composer:
-    - key: composer-$CI_DEFAULT_BRANCH
+    - key: composer--php-$PHP_VERSION--sf-$SYMFONY_VERSION
+      fallback_keys:
+        - composer-default
       when: always
       paths:
         - $COMPOSER_HOME/cache
         - vendor/
 
   php-cs-fixer:
-    - key: php-cs-fixer-$CI_DEFAULT_BRANCH
+    - key: php-cs-fixer--php-$PHP_VERSION
       fallback_keys:
         - php-cs-fixer-default
       paths:
         - .robo/cache/.php-cs-fixer.cache
 
   rector:
-    - key: rector-$CI_DEFAULT_BRANCH
+    - key: rector--php-$PHP_VERSION
       paths:
         - .robo/cache/rector
 
   robo:
-    - key: robo-$CI_DEFAULT_BRANCH
+    - key: robo--php-$PHP_VERSION
       when: always
       paths:
         - .robo/bin
+        - .robo/robo
         - .robo/vendor
 
-
-before_script:
+# -----------------------------------------------------------------------------
+# Script templates
+# -----------------------------------------------------------------------------
+.install-composer-and-robo: &install-composer-and-robo
+  # prevent "dubious ownership" errors
+  - git config --global --add safe.directory $CI_PROJECT_DIR
+  # setup composer
   - mkdir -p .robo/bin/
-  - if [[ ! -f .robo/bin/robo.phar ]]; then wget https://github.com/consolidation/robo/releases/download/4.0.4/robo.phar -O .robo/bin/robo.phar; fi
+  - if [[ ! -f .robo/bin/composer ]]; then wget -q https://github.com/composer/composer/releases/download/2.10.2/composer.phar -O .robo/bin/composer && chmod +x .robo/bin/composer; fi
+  - export PATH=".robo/bin:$PATH"
+  - which composer
+  - composer --version
+  # Verify main composer.json and install .robo dependencies
+  - composer validate
+  - composer update --working-dir .robo/robo/ --optimize-autoloader --no-progress --no-interaction --prefer-source -v
+  - chmod +x .robo/robo/vendor/bin/robo
+  - export PATH=".robo/robo/vendor/bin:$PATH"
+  - which robo
+  # Install symfony CLI
+  - if [[ ! -f .robo/bin/symfony ]]; then wget -qO - https://github.com/symfony-cli/symfony-cli/releases/latest/download/symfony-cli_linux_amd64.tar.gz | tar -C .robo/bin -zx; fi
 
-####################################################################################################
-# _____         _
-#|_   _|__  ___| |_
-#  | |/ _ \/ __| __|
-#  | |  __/\__ \ |_
-#  |_|\___||___/\__|
-####################################################################################################
+# -----------------------------------------------------------------------------
+# Jobs
+# -----------------------------------------------------------------------------
+check_matrix:
+  stage: check-and-test
+  parallel:
+    matrix:
+      - PHP_VERSION:
+          - '8.2.28'
+          - '8.3.18'
+          - '8.4.5'
+          - '8.5.2'
+  image: "endava/php:$PHP_VERSION"
+  before_script:
+    - *install-composer-and-robo
+  script:
+    - composer update
+    - robo init
+    - robo check
+
+  cache:
+    - !reference [ .caches, composer ]
+    - !reference [ .caches, php-cs-fixer ]
+    - !reference [ .caches, rector ]
+    - !reference [ .caches, robo ]
+
 test_matrix:
-  stage: test
+  stage: check-and-test
   parallel:
     matrix:
       - SYMFONY_VERSION:
-          - '~6.0.0'
           - '~6.4.0'
+          - '~7.4.0'
+          - '~7.4.0|~8.1.0'
         PHP_VERSION:
-          - '8.2.15'
-          - '8.3.2'
+          - '8.2.28'
+          - '8.3.18'
+          - '8.4.5'
+          - '8.5.2'
   image: "endava/php:$PHP_VERSION"
+  before_script:
+    - *install-composer-and-robo
+  script:
+    - 'sed -i "s/\"require\": \"^6.4\"/\"require\": \"$SYMFONY_VERSION\"/" composer.json'
+    - tail composer.json -n 14
+    - composer update
+    - robo init
+    - robo test
 
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   cache:
     - !reference [ .caches, composer ]
     - !reference [ .caches, robo ]
-
-  script:
-    - 'sed -i "s/\"require\": \"^6.4\"/\"require\": \"$SYMFONY_VERSION\"/" composer.json'
-    - tail composer.json -n 7
-    - php .robo/bin/robo.phar init
-    - php .robo/bin/robo.phar test
-
   artifacts:
     when: always
     paths:
@@ -82,6 +127,9 @@ test_matrix:
 
 coveralls_upload:
   stage: reporting
+  variables: 
+    PHP_VERSION: "8.2.28"
+  image: endava/php:$PHP_VERSION
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   cache:
@@ -90,23 +138,3 @@ coveralls_upload:
   script:
     - wget https://coveralls.io/coveralls-linux.tar.gz -O - | tar -xz
     - ./coveralls report
-
-
-####################################################################################################
-#  ____ _               _
-# / ___| |__   ___  ___| | __
-#| |   | '_ \ / _ \/ __| |/ /
-#| |___| | | |  __/ (__|   <
-# \____|_| |_|\___|\___|_|\_\
-####################################################################################################
-check:
-  stage: test
-  script:
-    - php .robo/bin/robo.phar init
-    - php .robo/bin/robo.phar check
-
-  cache:
-    - !reference [ .caches, composer ]
-    - !reference [ .caches, php-cs-fixer ]
-    - !reference [ .caches, rector ]
-    - !reference [ .caches, robo ]

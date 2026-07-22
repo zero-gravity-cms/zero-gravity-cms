@@ -223,7 +223,7 @@ class PathTest extends BaseUnit
         string $pathString,
         string $childString,
         string $newString,
-        array $expect
+        array $expect,
     ): void {
         $path = new Path($pathString);
         $child = new Path($childString);

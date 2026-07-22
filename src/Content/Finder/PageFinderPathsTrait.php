@@ -13,14 +13,17 @@ trait PageFinderPathsTrait
      * @var list<string>
      */
     private array $paths = [];
+
     /**
      * @var list<string>
      */
     private array $notPaths = [];
+
     /**
      * @var list<string>
      */
     private array $filesystemPaths = [];
+
     /**
      * @var list<string>
      */

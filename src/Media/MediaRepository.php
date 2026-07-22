@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Media;
 
 use ZeroGravity\Cms\Content\File;
@@ -9,7 +11,7 @@ use ZeroGravity\Cms\Path\Resolver\SinglePathResolver;
 final readonly class MediaRepository
 {
     public function __construct(
-        private SinglePathResolver $pathResolver
+        private SinglePathResolver $pathResolver,
     ) {
     }
 

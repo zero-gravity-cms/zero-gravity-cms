@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Filesystem\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
@@ -8,7 +10,7 @@ use ZeroGravity\Cms\Content\Page;
 final class AfterPageCreate extends Event
 {
     public function __construct(
-        private readonly Page $page
+        private readonly Page $page,
     ) {
     }
 

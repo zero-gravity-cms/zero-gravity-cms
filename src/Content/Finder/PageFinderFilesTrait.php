@@ -13,10 +13,12 @@ trait PageFinderFilesTrait
      * @var list<NumberComparator>
      */
     private array $numFiles = [];
+
     /**
      * @var list<NumberComparator>
      */
     private array $numImages = [];
+
     /**
      * @var list<NumberComparator>
      */

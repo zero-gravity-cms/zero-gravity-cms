@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo as FinderSplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
@@ -25,6 +24,7 @@ final class Directory
     use WritableDirectoryTrait;
 
     public const SORTING_PREFIX_PATTERN = '/^\d+\.(.*)/';
+
     public const MODULAR_PREFIX_PATTERN = '/^_(.*)/';
 
     /**
@@ -67,7 +67,7 @@ final class Directory
         private readonly FileFactory $fileFactory,
         private readonly LoggerInterface $logger,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly ?string $parentPath = null
+        private readonly ?string $parentPath = null,
     ) {
         $this->parseFiles();
         $this->parseDirectories();
@@ -91,7 +91,7 @@ final class Directory
 
         $this->files = [];
         foreach ($fileFinder as $fileInfo) {
-            /* @var $fileInfo FinderSplFileInfo */
+            /* @var $fileInfo \Symfony\Component\Finder\SplFileInfo */
             $filePath = $this->getPath().'/'.$fileInfo->getRelativePathname();
             $this->files[$fileInfo->getFilename()] = $this->fileFactory->createFile($filePath);
         }

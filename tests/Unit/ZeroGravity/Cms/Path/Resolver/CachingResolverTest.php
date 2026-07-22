@@ -24,7 +24,7 @@ class CachingResolverTest extends BaseUnit
      */
     #[DataProvider('provideMethods')]
     #[Test]
-    public function methodIsCached(string $method, string|array $expectedReturnValue, string $calledMethod = null): void
+    public function methodIsCached(string $method, string|array $expectedReturnValue, ?string $calledMethod = null): void
     {
         if (null === $calledMethod) {
             $calledMethod = $method;
@@ -34,9 +34,9 @@ class CachingResolverTest extends BaseUnit
             $expectedReturnValue = $fileFactory->createFile('');
         }
 
-        $called = false;
-        $callback = static function () use (&$called, $expectedReturnValue): string|File|array {
-            $called = true;
+        $calls = 0;
+        $callback = static function () use (&$calls, $expectedReturnValue): string|File|array {
+            ++$calls;
 
             // this is required for php-level return checks
             return $expectedReturnValue;
@@ -50,28 +50,24 @@ class CachingResolverTest extends BaseUnit
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
         self::assertSame($expectedReturnValue, $result);
-        self::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
-
-        $called = false;
+        self::assertSame(1, $calls, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
         $result = $resolver->$method(new Path('a'), new Path('b'));
         self::assertSame($expectedReturnValue, $result);
-        self::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        self::assertSame(1, $calls, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
 
         $result = $resolver->$method(new Path('b'), new Path('c'));
         self::assertSame($expectedReturnValue, $result);
-        self::assertTrue($called, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
+        self::assertSame(2, $calls, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
 
         // try without parent path
         $result = $resolver->$method(new Path('d'));
         self::assertSame($expectedReturnValue, $result);
-        self::assertTrue($called, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
-
-        $called = false;
+        self::assertSame(3, $calls, 'Wrapped repo is called upon first request without parent path: '.$method.' :: '.$calledMethod);
 
         $result = $resolver->$method(new Path('d'));
         self::assertSame($expectedReturnValue, $result);
-        self::assertFalse($called, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
+        self::assertSame(3, $calls, 'Wrapped repo is not called upon second request without parent path: '.$method.' :: '.$calledMethod);
     }
 
     public static function provideMethods(): Iterator

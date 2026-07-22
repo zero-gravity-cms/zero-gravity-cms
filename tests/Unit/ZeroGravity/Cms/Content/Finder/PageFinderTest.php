@@ -34,7 +34,7 @@ class PageFinderTest extends BaseUnit
     {
         $finder = new PageFinder();
         $this->expectException(LogicException::class);
-        count($finder);
+        $finder->count();
     }
 
     #[DataProvider('provideFinderMethods')]
@@ -644,7 +644,7 @@ class PageFinderTest extends BaseUnit
         self::assertCount(24, $finder);
     }
 
-    private function getFinder(): ?PageFinder
+    private function getFinder(): PageFinder
     {
         return clone $this->finderPrototype;
     }

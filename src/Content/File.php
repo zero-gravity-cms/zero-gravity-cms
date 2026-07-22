@@ -11,6 +11,7 @@ use ZeroGravity\Cms\Content\Meta\Metadata;
 final readonly class File implements Stringable
 {
     private string $pathName;
+
     private string $baseDir;
 
     public function __construct(
@@ -50,7 +51,7 @@ final readonly class File implements Stringable
     /**
      * Get the base name of the file, optionally excluding a given suffix.
      */
-    public function getBasename(string $suffix = null): string
+    public function getBasename(?string $suffix = null): string
     {
         return basename($this->pathName, $suffix);
     }

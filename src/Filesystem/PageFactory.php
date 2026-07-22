@@ -37,7 +37,7 @@ final class PageFactory
         Directory $directory,
         bool $convertMarkdown,
         array $defaultSettings,
-        Page $parentPage = null
+        ?Page $parentPage = null,
     ): ?Page {
         $directory->validateFiles();
         if (Directory::CONTENT_STRATEGY_NONE === $directory->getContentStrategy()) {
@@ -82,7 +82,7 @@ final class PageFactory
      *
      * @return array<string, SettingValue>
      */
-    private function buildPageSettings(array $defaultSettings, Directory $directory, Page $parentPage = null): array
+    private function buildPageSettings(array $defaultSettings, Directory $directory, ?Page $parentPage = null): array
     {
         $settings = $directory->fetchPageSettings();
         $defaultTemplate = $directory->getDefaultBasenameTwigFile();

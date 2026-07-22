@@ -15,7 +15,7 @@ final readonly class RouteProvider implements RouteProviderInterface
 {
     public function __construct(
         private ReadablePageRepository $repository,
-        private string $defaultController
+        private string $defaultController,
     ) {
     }
 
@@ -45,7 +45,7 @@ final readonly class RouteProvider implements RouteProviderInterface
     {
         $collection = new RouteCollection();
 
-        foreach ($this->getRoutesByNames(null) as $route) {
+        foreach ($this->getRoutesByNames() as $route) {
             $collection->add('zerogravity_'.uniqid('', true), $route);
         }
 
@@ -94,7 +94,7 @@ final readonly class RouteProvider implements RouteProviderInterface
      * @return array<Route>|Traversable<Route> Iterable list with the keys being the names from the
      *                                         $names array
      */
-    public function getRoutesByNames(array $names = null): iterable
+    public function getRoutesByNames(?array $names = null): iterable
     {
         $pages = $this->repository->getAllPages();
         if (is_array($names)) {

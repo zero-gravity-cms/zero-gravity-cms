@@ -181,7 +181,7 @@ class ContentRepositoryTest extends BaseUnit
         $repo->getAllPages();
     }
 
-    private function createSimplePage(string $name, Page $parent = null): Page
+    private function createSimplePage(string $name, ?Page $parent = null): Page
     {
         return new Page($name, ['slug' => $name], $parent);
     }

@@ -86,7 +86,7 @@ final class PageSettings
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
+     * @phpstan-return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
     public function toArray(bool $serialize = false): array
     {
@@ -98,7 +98,7 @@ final class PageSettings
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
     public function getNonDefaultValues(bool $serialize = false): array
     {
@@ -270,7 +270,7 @@ final class PageSettings
             return $value;
         }
         if (is_array($value)) {
-            return array_map(fn ($singleValue): mixed => $this->serialize($singleValue), $value);
+            return array_map($this->serialize(...), $value);
         }
         if (null === $value) {
             return null;

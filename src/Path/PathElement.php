@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Path;
 
 use Stringable;
@@ -7,7 +9,9 @@ use Stringable;
 final class PathElement implements Stringable
 {
     private string $name;
+
     private bool $isRegex = false;
+
     private bool $isGlob = false;
 
     /**

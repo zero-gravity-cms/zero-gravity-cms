@@ -13,9 +13,9 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
     use MultiPathFindOneTrait;
 
     public function __construct(
-        protected readonly CacheInterface $cache,
-        protected readonly SinglePathResolver $wrappedResolver,
-        protected readonly SlugifyInterface $slugify,
+        private readonly CacheInterface $cache,
+        private readonly SinglePathResolver $wrappedResolver,
+        private readonly SlugifyInterface $slugify,
     ) {
     }
 
@@ -26,7 +26,7 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
      *
      * @throws InvalidArgumentException
      */
-    public function find(Path $path, Path $parentPath = null): array
+    public function find(Path $path, ?Path $parentPath = null): array
     {
         if (!$this->wrappedResolver instanceof MultiPathResolver) {
             return [];
@@ -41,14 +41,14 @@ final class CachingResolver extends AbstractResolver implements MultiPathResolve
      *
      * @throws InvalidArgumentException
      */
-    public function get(Path $path, Path $parentPath = null): ?File
+    public function get(Path $path, ?Path $parentPath = null): ?File
     {
         $key = $this->generateCacheKey('get', $path, $parentPath);
 
         return $this->cache->get($key, fn (): ?File => $this->wrappedResolver->get($path, $parentPath));
     }
 
-    private function generateCacheKey(string $method, Path $path, Path $parentPath = null): string
+    private function generateCacheKey(string $method, Path $path, ?Path $parentPath = null): string
     {
         $parentString = $parentPath instanceof Path ? $parentPath->toString() : '';
         $signature = sprintf('%s::%s::%s', $method, $path, $parentString);

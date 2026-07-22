@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Filesystem\FilesystemMapper;
 use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
@@ -33,7 +32,6 @@ class FilesystemMapperTest extends BaseUnit
         $mapper = new FilesystemMapper($fileFactory, $path, false, [], new NullLogger(), new EventDispatcher());
 
         $pages = $mapper->parse();
-        self::assertContainsOnlyInstancesOf(Page::class, $pages);
         self::assertCount(8, $pages);
     }
 

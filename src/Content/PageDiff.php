@@ -42,8 +42,7 @@ final readonly class PageDiff
     }
 
     /**
-     * @return array<string, SettingValue>
-     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
     public function getNewNonDefaultSettings(bool $serialize = false): array
     {

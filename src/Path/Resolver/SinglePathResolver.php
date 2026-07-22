@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Path\Resolver;
 
 use ZeroGravity\Cms\Content\File;
@@ -10,5 +12,5 @@ interface SinglePathResolver
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ?File;
+    public function get(Path $path, ?Path $parentPath = null): ?File;
 }

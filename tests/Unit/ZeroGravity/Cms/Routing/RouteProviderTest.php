@@ -7,7 +7,6 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Symfony\Component\Routing\Route;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Content\ContentRepository;
 use ZeroGravity\Cms\Content\Page;
@@ -25,7 +24,6 @@ class RouteProviderTest extends BaseUnit
         self::assertSame(3, $collection->count());
 
         $routes = $collection->all();
-        self::assertContainsOnlyInstancesOf(Route::class, $routes);
         foreach ($routes as $route) {
             $page = $route->getDefault('_zg_page');
             self::assertInstanceOf(Page::class, $page);
@@ -39,7 +37,7 @@ class RouteProviderTest extends BaseUnit
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
         $route = $routeProvider->getRouteByName('/page1');
-        self::assertInstanceOf(Route::class, $route);
+        self::assertSame('/page1', $route->getPath());
     }
 
     #[Test]
@@ -56,9 +54,8 @@ class RouteProviderTest extends BaseUnit
     {
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
-        $routes = $routeProvider->getRoutesByNames(null);
+        $routes = $routeProvider->getRoutesByNames();
         self::assertCount(3, $routes);
-        self::assertContainsOnlyInstancesOf(Route::class, $routes);
     }
 
     #[Test]
@@ -72,7 +69,6 @@ class RouteProviderTest extends BaseUnit
             '/invalid/page',
         ]);
         self::assertCount(2, $routes);
-        self::assertContainsOnlyInstancesOf(Route::class, $routes);
     }
 
     private function getContentRepository(): ContentRepository
@@ -92,7 +88,7 @@ class RouteProviderTest extends BaseUnit
         return new ContentRepository($mapper, $cache, false);
     }
 
-    private function createSimplePage(string $name, Page $parent = null): Page
+    private function createSimplePage(string $name, ?Page $parent = null): Page
     {
         return new Page($name, ['slug' => $name], $parent);
     }

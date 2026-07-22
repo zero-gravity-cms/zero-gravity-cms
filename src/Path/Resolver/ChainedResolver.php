@@ -11,14 +11,14 @@ final class ChainedResolver extends AbstractResolver
      * @param AbstractResolver[] $resolvers
      */
     public function __construct(
-        private readonly array $resolvers
+        private readonly array $resolvers,
     ) {
     }
 
     /**
      * Resolve the given file name and path.
      */
-    public function get(Path $path, Path $parentPath = null): ?File
+    public function get(Path $path, ?Path $parentPath = null): ?File
     {
         foreach ($this->resolvers as $resolver) {
             $found = $resolver->get($path, $parentPath);

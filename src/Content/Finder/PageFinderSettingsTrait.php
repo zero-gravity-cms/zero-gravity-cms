@@ -20,34 +20,42 @@ trait PageFinderSettingsTrait
      * @var list<ExtraFilter>
      */
     private array $extras = [];
+
     /**
      * @var list<SettingFilter>
      */
     private array $settings = [];
+
     /**
      * @var list<DateComparator>
      */
     private array $dates = [];
+
     /**
      * @var list<string>
      */
     private array $slugs = [];
+
     /**
      * @var list<string>
      */
     private array $notSlugs = [];
+
     /**
      * @var list<string>
      */
     private array $titles = [];
+
     /**
      * @var list<string>
      */
     private array $notTitles = [];
+
     /**
      * @var list<string>
      */
     private array $contentTypes = [];
+
     /**
      * @var list<string>
      */

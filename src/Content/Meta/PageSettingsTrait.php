@@ -59,7 +59,7 @@ trait PageSettingsTrait
     /**
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
+     * @phpstan-return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
     public function getSettings(bool $serialize = false): array
     {
@@ -70,7 +70,7 @@ trait PageSettingsTrait
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
      *
-     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
     public function getNonDefaultSettings(bool $serialize = false): array
     {

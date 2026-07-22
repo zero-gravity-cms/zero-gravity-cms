@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Routing;
 
 use Symfony\Component\HttpFoundation\Request;

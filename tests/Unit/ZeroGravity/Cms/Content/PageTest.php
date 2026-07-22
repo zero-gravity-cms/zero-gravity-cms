@@ -19,7 +19,7 @@ class PageTest extends BaseUnit
     #[Test]
     public function filesystemPathContainsParentPath(): void
     {
-        $parentPage = new Page('the_parent', [], null);
+        $parentPage = new Page('the_parent', []);
         $childPage = new Page('the_child', [], $parentPage);
         $childChildPage = new Page('one_more_child', [], $childPage);
 
@@ -30,7 +30,7 @@ class PageTest extends BaseUnit
     #[Test]
     public function pathContainsParentSlug(): void
     {
-        $parentPage = new Page('the_parent', ['slug' => ''], null);
+        $parentPage = new Page('the_parent', ['slug' => '']);
         $childPage = new Page('the_child', ['slug' => 'foo'], $parentPage);
         $childChildPage = new Page('one_more_child', ['slug' => 'bar'], $childPage);
 
@@ -116,14 +116,14 @@ class PageTest extends BaseUnit
         self::assertNull($page->getContent());
         $page->setContent('This is the content');
         self::assertSame('This is the content', $page->getContent());
-        $page->setContent(null);
+        $page->setContent();
         self::assertNull($page->getContent());
     }
 
     #[Test]
     public function parentCanBeFetched(): void
     {
-        $parentPage = new Page('the_parent', [], null);
+        $parentPage = new Page('the_parent', []);
         $childPage = new Page('the_child', [], $parentPage);
 
         self::assertSame($parentPage, $childPage->getParent());

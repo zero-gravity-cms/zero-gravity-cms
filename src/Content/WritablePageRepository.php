@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Exception\StructureException;
@@ -15,7 +17,7 @@ interface WritablePageRepository
     /**
      * Get new writable page instance.
      */
-    public function getNewWritablePage(ReadablePage $parentPage = null): WritablePage;
+    public function getNewWritablePage(?ReadablePage $parentPage = null): WritablePage;
 
     /**
      * Store changes of the given page diff.

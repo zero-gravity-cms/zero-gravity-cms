@@ -274,7 +274,7 @@ class KnpMenuProviderTest extends BaseUnit
         return new ContentRepository($mapper, new ArrayAdapter(), false);
     }
 
-    protected function getProvider(EventDispatcherInterface $dispatcher = null): KnpMenuProvider
+    protected function getProvider(?EventDispatcherInterface $dispatcher = null): KnpMenuProvider
     {
         if (!$dispatcher instanceof EventDispatcherInterface) {
             $dispatcher = new EventDispatcher();

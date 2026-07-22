@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Filesystem\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
@@ -18,7 +20,7 @@ final class BeforePageCreate extends Event
     public function __construct(
         private readonly Directory $directory,
         private array $settings,
-        private readonly ?Page $parentPage = null
+        private readonly ?Page $parentPage = null,
     ) {
     }
 

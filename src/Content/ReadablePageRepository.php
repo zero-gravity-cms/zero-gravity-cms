@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;

@@ -11,12 +11,14 @@ use ZeroGravity\Cms\Content\ReadablePage;
  * TaxonomiesFilterIterator filters out pages that do not match the required taxonomies.
  *
  * @method ReadablePage current()
+ *
+ * @extends FilterIterator<string, ReadablePage, Iterator<string, ReadablePage>>
  */
 final class TaxonomiesFilterIterator extends FilterIterator
 {
     /**
-     * @param Iterator         $iterator   The Iterator to filter
-     * @param TaxonomyTester[] $taxonomies
+     * @param Iterator<string, ReadablePage> $iterator   The Iterator to filter
+     * @param TaxonomyTester[]               $taxonomies
      */
     public function __construct(
         Iterator $iterator,

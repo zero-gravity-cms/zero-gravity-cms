@@ -11,7 +11,7 @@ trait TempDirTrait
     /**
      * Create temporary directory and optionally mirror the content of the given directory.
      */
-    protected function setupTempDir(string $copyDir = null): void
+    protected function setupTempDir(?string $copyDir = null): void
     {
         $this->tempDir = tempnam(sys_get_temp_dir(), 'zg_');
 

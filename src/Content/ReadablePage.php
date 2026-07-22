@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
@@ -69,7 +71,7 @@ interface ReadablePage
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @return ($serialize is true ? SerializedSettingValues : SettingValues)
+     * @phpstan-return ($serialize is true ? SerializedSettingValues : SettingValues)
      */
     public function getSettings(bool $serialize = false): array;
 
@@ -79,7 +81,7 @@ interface ReadablePage
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
     public function getNonDefaultSettings(bool $serialize = false): array;
 

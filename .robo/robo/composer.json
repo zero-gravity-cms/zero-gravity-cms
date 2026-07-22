@@ -1,0 +1,19 @@
+{
+    "require": {
+        "consolidation/robo": "^5.1",
+        "symfony/console": "<8.0",
+        "cweagans/composer-patches": "~1.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "cweagans/composer-patches": true
+        }
+    },
+    "extra": {
+        "patches": {
+            "consolidation/robo": {
+                "Symfony Console 7.4 compatibility": "robo-application-patch.diff"
+            }
+        }
+    }
+}

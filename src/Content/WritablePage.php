@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Meta\PageSettings;
@@ -17,7 +19,7 @@ interface WritablePage extends ReadablePage
      */
     public function setName(string $name): void;
 
-    public function setParent(ReadablePage $parent = null): void;
+    public function setParent(?ReadablePage $parent = null): void;
 
     /**
      * Get raw (un-processed) markdown content.
@@ -27,7 +29,7 @@ interface WritablePage extends ReadablePage
     /**
      * Set raw (un-processed) markdown content.
      */
-    public function setContentRaw(string $contentRaw = null): void;
+    public function setContentRaw(?string $contentRaw = null): void;
 
     /**
      * Set page settings as plain array.

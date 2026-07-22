@@ -220,10 +220,11 @@ class SortableIteratorTest extends BaseUnit
     public function invalidSortMethodThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
+        /* @phpstan-ignore-next-line */
         new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
-    private function getFinder(): ?PageFinder
+    private function getFinder(): PageFinder
     {
         return clone $this->finderPrototype;
     }

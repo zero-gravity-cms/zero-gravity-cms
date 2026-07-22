@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use FilterIterator;
@@ -23,7 +25,7 @@ final class DateRangeFilterIterator extends FilterIterator
      */
     public function __construct(
         Iterator $iterator,
-        private readonly array $comparators
+        private readonly array $comparators,
     ) {
         parent::__construct($iterator);
     }

@@ -19,12 +19,19 @@ use ZeroGravity\Cms\Content\ReadablePage;
 final class SortableIterator implements IteratorAggregate
 {
     public const SORT_BY_DATE = 'date';
+
     public const SORT_BY_EXTRA_VALUE = 'extra';
+
     public const SORT_BY_FILESYSTEM_PATH = 'filesystemPath';
+
     public const SORT_BY_NAME = 'name';
+
     public const SORT_BY_PATH = 'path';
+
     public const SORT_BY_PUBLISH_DATE = 'publishDate';
+
     public const SORT_BY_SLUG = 'slug';
+
     public const SORT_BY_TITLE = 'title';
 
     /**
@@ -33,10 +40,10 @@ final class SortableIterator implements IteratorAggregate
     private $sortBy;
 
     /**
-     * @param Iterator<string, ReadablePage>                      $iterator The Iterator to filter
-     * @param self::SORT_BY_*|Closure|array{0: string, 1: string} $sortBy   the sort type (one of the SORT_BY_* constants),
-     *                                                                      a PHP closure or
-     *                                                                      an array holding a SORT_BY_ type and an additional parameter
+     * @param Iterator<string, ReadablePage>       $iterator The Iterator to filter
+     * @param self::SORT_BY_*|Closure|list<string> $sortBy   the sort type (one of the SORT_BY_* constants),
+     *                                                       a PHP closure or
+     *                                                       an array holding a SORT_BY_ type and an additional parameter
      *
      * @throws InvalidArgumentException
      */
@@ -49,12 +56,15 @@ final class SortableIterator implements IteratorAggregate
 
             return;
         }
+
         $parameter = null;
-        if (is_array($sortBy) && 2 === count($sortBy)) {
-            [$sortBy, $parameter] = $sortBy;
-        }
         if (is_array($sortBy)) {
-            throw new InvalidArgumentException('Arrays not holding a sorting type and parameters are not supported');
+            if (2 !== count($sortBy)) {
+                throw new InvalidArgumentException('Arrays not holding a sorting type and parameters are not supported');
+            }
+
+            /* @noinspection SuspiciousAssignmentsInspection */
+            [$sortBy, $parameter] = $sortBy;
         }
 
         Assert::oneOf($sortBy, [
@@ -74,7 +84,7 @@ final class SortableIterator implements IteratorAggregate
     /**
      * @throws InvalidArgumentException
      */
-    private function configureSortFunction(string $sortBy, string $parameter = null): void
+    private function configureSortFunction(string $sortBy, ?string $parameter = null): void
     {
         match ($sortBy) {
             self::SORT_BY_NAME,
@@ -99,7 +109,7 @@ final class SortableIterator implements IteratorAggregate
         return new ArrayIterator($array);
     }
 
-    private function sortByGetterOrPath(string $getter, string $parameter = null): void
+    private function sortByGetterOrPath(string $getter, ?string $parameter = null): void
     {
         $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter, $parameter): int {
             $valueA = $pageA->$getter($parameter);

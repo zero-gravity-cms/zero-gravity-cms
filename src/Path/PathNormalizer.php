@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Path;
 
 use ZeroGravity\Cms\Exception\UnsafePathException;
@@ -15,7 +17,7 @@ final class PathNormalizer
      *
      * $parentPath can be used to step outside the filename level.
      */
-    public static function normalizePath(Path $path, Path $parentPath = null): void
+    public static function normalizePath(Path $path, ?Path $parentPath = null): void
     {
         $normalizedElements = [];
         $parentPathElements = ($parentPath instanceof Path) ? $parentPath->getElements() : [];
