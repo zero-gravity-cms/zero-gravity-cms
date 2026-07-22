@@ -25,7 +25,7 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
      */
     public function find(Path $path, ?Path $parentPath = null): array
     {
-        /* @var $parentPath Path */
+        $parentPath ??= new Path('');
         $this->preparePaths($path, $parentPath);
 
         $finder = Finder::create()
@@ -45,11 +45,8 @@ final class FilesystemResolver extends AbstractResolver implements MultiPathReso
         return $this->doFind($finder, $parentPath);
     }
 
-    private function preparePaths(Path &$path, ?Path &$parentPath = null): void
+    private function preparePaths(Path &$path, Path $parentPath): void
     {
-        if (!$parentPath instanceof Path) {
-            $parentPath = new Path('');
-        }
         $path->normalize($parentPath);
 
         if ($path->isAbsolute() && !$path->isRegex()) {

@@ -34,7 +34,7 @@ class PageFinderTest extends BaseUnit
     {
         $finder = new PageFinder();
         $this->expectException(LogicException::class);
-        count($finder);
+        $finder->count();
     }
 
     #[DataProvider('provideFinderMethods')]

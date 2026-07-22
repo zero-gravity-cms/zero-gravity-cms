@@ -40,10 +40,10 @@ final class SortableIterator implements IteratorAggregate
     private $sortBy;
 
     /**
-     * @param Iterator<string, ReadablePage>                      $iterator The Iterator to filter
-     * @param self::SORT_BY_*|Closure|array{0: string, 1: string} $sortBy   the sort type (one of the SORT_BY_* constants),
-     *                                                                      a PHP closure or
-     *                                                                      an array holding a SORT_BY_ type and an additional parameter
+     * @param Iterator<string, ReadablePage>       $iterator The Iterator to filter
+     * @param self::SORT_BY_*|Closure|list<string> $sortBy   the sort type (one of the SORT_BY_* constants),
+     *                                                       a PHP closure or
+     *                                                       an array holding a SORT_BY_ type and an additional parameter
      *
      * @throws InvalidArgumentException
      */
@@ -56,12 +56,15 @@ final class SortableIterator implements IteratorAggregate
 
             return;
         }
+
         $parameter = null;
-        if (is_array($sortBy) && 2 === count($sortBy)) {
-            [$sortBy, $parameter] = $sortBy;
-        }
         if (is_array($sortBy)) {
-            throw new InvalidArgumentException('Arrays not holding a sorting type and parameters are not supported');
+            if (2 !== count($sortBy)) {
+                throw new InvalidArgumentException('Arrays not holding a sorting type and parameters are not supported');
+            }
+
+            /* @noinspection SuspiciousAssignmentsInspection */
+            [$sortBy, $parameter] = $sortBy;
         }
 
         Assert::oneOf($sortBy, [

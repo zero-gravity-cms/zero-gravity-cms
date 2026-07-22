@@ -79,9 +79,9 @@ trait TwigExtensionTestTrait
      */
     #[Test]
     #[DataProvider('getTests')]
-    public function testIntegration(string $file, string $message, ?string $condition, array $templates, false|string $exception, array $outputs): void
+    public function testIntegration(string $file, string $message, array $templates, false|string $exception, array $outputs): void
     {
-        $this->doIntegrationTest($file, $message, $condition, $templates, $exception, $outputs);
+        $this->doIntegrationTest($file, $message, $templates, $exception, $outputs);
     }
 
     /**
@@ -103,16 +103,14 @@ trait TwigExtensionTestTrait
 
             $test = file_get_contents($file->getRealpath());
 
-            if (preg_match('/--TEST--\s*(.*?)\s*(?:--CONDITION--\s*(.*))?\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)\s*(?:--DATA--\s*(.*))?\s*--EXCEPTION--\s*(.*)/sx', $test, $match)) {
+            if (preg_match('/--TEST--\s*(.*?)\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)\s*(?:--DATA--\s*(.*))?\s*--EXCEPTION--\s*(.*)/sx', $test, $match)) {
                 $message = $match[1];
-                $condition = $match[2];
-                $templates = self::parseTemplates($match[3]);
-                $exception = $match[5];
-                $outputs = [[null, $match[4], null, '']];
-            } elseif (preg_match('/--TEST--\s*(.*?)\s*(?:--CONDITION--\s*(.*))?\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)--DATA--.*?--EXPECT--.*/s', $test, $match)) {
+                $templates = self::parseTemplates($match[2]);
+                $exception = $match[4];
+                $outputs = [[null, $match[3], null, '']];
+            } elseif (preg_match('/--TEST--\s*(.*?)\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)--DATA--.*?--EXPECT--.*/s', $test, $match)) {
                 $message = $match[1];
-                $condition = $match[2];
-                $templates = self::parseTemplates($match[3]);
+                $templates = self::parseTemplates($match[2]);
                 $exception = false;
                 preg_match_all('/--DATA--(.*?)(?:--CONFIG--(.*?))?--EXPECT--(.*?)(?=\-\-DATA\-\-|$)/s', $test, $outputs, PREG_SET_ORDER);
             } else {
@@ -122,7 +120,7 @@ trait TwigExtensionTestTrait
             while (isset($tests[$message])) {
                 $message .= '.';
             }
-            $tests[$message] = [str_replace($fixturesDir.'/', '', (string) $file), $message, $condition, $templates, $exception, $outputs];
+            $tests[$message] = [str_replace($fixturesDir.'/', '', (string) $file), $message, $templates, $exception, $outputs];
         }
         if (!$legacyTests) {
             return $tests;
@@ -139,17 +137,10 @@ trait TwigExtensionTestTrait
      * @param array<string, string>          $templates
      * @param array<int, array<int, string>> $outputs
      */
-    protected function doIntegrationTest(string $file, string $message, ?string $condition, array $templates, false|string $exception, array $outputs, string $deprecation = ''): void
+    protected function doIntegrationTest(string $file, string $message, array $templates, false|string $exception, array $outputs, string $deprecation = ''): void
     {
         if ([] === $outputs) {
             $this->markTestSkipped('no tests to run');
-        }
-
-        if ($condition) {
-            eval('$ret = '.$condition.';');
-            if (!$ret) {
-                $this->markTestSkipped($condition);
-            }
         }
 
         $loader = new ChainLoader();

@@ -10,6 +10,7 @@ use Exception;
 use Iterator;
 use IteratorAggregate;
 use LogicException;
+use RecursiveIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
@@ -227,6 +228,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private function buildIteratorFromSinglePageList(array $pageList): Iterator
     {
         $mode = RecursiveIteratorIterator::SELF_FIRST;
+        /** @var RecursiveIteratorIterator<RecursiveIterator<string, ReadablePage>> $iterator */
         $iterator = new RecursiveIteratorIterator(new RecursivePageIterator($pageList), $mode);
 
         $iterator = $this->applyDepthsIterator($iterator);
