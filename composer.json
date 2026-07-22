@@ -1,34 +1,41 @@
 {
     "name": "zero-gravity/zero-gravity-cms",
     "description": "ZeroGravity CMS core library",
-    "type": "library",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "David Grüner",
             "email": "office@web-emerge.com"
         }
     ],
-    "minimum-stability": "stable",
     "require": {
         "php": ">=8.2",
         "cocur/slugify": "^4.0",
+        "ergebnis/composer-normalize": "^2.52",
         "mnapoli/front-yaml": "^2.0",
-        "symfony/cache": "^5.4|^6.0|^7.0",
-        "symfony/finder": "^5.4|^6.0|^7.0",
-        "webmozart/assert": "^1.10"
+        "symfony/cache": "^6.4 || ^7.0 || ^8.0",
+        "symfony/finder": "^6.4 || ^7.0 || ^8.0",
+        "webmozart/assert": "^1.10 || ^2.4"
     },
     "require-dev": {
         "codeception/codeception": "^5.0",
         "codeception/stub": "^4.1",
-        "liip/imagine-bundle": "^2.0",
         "knplabs/knp-menu": "^3.0",
-        "phpstan/phpstan": "^1.10",
-        "rector/rector": "^0.19.6",
+        "liip/imagine-bundle": "^2.0",
+        "phpstan/phpstan": "^2.2",
+        "rector/rector": "^2.5",
         "symfony-cmf/routing": "^3.0",
-        "symfony/var-dumper": "^6.0|^7.0",
+        "symfony/flex": "^2.11",
+        "symfony/var-dumper": "^6.4 || ^7.0 || ^8.0",
+        "twig/twig": "^2.7 || ^3.5"
+    },
+    "suggest": {
+        "liip/imagine-bundle": "^2.0",
+        "symfony-cmf/routing": "^3.0",
         "twig/twig": "^2.7|^3.5"
     },
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "ZeroGravity\\Cms\\": "src/"
@@ -39,22 +46,24 @@
             "Tests\\": "tests/"
         }
     },
-    "suggest": {
-        "liip/imagine-bundle": "^2.0",
-        "symfony-cmf/routing": "^3.0",
-        "twig/twig": "^2.7|^3.5"
-    },
     "config": {
-        "sort-packages": true,
         "allow-plugins": {
+            "ergebnis/composer-normalize": true,
             "symfony/flex": true
-        }
+        },
+        "sort-packages": true
     },
     "extra": {
         "symfony": {
+            "allow-contrib": true,
             "id": "",
-            "allow-contrib": false,
             "require": "^6.4"
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         }
     }
 }
