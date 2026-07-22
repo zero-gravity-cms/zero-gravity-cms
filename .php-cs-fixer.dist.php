@@ -19,6 +19,7 @@ return (new PhpCsFixer\Config())
 //    ->setUsingCache(false)
     ->setCacheFile($cacheDir.'/.php-cs-fixer.cache')
     ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
+    ->setUnsupportedPhpVersionAllowed(true)
     ->registerCustomFixers(new PhpCsFixerCustomFixers\Fixers())
     ->setRules([
         '@Symfony' => true,
