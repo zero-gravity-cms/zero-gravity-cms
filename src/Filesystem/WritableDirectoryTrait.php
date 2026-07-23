@@ -8,12 +8,12 @@ use LogicException;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
 use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
 /**
- * @phpstan-import-type SerializedSettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 trait WritableDirectoryTrait
 {
@@ -65,6 +65,7 @@ trait WritableDirectoryTrait
         $this->logger->debug("Updating markdown file in directory {$this->getPath()}");
         $document = $this->getFrontYAMLDocument(false);
         if (is_array($document->getYAML())) {
+            /* @phpstan-ignore-next-line we re-write existing YAML data as is */
             $yamlContent = $this->dumpSettingsToYaml($document->getYAML());
             $newRawContent = <<<FRONTMATTER
 ---

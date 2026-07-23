@@ -42,7 +42,7 @@ class PageFinderTest extends BaseUnit
     public function finderMethodReturnsThisForChaining(string $method, string|int|true $param): void
     {
         $finder = $this->getFinder();
-        $returnValue = $finder->$method($param, null);
+        $returnValue = $finder->$method($param, '');
 
         self::assertSame($finder, $returnValue);
     }
@@ -76,10 +76,10 @@ class PageFinderTest extends BaseUnit
         yield ['modular', true];
         yield ['module', true];
         yield ['visible', true];
-        yield ['extra', ''];
-        yield ['notExtra', ''];
-        yield ['setting', ''];
-        yield ['notSetting', ''];
+        yield ['extra', 'foo'];
+        yield ['notExtra', 'foo'];
+        yield ['setting', 'title'];
+        yield ['notSetting', 'title'];
         yield ['contentType', ''];
         yield ['notContentType', ''];
     }
@@ -572,12 +572,19 @@ class PageFinderTest extends BaseUnit
     }
 
     #[Test]
+    public function stringComparatorThrowsExceptionForEmptyName(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        /* @phpstan-ignore-next-line */
+        $this->getFinder()->extra('', 'something');
+    }
+
+    #[Test]
     public function extraFilterThrowsExceptionForInvalidComparator(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->getFinder()
-            ->extra('custom', 'somevalue', 'this-is-not-a-comparator')
-        ;
+        /* @phpstan-ignore-next-line */
+        $this->getFinder()->extra('custom', 'somevalue', 'this-is-not-a-comparator');
     }
 
     #[Test]

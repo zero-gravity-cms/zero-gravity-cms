@@ -48,6 +48,7 @@ class FilesystemMapperTest extends BaseUnit
 
         $writablePage = $mapper->getWritablePageInstance($page);
         self::assertInstanceOf(WritableFilesystemPage::class, $writablePage);
+        self::assertNotNull($writablePage->getDirectory());
         self::assertSame('01.yaml_only', $writablePage->getName());
     }
 }

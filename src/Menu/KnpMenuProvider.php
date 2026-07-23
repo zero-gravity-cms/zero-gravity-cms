@@ -91,21 +91,26 @@ readonly class KnpMenuProvider implements MenuProviderInterface
             return;
         }
 
-        $pageItemSettings = $page->getExtra('menu_item_options', []);
+        $extraItemOptions = $page->getExtra('menu_item_options', []);
+        if (!\is_array($extraItemOptions)) {
+            $extraItemOptions = [];
+        }
         $itemOptions = array_merge(
             $defaultOptions,
             [
                 'route' => $page->getPath()->toString(),
                 'label' => $page->getMenuLabel(),
             ],
-            $pageItemSettings
+            $extraItemOptions
         );
+        $defaultOptions['extras'] ??= [];
+        $extraItemOptions['extras'] ??= [];
         $itemOptions['extras'] = array_merge(
-            $defaultOptions['extras'] ?? [],
+            is_array($defaultOptions['extras']) ? $defaultOptions['extras'] : [],
             [
                 'page_slug' => $page->getSlug(),
             ],
-            $pageItemSettings['extras'] ?? []
+            is_array($extraItemOptions['extras']) ? $extraItemOptions['extras'] : []
         );
         $item = $this->factory->createItem($page->getName(), $itemOptions);
 

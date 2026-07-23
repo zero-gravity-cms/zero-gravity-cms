@@ -7,7 +7,7 @@ use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use ZeroGravity\Cms\Content\FileFactory;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Content\ReadablePage;
@@ -21,15 +21,15 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageSave;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
 /**
- * @phpstan-import-type SettingValue from PageSettings
- * @phpstan-import-type SerializedSettingValue from PageSettings
+ * @phpstan-import-type RawSettingValue from PageSettingsLoader
+ * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 final readonly class FilesystemMapper implements StructureMapper
 {
     private PageFactory $pageFactory;
 
     /**
-     * @param array<string, SettingValue> $defaultPageSettings
+     * @param array<string, RawSettingValue> $defaultPageSettings
      */
     public function __construct(
         private FileFactory $fileFactory,

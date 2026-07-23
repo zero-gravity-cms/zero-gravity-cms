@@ -16,6 +16,7 @@ final class PageFiles
         private array $files,
         array $fileAliases = [],
     ) {
+        /* @phpstan-ignore-next-line */
         Assert::allIsInstanceOf($this->files, File::class);
         $this->applyFileAliases($fileAliases);
     }
@@ -38,15 +39,15 @@ final class PageFiles
     }
 
     /**
-     * Get a single setting value or a default, if not defined.
+     * Get a single file by name if it exists.
      */
-    public function get(string $filename, mixed $default = null): ?File
+    public function get(string $filename): ?File
     {
         if ($this->has($filename)) {
             return $this->files[$filename];
         }
 
-        return $default;
+        return null;
     }
 
     /**

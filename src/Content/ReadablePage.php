@@ -6,17 +6,16 @@ namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
+use ZeroGravity\Cms\Content\Meta\SettingValues;
 use ZeroGravity\Cms\Path\Path;
 
 /**
  * This trait contains settings related methods (mostly getters) of the Page class.
  * This helps to separate native properties from validated settings/options.
  *
- * @phpstan-import-type SettingValue from PageSettings
- * @phpstan-import-type SettingValues from PageSettings
- * @phpstan-import-type SerializedSettingValue from PageSettings
- * @phpstan-import-type SerializedSettingValues from PageSettings
+ * @phpstan-import-type RawSettingValue from PageSettingsLoader
+ * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 interface ReadablePage
 {
@@ -67,21 +66,12 @@ interface ReadablePage
     public function getFilesystemPath(): Path;
 
     /**
-     * Get all setting values.
-     *
-     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
-     *
-     * @phpstan-return ($serialize is true ? SerializedSettingValues : SettingValues)
-     */
-    public function getSettings(bool $serialize = false): array;
-
-    /**
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, RawSettingValue>)
      */
     public function getNonDefaultSettings(bool $serialize = false): array;
 
@@ -89,7 +79,10 @@ interface ReadablePage
 
     public function hasChildren(): bool;
 
-    public function getSetting(string $name): mixed;
+    /**
+     * Get all setting values.
+     */
+    public function getSettings(): SettingValues;
 
     public function getSlug(): string;
 
@@ -134,7 +127,7 @@ interface ReadablePage
     /**
      * Get default setting values for child pages.
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     public function getChildDefaults(): array;
 

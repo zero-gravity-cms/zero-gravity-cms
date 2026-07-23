@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Constraint\Exception as FrameworkConstraintException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use SplFileInfo;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Extension\ExtensionInterface;
@@ -96,6 +97,7 @@ trait TwigExtensionTestTrait
         $tests = [];
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fixturesDir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+            self::assertInstanceOf(SplFileInfo::class, $file);
             if (!preg_match('/\.test$/', (string) $file)) {
                 continue;
             }

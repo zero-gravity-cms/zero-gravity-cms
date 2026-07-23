@@ -171,7 +171,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -198,7 +198,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -225,7 +225,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -298,6 +298,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
 
         $oldPage = $mapper->getNewWritablePage();
+        self::assertNull($oldPage->getDirectory());
         $newPage = clone $oldPage;
         $newPage->setName('08.totally_new');
         $newPage->setSettings([

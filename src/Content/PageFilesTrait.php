@@ -13,7 +13,7 @@ trait PageFilesTrait
      */
     public function setFiles(array $files): void
     {
-        $this->files = new PageFiles($files, $this->getSetting('file_aliases'));
+        $this->files = new PageFiles($files, $this->settings->file_aliases);
     }
 
     /**

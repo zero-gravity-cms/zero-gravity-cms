@@ -17,7 +17,7 @@ use ZeroGravity\Cms\Content\ReadablePage;
 final readonly class LimitAndOffsetIterator implements IteratorAggregate
 {
     /**
-     * @param Iterator $iterator The Iterator to filter
+     * @param Iterator<string, ReadablePage> $iterator The Iterator to filter
      */
     public function __construct(
         private Iterator $iterator,

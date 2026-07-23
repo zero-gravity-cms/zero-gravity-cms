@@ -179,6 +179,7 @@ final class PageFinder implements IteratorAggregate, Countable
     {
         $pages = [];
         foreach ($iterator as $page) {
+            /* @phpstan-ignore-next-line */
             Assert::isInstanceOf($page, ReadablePage::class);
             /* @var $page ReadablePage */
             $pages[$page->getPath()->toString()] = $page;
@@ -207,6 +208,7 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     private function buildIteratorFromPageListsAndIterators(): Iterator
     {
+        /** @var AppendIterator<string, ReadablePage, Iterator<string, ReadablePage>> $iterator */
         $iterator = new AppendIterator();
         foreach ($this->pageLists as $pageList) {
             $iterator->append($this->buildIteratorFromSinglePageList($pageList));

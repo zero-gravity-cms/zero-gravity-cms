@@ -32,6 +32,7 @@ class CustomPageFilterIterator extends FilterIterator
      */
     public function __construct(Iterator $iterator, array $filters)
     {
+        /* @phpstan-ignore-next-line */
         Assert::allIsInstanceOf($filters, Closure::class, 'Invalid PHP callback.');
         $this->filters = $filters;
 

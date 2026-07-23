@@ -21,7 +21,7 @@ final class WritableFilesystemPage extends Page implements WritablePage
             $this->contentRaw = $this->directory->fetchPageContent(false) ?? '';
         }
 
-        parent::__construct($page->getName(), $page->getSettings(), $page->getParent());
+        parent::__construct($page->getName(), $page->getSettings()->toArray(), $page->getParent());
     }
 
     public function getDirectory(): ?Directory

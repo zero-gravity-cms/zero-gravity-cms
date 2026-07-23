@@ -82,6 +82,8 @@ final class SortableIterator implements IteratorAggregate
     }
 
     /**
+     * @param self::SORT_BY_* $sortBy
+     *
      * @throws InvalidArgumentException
      */
     private function configureSortFunction(string $sortBy, ?string $parameter = null): void
@@ -97,7 +99,6 @@ final class SortableIterator implements IteratorAggregate
 
             self::SORT_BY_PATH,
             self::SORT_BY_FILESYSTEM_PATH => $this->sortByGetter('get'.ucfirst($sortBy)),
-            default => throw new InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.'),
         };
     }
 

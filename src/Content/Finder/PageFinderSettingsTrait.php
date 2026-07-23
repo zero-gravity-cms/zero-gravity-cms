@@ -12,6 +12,7 @@ use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilter;
 use ZeroGravity\Cms\Content\Finder\Iterator\SettingFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\SlugFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\TitleFilterIterator;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\ReadablePage;
 
 trait PageFinderSettingsTrait
@@ -66,11 +67,12 @@ trait PageFinderSettingsTrait
      *
      * $finder->extra('my_extra', 'value')
      *
-     * @param string $comparator One of the ExtraFilter::COMPARATOR_* constants
+     * @param non-empty-string          $name
+     * @param ExtraFilter::COMPARATOR_* $comparator One of the ExtraFilter::COMPARATOR_* constants
      *
      * @see ExtraFilterIterator
      */
-    public function extra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function extra(string $name, string $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::has($name, $value, $comparator);
 
@@ -82,11 +84,12 @@ trait PageFinderSettingsTrait
      *
      * $finder->notExtra('my_extra', 'value')
      *
-     * @param string $comparator One of the ExtraFilter::COMPARATOR_* constants
+     * @param non-empty-string          $name
+     * @param ExtraFilter::COMPARATOR_* $comparator One of the ExtraFilter::COMPARATOR_* constants
      *
      * @see ExtraFilterIterator
      */
-    public function notExtra(string $name, mixed $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
+    public function notExtra(string $name, string $value, string $comparator = ExtraFilter::COMPARATOR_STRING): self
     {
         $this->extras[] = ExtraFilter::hasNot($name, $value, $comparator);
 
@@ -97,6 +100,8 @@ trait PageFinderSettingsTrait
      * Adds rules that pages setting values must match.
      *
      * $finder->setting('my_setting', 'value')
+     *
+     * @param PageSettingsLoader::KEY_* $name
      *
      * @see SettingFilterIterator
      */
@@ -111,6 +116,8 @@ trait PageFinderSettingsTrait
      * Adds rules that pages setting values must not match.
      *
      * $finder->notSetting('my_setting', 'value')
+     *
+     * @param PageSettingsLoader::KEY_* $name
      *
      * @see SettingFilterIterator
      */

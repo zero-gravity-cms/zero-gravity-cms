@@ -12,13 +12,9 @@ use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypes;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
 
-/**
- * @phpstan-import-type SettingValue from PageSettings
- */
 final class Directory
 {
     use WritableDirectoryTrait;
@@ -356,20 +352,18 @@ final class Directory
     /**
      * Fetch page settings from either YAML or markdown/frontmatter.
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     public function fetchPageSettings(): array
     {
+        $data = [];
         if ($this->hasYamlFile()) {
             $data = Yaml::parse($this->readFile($this->getYamlFile()));
-
-            return is_array($data) ? $data : [];
-        }
-        if ($this->hasMarkdownFile()) {
-            return $this->getFrontYAMLDocument(false)->getYAML() ?: [];
+        } elseif ($this->hasMarkdownFile()) {
+            $data = $this->getFrontYAMLDocument(false)->getYAML();
         }
 
-        return [];
+        return is_array($data) && !array_is_list($data) ? $data : [];
     }
 
     /**

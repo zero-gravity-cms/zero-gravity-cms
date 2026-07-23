@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace ZeroGravity\Cms\Filesystem\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Filesystem\Directory;
 
 /**
- * @phpstan-import-type SettingValue from PageSettings
- * @phpstan-import-type SettingValues from PageSettings
+ * @phpstan-import-type RawSettingValue from PageSettingsLoader
  */
 final class BeforePageCreate extends Event
 {
     /**
-     * @param array<string, SettingValue> $settings
+     * @param array<string, RawSettingValue> $settings
      */
     public function __construct(
         private readonly Directory $directory,
+        /**
+         * @var array<string, mixed>
+         */
         private array $settings,
         private readonly ?Page $parentPage = null,
     ) {
@@ -31,7 +33,7 @@ final class BeforePageCreate extends Event
     }
 
     /**
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     public function getSettings(): array
     {
@@ -39,7 +41,7 @@ final class BeforePageCreate extends Event
     }
 
     /**
-     * @param array<string, SettingValue> $settings
+     * @param array<string, mixed> $settings
      */
     public function setSettings(array $settings): void
     {

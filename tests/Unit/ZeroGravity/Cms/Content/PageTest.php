@@ -143,7 +143,7 @@ class PageTest extends BaseUnit
             'menu_id' => 'custom_id',
             'menu_label' => 'custom label',
             'extra' => [
-                'fancy_extra_settings' => 'are not validated',
+                'fancy_extra_settings' => 'can be any RawSettingValue',
             ],
         ]);
 
@@ -155,7 +155,30 @@ class PageTest extends BaseUnit
         self::assertSame('CustomBundle:Custom:action', $page->getController());
         self::assertSame('custom_id', $page->getMenuId());
         self::assertSame('custom label', $page->getMenuLabel());
-        self::assertSame(['fancy_extra_settings' => 'are not validated'], $page->getExtraValues());
+        self::assertSame(['fancy_extra_settings' => 'can be any RawSettingValue'], $page->getExtraValues());
+    }
+
+    #[Test]
+    public function customSlugIsRecognized(): void
+    {
+        $page = new Page('page', [
+            'slug' => 'not-page',
+            'title' => 'Page title',
+        ]);
+
+        self::assertTrue($page->hasCustomSlug());
+        self::assertSame('not-page', $page->getSlug());
+    }
+
+    #[Test]
+    public function customSlugIsIgnoredWhenMatchingName(): void
+    {
+        $page = new Page('page', [
+            'slug' => 'page',
+            'title' => 'Page title',
+        ]);
+
+        self::assertFalse($page->hasCustomSlug());
     }
 
     #[Test]
@@ -205,11 +228,11 @@ class PageTest extends BaseUnit
     {
         $page = new Page('page', [
             'extra' => [
-                'fancy_extra_settings' => 'are not validated',
+                'fancy_extra_settings' => 'can be any RawSettingValue',
             ],
         ]);
 
-        self::assertSame('are not validated', $page->getExtra('fancy_extra_settings'));
+        self::assertSame('can be any RawSettingValue', $page->getExtra('fancy_extra_settings'));
         self::assertNull($page->getExtra('does_not_exist'));
         self::assertSame('default', $page->getExtra('does_not_exist', 'default'));
     }
@@ -332,7 +355,7 @@ class PageTest extends BaseUnit
     }
 
     #[Test]
-    public function taxonomyIsNormalizedToArrays(): void
+    public function taxonomyIsNormalizedToArraysAndSortedByValue(): void
     {
         $page = new Page('page', [
             'taxonomy' => [
@@ -343,7 +366,7 @@ class PageTest extends BaseUnit
 
         self::assertSame([
             'category' => ['baz'],
-            'tag' => ['foo', 'bar'],
+            'tag' => ['bar', 'foo'],
         ], $page->getTaxonomies());
 
         $page = new Page('page', [
@@ -362,7 +385,7 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        self::assertSame(['foo', 'bar'], $page->getTaxonomy('tag'));
+        self::assertSame(['bar', 'foo'], $page->getTaxonomy('tag'));
         self::assertSame([], $page->getTaxonomy('category'));
     }
 
@@ -377,7 +400,7 @@ class PageTest extends BaseUnit
             ],
         ]);
 
-        self::assertSame(['foo', 'bar'], $page->getTags());
+        self::assertSame(['bar', 'foo'], $page->getTags());
         self::assertSame(['baz'], $page->getCategories());
         self::assertSame(['David', 'Julian'], $page->getAuthors());
     }

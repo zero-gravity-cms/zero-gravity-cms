@@ -22,4 +22,14 @@ class FilterException extends RuntimeException implements ZeroGravityException
             implode(', ', $existingFilters),
         ));
     }
+
+    public static function notAScalar(mixed $value): self
+    {
+        return new self(sprintf('Expected a scalar, got `%s`', get_debug_type($value)));
+    }
+
+    public static function notAString(mixed $value): self
+    {
+        return new self(sprintf('Expected a string, got `%s`', get_debug_type($value)));
+    }
 }

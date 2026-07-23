@@ -11,14 +11,12 @@ use DateTimeImmutable;
  */
 trait PagePublishingTrait
 {
-    abstract public function getSetting(string $name): mixed;
-
     /**
      * Get optional publishing date of this page.
      */
     public function getPublishDate(): ?DateTimeImmutable
     {
-        return $this->getSetting('publish_date');
+        return $this->settings->publish_date;
     }
 
     /**
@@ -26,7 +24,7 @@ trait PagePublishingTrait
      */
     public function getUnpublishDate(): ?DateTimeImmutable
     {
-        return $this->getSetting('unpublish_date');
+        return $this->settings->unpublish_date;
     }
 
     /**
@@ -40,7 +38,7 @@ trait PagePublishingTrait
      */
     public function isPublished(): bool
     {
-        if (!$this->getSetting('publish')) {
+        if (!$this->settings->publish) {
             return false;
         }
 

@@ -224,6 +224,21 @@ class SortableIteratorTest extends BaseUnit
         new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
+    #[Test]
+    public function invalidSortByArrayThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new SortableIterator(new ArrayIterator([]), ['only one array item']);
+    }
+
+    #[Test]
+    public function invalidSortByThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        /* @phpstan-ignore-next-line */
+        new SortableIterator(new ArrayIterator([]), ['invalid', null]);
+    }
+
     private function getFinder(): PageFinder
     {
         self::assertNotNull($this->finderPrototype);

@@ -52,7 +52,7 @@ class PathTest extends BaseUnit
      */
     #[DataProvider('providePathData')]
     #[Test]
-    public function toStringRebuildsPath(mixed $pathString, array $expectations): void
+    public function toStringRebuildsPath(string $pathString, array $expectations): void
     {
         if ($expectations['cannotRebuild']) {
             // this is for paths containing "empty" elements that get lost during parsing

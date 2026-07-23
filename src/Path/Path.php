@@ -114,6 +114,7 @@ final class Path implements Stringable
      */
     public function setElements(array $elements): void
     {
+        /* @phpstan-ignore-next-line */
         Assert::allIsInstanceOf($elements, PathElement::class);
         $this->elements = $elements;
         $this->rebuildString();

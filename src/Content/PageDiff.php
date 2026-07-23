@@ -2,11 +2,12 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
+use ZeroGravity\Cms\Content\Meta\SettingValuesSerializer;
 
 /**
- * @phpstan-import-type SettingValue from PageSettings
- * @phpstan-import-type SerializedSettingValue from PageSettings
+ * @phpstan-import-type RawSettingValue from PageSettingsLoader
+ * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 final readonly class PageDiff
 {
@@ -38,11 +39,11 @@ final readonly class PageDiff
 
     public function settingsHaveChanged(): bool
     {
-        return $this->old->getSettings(true) !== $this->new->getSettings(true);
+        return SettingValuesSerializer::serialize($this->old->getSettings())->toArray() !== SettingValuesSerializer::serialize($this->new->getSettings())->toArray();
     }
 
     /**
-     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, RawSettingValue>)
      */
     public function getNewNonDefaultSettings(bool $serialize = false): array
     {
