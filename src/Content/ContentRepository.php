@@ -6,6 +6,7 @@ use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Throwable;
 use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
@@ -79,13 +80,18 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
             if (!$item->isHit()) {
                 return false;
             }
-            $pages = $item->get();
-            Assert::isMap($pages, 'Expected assoziative array in page cache.');
-            Assert::allIsInstanceOf($pages, ReadablePage::class);
-            $this->pages = $pages;
-            $this->flattenPages($pages);
+
+            $pageList = $item->get();
+            Assert::allIsInstanceOf($pageList, ReadablePage::class, 'Found non-page entries in page cache.');
+            $this->pages = [];
+            foreach ($pageList as $page) {
+                $this->pages[$page->getPath()->toString()] = $page;
+            }
+            $this->flattenPages($this->pages);
 
             return true;
+        } catch (InvalidArgumentException $exception) {
+            throw $exception;
         } catch (Throwable) {
             return false;
         }

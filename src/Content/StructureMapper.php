@@ -12,7 +12,7 @@ interface StructureMapper
     /**
      * Parse any content source for all Page data and return Page tree as array containing base nodes.
      *
-     * @return array<string, ReadablePage>
+     * @return array<string, ReadablePage> Pages by path
      */
     public function parse(): array;
 

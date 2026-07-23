@@ -45,7 +45,7 @@ final readonly class FilesystemMapper implements StructureMapper
     /**
      * Parse any content source for all Page data and return Page tree as array containing base nodes.
      *
-     * @return array<string, Page>
+     * @return array<string, Page> Pages by path
      *
      * @throws ZeroGravityException|FilesystemException
      */

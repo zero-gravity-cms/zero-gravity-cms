@@ -144,10 +144,16 @@ class RoboFile extends BaseRoboFile
 
     /**
      * Run tests.
+     *
+     * @arg string $group Test group
+     * @arg string $suite Codeception suite
      */
-    public function test(): void
+    public function test($group = '', $suite = ''): void
     {
-        $this->_execPhp('php ./vendor/bin/codecept run --coverage-xml --coverage-html --coverage-text', true);
+        if ($group) {
+            $group = "-g {$group}";
+        }
+        $this->_execPhp("php ./vendor/bin/codecept run {$suite} {$group} --coverage-xml --coverage-html --coverage-text", true);
         $this->outputCoverage();
     }
 
