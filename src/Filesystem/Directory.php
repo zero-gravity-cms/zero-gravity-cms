@@ -55,12 +55,12 @@ final class Directory
     /**
      * @var array<string, File>
      */
-    private ?array $files = null;
+    private array $files = [];
 
     /**
-     * @var array<string, Directory>|null
+     * @var array<string, Directory>
      */
-    private ?array $directories = null;
+    private array $directories = [];
 
     public function __construct(
         private SplFileInfo $directoryInfo,
@@ -202,7 +202,7 @@ final class Directory
     }
 
     /**
-     * Validate basenames of YAML and markdown files.
+     * Validate basenames of YAML and markdown files. Only compares if both files exist.
      */
     private function validateBasenames(): void
     {
@@ -211,6 +211,10 @@ final class Directory
         }
     }
 
+    /**
+     * @phpstan-assert-if-false File $this->getYamlFile()
+     * @phpstan-assert-if-false File $this->getMarkdownFile()
+     */
     private function yamlAndMarkdownBasenamesMatch(): bool
     {
         if (!$this->hasYamlFile()) {
@@ -220,7 +224,7 @@ final class Directory
             return true;
         }
 
-        return $this->getYamlFile()?->getDefaultBasename() === $this->getMarkdownFile()?->getDefaultBasename();
+        return $this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename();
     }
 
     public function getYamlFile(): ?File
@@ -230,6 +234,9 @@ final class Directory
         return count($files) ? current($files) : null;
     }
 
+    /**
+     * @phpstan-assert-if-true File $this->getYamlFile()
+     */
     public function hasYamlFile(): bool
     {
         return $this->getYamlFile() instanceof File;
@@ -242,6 +249,9 @@ final class Directory
         return count($files) ? current($files) : null;
     }
 
+    /**
+     * @phpstan-assert-if-true File $this->getMarkdownFile()
+     */
     public function hasMarkdownFile(): bool
     {
         return $this->getMarkdownFile() instanceof File;
@@ -327,6 +337,9 @@ final class Directory
         return null;
     }
 
+    /**
+     * @phpstan-assert File $this->getMarkdownFile()
+     */
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
         $markdownFile = $this->getMarkdownFile();

@@ -10,7 +10,7 @@ use ZeroGravity\Cms\Filesystem\Directory;
  */
 trait BasicWritablePageTrait
 {
-    private ?string $contentRaw = null;
+    private string $contentRaw = '';
 
     private readonly ?Directory $directory;
 
@@ -32,7 +32,7 @@ trait BasicWritablePageTrait
     /**
      * Get raw (un-processed) markdown content.
      */
-    public function getContentRaw(): ?string
+    public function getContentRaw(): string
     {
         return $this->contentRaw;
     }
@@ -40,9 +40,9 @@ trait BasicWritablePageTrait
     /**
      * Set raw (un-processed) markdown content.
      */
-    public function setContentRaw(?string $contentRaw = null): void
+    public function setContentRaw(string $contentRaw = ''): void
     {
-        $this->contentRaw = str_replace("\r\n", "\n", (string) $contentRaw);
+        $this->contentRaw = str_replace("\r\n", "\n", $contentRaw);
     }
 
     /**

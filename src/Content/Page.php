@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;
@@ -39,9 +41,9 @@ class Page implements ReadablePage
      */
     private array $children = [];
 
-    private ?Path $path = null;
+    private Path $path;
 
-    private ?Path $filesystemPath = null;
+    private Path $filesystemPath;
 
     /**
      * @param array<string, SettingValue> $settings
@@ -62,7 +64,7 @@ class Page implements ReadablePage
     }
 
     /**
-     * Set parent page and initialize all dependent values.
+     * Set parent page and initialize all dependent values such as $this->path and $this->filesystemPath.
      */
     protected function initParent(ReadablePage|self|null $parent = null): void
     {

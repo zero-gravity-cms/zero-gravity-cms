@@ -18,7 +18,7 @@ final class WritableFilesystemPage extends Page implements WritablePage
         private readonly ?Directory $directory = null,
     ) {
         if ($this->directory instanceof Directory) {
-            $this->contentRaw = $this->directory->fetchPageContent(false);
+            $this->contentRaw = $this->directory->fetchPageContent(false) ?? '';
         }
 
         parent::__construct($page->getName(), $page->getSettings(), $page->getParent());
