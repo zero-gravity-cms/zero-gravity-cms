@@ -22,6 +22,7 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
 /**
  * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SerializedSettingValue from PageSettings
  */
 final readonly class FilesystemMapper implements StructureMapper
 {
@@ -170,7 +171,7 @@ final readonly class FilesystemMapper implements StructureMapper
     }
 
     /**
-     * @return array<string, SettingValue>
+     * @return array<string, SerializedSettingValue>
      */
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
     {

@@ -90,6 +90,9 @@ trait TwigExtensionTestTrait
     public function getTests(?string $name, bool $legacyTests = false): array
     {
         $fixturesDir = realpath($this->getFixturesDir());
+        if (false === $fixturesDir) {
+            throw new InvalidArgumentException('Fixtures directory '.$this->getFixturesDir().' does not exist');
+        }
         $tests = [];
 
         foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fixturesDir), RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
@@ -102,6 +105,9 @@ trait TwigExtensionTestTrait
             }
 
             $test = file_get_contents($file->getRealpath());
+            if (false === $test) {
+                throw new InvalidArgumentException('Cannot read file '.$file->getRealpath());
+            }
 
             if (preg_match('/--TEST--\s*(.*?)\s*((?:--TEMPLATE(?:\(.*?\))?--(?:.*?))+)\s*(?:--DATA--\s*(.*))?\s*--EXCEPTION--\s*(.*)/sx', $test, $match)) {
                 $message = $match[1];

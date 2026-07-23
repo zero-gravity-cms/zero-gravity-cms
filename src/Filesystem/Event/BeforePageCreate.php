@@ -11,6 +11,7 @@ use ZeroGravity\Cms\Filesystem\Directory;
 
 /**
  * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type SettingValues from PageSettings
  */
 final class BeforePageCreate extends Event
 {

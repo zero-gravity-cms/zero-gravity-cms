@@ -14,6 +14,7 @@ use RecursiveIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
+use ZeroGravity\Cms\Content\Finder\Iterator\CustomPageFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\ReadablePage;
@@ -44,7 +45,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private array $pageLists = [];
 
     /**
-     * @var callable[]
+     * @var list<Closure>
      */
     private array $filters = [];
 
@@ -158,11 +159,9 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     public function append(IteratorAggregate|Iterator|iterable|ReadablePage $iterator): self
     {
-        if ($iterator instanceof IteratorAggregate) {
-            $this->iterators[] = $iterator->getIterator();
-        } elseif ($iterator instanceof Iterator) {
+        if ($iterator instanceof Iterator) {
             $this->iterators[] = $iterator;
-        } elseif (is_iterable($iterator)) {
+        } elseif ($iterator instanceof IteratorAggregate || is_iterable($iterator)) {
             $this->iterators[] = $this->appendPageArrayIterator($iterator);
         } elseif ($iterator instanceof ReadablePage) {
             $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);
@@ -262,7 +261,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
         if ([] !== $this->filters) {
-            return new CustomFilterIterator($iterator, $this->filters);
+            return new CustomPageFilterIterator($iterator, $this->filters);
         }
 
         return $iterator;

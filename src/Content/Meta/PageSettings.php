@@ -7,9 +7,10 @@ use DateTimeInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use ZeroGravity\Cms\Content\Page;
+use ZeroGravity\Cms\Exception\PageException;
 
 /**
- * @phpstan-type TaxonomySettingValue array<string>
+ * @phpstan-type TaxonomySettingValue list<string>
  * @phpstan-type DateTimeSettingValue int|string|DateTimeInterface
  * @phpstan-type SettingValue null|string|bool|DateTimeSettingValue|array<string, TaxonomySettingValue>|array<string, mixed>
  * @phpstan-type SerializedSettingValue null|string|bool|int|array<string, TaxonomySettingValue>|array<string, mixed>
@@ -35,7 +36,7 @@ use ZeroGravity\Cms\Content\Page;
  *      visible: bool
  * }
  * @phpstan-type SerializedSettingValues array{
- *      child_defaults: null|array<string, mixed>,
+ *      child_defaults: null|array<string, SerializedSettingValue>,
  *      content_template: null|string,
  *      content_type: string,
  *      controller: string|null,
@@ -75,6 +76,8 @@ final class PageSettings
 
     /**
      * Get a single setting value.
+     *
+     * @phpstan-return SettingValue
      */
     public function get(string $name): mixed
     {
@@ -90,13 +93,15 @@ final class PageSettings
      */
     public function toArray(bool $serialize = false): array
     {
-        return $serialize ? $this->serialize($this->values) : $this->values;
+        return $serialize ? $this->serializeValues($this->values) : $this->values;
     }
 
     /**
      * Get all values that wouldn't have been set by default.
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
+     *
+     * @return array<string, SettingValue|SerializedSettingValue>
      *
      * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
      */
@@ -125,7 +130,9 @@ final class PageSettings
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
 
+        /* @phpstan-ignore-next-line */
         $this->values = $resolver->resolve($values);
+        /* @phpstan-ignore-next-line */
         ksort($this->values);
     }
 
@@ -174,7 +181,7 @@ final class PageSettings
         $resolver->setAllowedTypes('controller', ['null', 'string']);
         $resolver->setAllowedTypes('date', $dateTypes);
         $resolver->setAllowedTypes('extra', ['null', 'array']);
-        $resolver->setAllowedTypes('file_aliases', ['null', 'array']);
+        $resolver->setAllowedTypes('file_aliases', ['null', 'string[]']);
         $resolver->setAllowedTypes('layout_template', ['null', 'string']);
         $resolver->setAllowedTypes('menu_id', ['string', 'bool']);
         $resolver->setAllowedTypes('menu_label', ['null', 'string']);
@@ -264,6 +271,22 @@ final class PageSettings
         $resolver->setNormalizer('file_aliases', $normalizeArray);
     }
 
+    /**
+     * @param SettingValues $values
+     *
+     * @return SerializedSettingValues
+     */
+    private function serializeValues(array $values): array
+    {
+        /* @phpstan-ignore-next-line */
+        return array_map($this->serialize(...), $values);
+    }
+
+    /**
+     * @param SettingValue $value
+     *
+     * @return SerializedSettingValue
+     */
     private function serialize(mixed $value): mixed
     {
         if (is_scalar($value)) {
@@ -279,6 +302,7 @@ final class PageSettings
             return $value->format('Y-m-d H:i:s');
         }
 
-        return (string) $value;
+        /* @phpstan-ignore-next-line */
+        throw PageException::invalidSettingValue($value, $this->pageName);
     }
 }

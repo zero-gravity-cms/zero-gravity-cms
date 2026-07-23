@@ -41,7 +41,7 @@ final class SortableIterator implements IteratorAggregate
 
     /**
      * @param Iterator<string, ReadablePage>       $iterator The Iterator to filter
-     * @param self::SORT_BY_*|Closure|list<string> $sortBy   the sort type (one of the SORT_BY_* constants),
+     * @param self::SORT_BY_*|list<string>|Closure $sortBy   the sort type (one of the SORT_BY_* constants),
      *                                                       a PHP closure or
      *                                                       an array holding a SORT_BY_ type and an additional parameter
      *

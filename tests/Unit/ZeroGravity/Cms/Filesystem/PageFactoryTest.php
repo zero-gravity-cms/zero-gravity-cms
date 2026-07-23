@@ -11,6 +11,7 @@ use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
+use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Page;
@@ -198,7 +199,10 @@ class PageFactoryTest extends BaseUnit
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(BeforePageCreate::class, static function (BeforePageCreate $event): void {
             $settings = $event->getSettings();
-            $settings['extra']['very_custom_key'] = 'very custom value';
+            $extra = $settings['extra'];
+            Assert::isArray($extra);
+            $extra['very_custom_key'] = 'very custom value';
+            $settings['extra'] = $extra;
             $event->setSettings($settings);
         });
 

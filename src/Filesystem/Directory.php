@@ -335,7 +335,7 @@ final class Directory
         }
 
         return (new FrontYAMLParser())->parse(
-            file_get_contents($markdownFile->getFilesystemPathname()),
+            $this->readFile($markdownFile),
             $convertMarkdown
         );
     }
@@ -348,7 +348,7 @@ final class Directory
     public function fetchPageSettings(): array
     {
         if ($this->hasYamlFile()) {
-            $data = Yaml::parse(file_get_contents($this->getYamlFile()->getFilesystemPathname()));
+            $data = Yaml::parse($this->readFile($this->getYamlFile()));
 
             return is_array($data) ? $data : [];
         }
@@ -382,5 +382,18 @@ final class Directory
         }
 
         return self::CONTENT_STRATEGY_NONE;
+    }
+
+    /**
+     * @throws FilesystemException if the given file cannot be read
+     */
+    private function readFile(File $file): string
+    {
+        $content = file_get_contents($file->getFilesystemPathname());
+        if (false === $content) {
+            throw FilesystemException::cannotReadFile($file);
+        }
+
+        return $content;
     }
 }

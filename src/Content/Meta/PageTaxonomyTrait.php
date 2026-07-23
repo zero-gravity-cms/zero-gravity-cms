@@ -30,7 +30,7 @@ trait PageTaxonomyTrait
      */
     public function getTaxonomy(string $name): array
     {
-        $taxonomy = $this->getSetting('taxonomy');
+        $taxonomy = $this->getTaxonomies();
         if (isset($taxonomy[$name])) {
             return (array) $taxonomy[$name];
         }
