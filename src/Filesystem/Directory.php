@@ -146,7 +146,7 @@ final class Directory
 
     public function getSlug(): string
     {
-        if (preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
+        if (1 === preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
             return $matches[1];
         }
 
@@ -227,7 +227,7 @@ final class Directory
     {
         $files = $this->getFilesByType(FileTypes::TYPE_YAML);
 
-        return count($files) ? current($files) : null;
+        return [] !== $files ? current($files) : null;
     }
 
     /**
@@ -242,7 +242,7 @@ final class Directory
     {
         $files = $this->getFilesByType(FileTypes::TYPE_MARKDOWN);
 
-        return count($files) ? current($files) : null;
+        return [] !== $files ? current($files) : null;
     }
 
     /**
@@ -373,7 +373,7 @@ final class Directory
     {
         $hasMarkdown = $this->hasMarkdownFile();
         $hasYaml = $this->hasYamlFile();
-        $hasTwig = count($this->getTwigFiles()) > 0;
+        $hasTwig = [] !== $this->getTwigFiles();
 
         if ($hasMarkdown && $hasYaml) {
             return self::CONTENT_STRATEGY_YAML_AND_MARKDOWN;

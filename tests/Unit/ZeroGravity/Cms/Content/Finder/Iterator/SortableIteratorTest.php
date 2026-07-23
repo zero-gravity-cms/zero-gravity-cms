@@ -40,10 +40,12 @@ class SortableIteratorTest extends BaseUnit
         $finder = $this->getFinder();
         if (is_string($method)) {
             $sortMethod = 'sortBy'.ucfirst($method);
+            /* @phpstan-ignore method.dynamicName */
             $finder->$sortMethod();
         } elseif (is_array($method)) {
             [$method, $parameter] = $method;
-            $sortMethod = 'sortBy'.ucfirst((string) $method);
+            $sortMethod = 'sortBy'.ucfirst($method);
+            /* @phpstan-ignore method.dynamicName */
             $finder->$sortMethod($parameter);
         } elseif (is_callable($method)) {
             $finder->sort($method);

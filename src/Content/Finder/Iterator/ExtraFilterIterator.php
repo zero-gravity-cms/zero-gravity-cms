@@ -73,7 +73,7 @@ final class ExtraFilterIterator extends FilterIterator
 
         switch ($extraFilter->comparator()) {
             case ExtraFilter::COMPARATOR_NUMERIC:
-                if (empty($value)) {
+                if ('' === $value) {
                     return 0;
                 }
                 if (!is_scalar($value)) {

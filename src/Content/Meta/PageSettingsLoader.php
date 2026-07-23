@@ -279,7 +279,7 @@ final class PageSettingsLoader
                 return (string) $value;
             }
             $name = $this->pageName;
-            if (preg_match(Page::SORTING_PREFIX_PATTERN, $name, $matches)) {
+            if (1 === preg_match(Page::SORTING_PREFIX_PATTERN, $name, $matches)) {
                 $name = $matches[1];
             }
 

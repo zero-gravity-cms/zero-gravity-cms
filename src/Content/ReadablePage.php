@@ -71,7 +71,7 @@ interface ReadablePage
      *
      * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
      *
-     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, RawSettingValue>)
+     * @return array<string, mixed>
      */
     public function getNonDefaultSettings(bool $serialize = false): array;
 

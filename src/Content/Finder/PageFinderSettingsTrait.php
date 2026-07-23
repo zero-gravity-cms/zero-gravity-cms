@@ -260,7 +260,7 @@ trait PageFinderSettingsTrait
      */
     private function applySlugsIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->slugs) || !empty($this->notSlugs)) {
+        if ([] !== $this->slugs || [] !== $this->notSlugs) {
             return new SlugFilterIterator($iterator, $this->slugs, $this->notSlugs);
         }
 
@@ -274,7 +274,7 @@ trait PageFinderSettingsTrait
      */
     private function applyTitlesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->titles) || !empty($this->notTitles)) {
+        if ([] !== $this->titles || [] !== $this->notTitles) {
             return new TitleFilterIterator($iterator, $this->titles, $this->notTitles);
         }
 
@@ -288,7 +288,7 @@ trait PageFinderSettingsTrait
      */
     private function applyExtrasIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->extras)) {
+        if ([] !== $this->extras) {
             return new ExtraFilterIterator($iterator, $this->extras);
         }
 
@@ -302,7 +302,7 @@ trait PageFinderSettingsTrait
      */
     private function applySettingsIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->settings)) {
+        if ([] !== $this->settings) {
             return new SettingFilterIterator($iterator, $this->settings);
         }
 
@@ -316,7 +316,7 @@ trait PageFinderSettingsTrait
      */
     private function applyContentTypesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->contentTypes) || !empty($this->notContentTypes)) {
+        if ([] !== $this->contentTypes || [] !== $this->notContentTypes) {
             return new ContentTypeFilterIterator($iterator, $this->contentTypes, $this->notContentTypes);
         }
 
@@ -330,7 +330,7 @@ trait PageFinderSettingsTrait
      */
     private function applyDatesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->dates)) {
+        if ([] !== $this->dates) {
             return new DateRangeFilterIterator($iterator, $this->dates);
         }
 

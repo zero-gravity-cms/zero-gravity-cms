@@ -32,7 +32,6 @@ class SerializedSettingValuesTest extends BaseUnit
 
         self::assertTrue($values->offsetExists('slug'));
         self::assertTrue($values->offsetExists('date'));
-        /* @phpstan-ignore-next-line */
         self::assertFalse($values->offsetExists('unknown'));
     }
 
@@ -51,7 +50,6 @@ class SerializedSettingValuesTest extends BaseUnit
         $values = $this->createSerializedSettingValues();
 
         $this->expectException(OutOfBoundsException::class);
-        /* @phpstan-ignore-next-line */
         $values->offsetGet('unknown');
     }
 

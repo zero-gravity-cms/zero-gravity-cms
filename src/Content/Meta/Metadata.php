@@ -70,10 +70,14 @@ final class Metadata implements ArrayAccess
     }
 
     /**
-     * @param string $offset
+     * @param string|null $offset
      */
-    public function offsetSet($offset, mixed $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
+        if (!is_string($offset)) {
+            return;
+        }
+
         $this->setValue($offset, $value);
     }
 

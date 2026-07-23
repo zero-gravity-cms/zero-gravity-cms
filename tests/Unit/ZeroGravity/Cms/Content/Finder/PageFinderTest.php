@@ -42,6 +42,7 @@ class PageFinderTest extends BaseUnit
     public function finderMethodReturnsThisForChaining(string $method, string|int|true $param): void
     {
         $finder = $this->getFinder();
+        /* @phpstan-ignore method.dynamicName */
         $returnValue = $finder->$method($param, '');
 
         self::assertSame($finder, $returnValue);

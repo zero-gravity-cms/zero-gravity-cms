@@ -17,7 +17,7 @@ use ZeroGravity\Cms\Path\Path;
  *      directory: bool,
  *      regex: bool,
  *      glob: bool,
- *      cannotRebuild: bool|null,
+ *      cannotRebuild: bool,
  * }
  * @phpstan-type AppendPathExpectations array{
  *      elements: int,

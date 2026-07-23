@@ -32,7 +32,7 @@ trait WritableDirectoryTrait
     /**
      * Save the given settings array to the filesystem.
      *
-     * @param array<string, SerializedSettingValue> $newSettings
+     * @param array<string, mixed> $newSettings
      */
     public function saveSettings(array $newSettings): void
     {
@@ -129,7 +129,7 @@ FRONTMATTER;
     }
 
     /**
-     * @param array<string, SerializedSettingValue> $settings
+     * @param array<string, mixed> $settings
      */
     private function dumpSettingsToYaml(array $settings): string
     {

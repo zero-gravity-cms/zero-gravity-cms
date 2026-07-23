@@ -101,7 +101,7 @@ final class Path implements Stringable
      */
     public function hasElements(): bool
     {
-        return count($this->elements) > 0;
+        return [] !== $this->elements;
     }
 
     public function isSingleElement(): bool

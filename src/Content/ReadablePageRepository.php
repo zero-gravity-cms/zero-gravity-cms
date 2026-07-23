@@ -11,14 +11,14 @@ interface ReadablePageRepository
     /**
      * Get pages as nested tree. This will include unpublished pages.
      *
-     * @return ReadablePage[]
+     * @return array<string, ReadablePage>
      */
     public function getPageTree(): array;
 
     /**
      * Get all pages as flattened array, indexed by full path. This will include unpublished pages.
      *
-     * @return ReadablePage[]
+     * @return array<string, ReadablePage>
      */
     public function getAllPages(): array;
 

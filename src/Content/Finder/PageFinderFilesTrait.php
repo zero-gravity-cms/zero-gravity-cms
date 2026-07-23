@@ -91,7 +91,7 @@ trait PageFinderFilesTrait
      */
     private function applyNumberOfFilesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->numFiles)) {
+        if ([] !== $this->numFiles) {
             return new FileCountFilterIterator(
                 $iterator,
                 $this->numFiles,
@@ -109,7 +109,7 @@ trait PageFinderFilesTrait
      */
     private function applyNumberOfImagesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->numImages)) {
+        if ([] !== $this->numImages) {
             return new FileCountFilterIterator(
                 $iterator,
                 $this->numImages,
@@ -127,7 +127,7 @@ trait PageFinderFilesTrait
      */
     private function applyNumberOfDocumentsIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->numDocuments)) {
+        if ([] !== $this->numDocuments) {
             return new FileCountFilterIterator(
                 $iterator,
                 $this->numDocuments,

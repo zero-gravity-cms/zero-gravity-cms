@@ -171,7 +171,7 @@ final readonly class FilesystemMapper implements StructureMapper
     }
 
     /**
-     * @return array<string, SerializedSettingValue>
+     * @return array<string, mixed>
      */
     private function getNonDefaultSettingsForDiff(PageDiff $diff): array
     {

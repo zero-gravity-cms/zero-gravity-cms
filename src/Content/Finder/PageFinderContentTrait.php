@@ -110,7 +110,7 @@ trait PageFinderContentTrait
      */
     private function applyNamesIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->names) || !empty($this->notNames)) {
+        if ([] !== $this->names || [] !== $this->notNames) {
             return new NameFilterIterator($iterator, $this->names, $this->notNames);
         }
 
@@ -124,7 +124,7 @@ trait PageFinderContentTrait
      */
     private function applyContentIterator(Iterator $iterator): Iterator
     {
-        if (!empty($this->contains) || !empty($this->notContains)) {
+        if ([] !== $this->contains || [] !== $this->notContains) {
             return new ContentFilterIterator($iterator, $this->contains, $this->notContains);
         }
 

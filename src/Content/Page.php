@@ -118,7 +118,7 @@ class Page implements ReadablePage
 
     public function hasChildren(): bool
     {
-        return count($this->children) > 0;
+        return [] !== $this->children;
     }
 
     /**

@@ -15,10 +15,12 @@ final class StringComparator extends Comparator
      */
     public function __construct(string $target, string $operator = '==')
     {
-        if (!preg_match('#^\s*(==|!=|[<>]=?)?\s*(.+?)\s*$#i', $target, $matches)) {
+        $matchResult = preg_match('#^\s*(==|!=|[<>]=?)?\s*(.+?)\s*$#i', $target, $matches);
+        if (false === $matchResult || 0 === $matchResult) {
+            // The string should always match. If it doesn't something is really wrong.
             throw new InvalidArgumentException(sprintf('Don\'t understand "%s" as a string test.', $target));
         }
 
-        parent::__construct($matches[2], $matches[1] ?: $operator);
+        parent::__construct($matches[2], '' !== $matches[1] ? $matches[1] : $operator);
     }
 }

@@ -93,7 +93,7 @@ trait PageSettingsTrait
 
     public function getMenuLabel(): string
     {
-        if (!empty($this->settings->menu_label)) {
+        if (null !== $this->settings->menu_label && '' !== $this->settings->menu_label) {
             return $this->settings->menu_label;
         }
 

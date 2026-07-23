@@ -34,7 +34,6 @@ class SettingValuesTest extends BaseUnit
 
         self::assertTrue($values->offsetExists('slug'));
         self::assertTrue($values->offsetExists('unpublish_date'));
-        /* @phpstan-ignore-next-line */
         self::assertFalse($values->offsetExists('unknown'));
     }
 
@@ -53,7 +52,6 @@ class SettingValuesTest extends BaseUnit
         $values = $this->createSettingValues();
 
         $this->expectException(OutOfBoundsException::class);
-        /* @phpstan-ignore-next-line */
         $values->offsetGet('unknown');
     }
 

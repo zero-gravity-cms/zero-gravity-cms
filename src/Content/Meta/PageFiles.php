@@ -86,7 +86,7 @@ final class PageFiles
     public function getMarkdownFile(): ?File
     {
         $files = $this->getFilesByType(FileTypes::TYPE_MARKDOWN);
-        if (count($files) > 0) {
+        if ([] !== $files) {
             return current($files);
         }
 
@@ -99,7 +99,7 @@ final class PageFiles
     public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypes::TYPE_YAML);
-        if (count($files) > 0) {
+        if ([] !== $files) {
             return current($files);
         }
 
@@ -112,7 +112,7 @@ final class PageFiles
     public function getTwigFile(): ?File
     {
         $files = $this->getFilesByType(FileTypes::TYPE_TWIG);
-        if (count($files) > 0) {
+        if ([] !== $files) {
             return current($files);
         }
 

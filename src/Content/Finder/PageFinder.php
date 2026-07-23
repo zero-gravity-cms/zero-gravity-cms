@@ -141,7 +141,7 @@ final class PageFinder implements IteratorAggregate, Countable
     {
         $this->validatePageListsAndIterators();
 
-        if (1 === count($this->pageLists) && 0 === count($this->iterators)) {
+        if (1 === count($this->pageLists) && [] === $this->iterators) {
             return $this->buildIteratorFromSinglePageList($this->pageLists[0]);
         }
 
@@ -193,10 +193,10 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     private function validatePageListsAndIterators(): void
     {
-        if (0 !== count($this->pageLists)) {
+        if ([] !== $this->pageLists) {
             return;
         }
-        if (0 !== count($this->iterators)) {
+        if ([] !== $this->iterators) {
             return;
         }
 

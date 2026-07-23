@@ -48,26 +48,31 @@ class CachingResolverTest extends BaseUnit
             new Slugify()
         );
 
+        /* @phpstan-ignore method.dynamicName */
         $result = $resolver->$method(new Path('a'), new Path('b'));
         self::assertSame($expectedReturnValue, $result);
         self::assertSame(1, $calls, 'Wrapped repo is called upon first request: '.$method.' :: '.$calledMethod);
 
+        /* @phpstan-ignore method.dynamicName */
         $result = $resolver->$method(new Path('a'), new Path('b'));
         self::assertSame($expectedReturnValue, $result);
         /* @phpstan-ignore-next-line phpstan doesn't understand the callback binding */
         self::assertSame(1, $calls, 'Wrapped repo is not called upon second request: '.$method.' :: '.$calledMethod);
 
+        /* @phpstan-ignore method.dynamicName */
         $result = $resolver->$method(new Path('b'), new Path('c'));
         self::assertSame($expectedReturnValue, $result);
         /* @phpstan-ignore-next-line phpstan doesn't understand the callback binding */
         self::assertSame(2, $calls, 'Wrapped repo is called when arguments changed: '.$method.' :: '.$calledMethod);
 
         // try without parent path
+        /* @phpstan-ignore method.dynamicName */
         $result = $resolver->$method(new Path('d'));
         self::assertSame($expectedReturnValue, $result);
         /* @phpstan-ignore-next-line phpstan doesn't understand the callback binding */
         self::assertSame(3, $calls, 'Wrapped repo is called upon first request without parent path: '.$method.' :: '.$calledMethod);
 
+        /* @phpstan-ignore method.dynamicName */
         $result = $resolver->$method(new Path('d'));
         self::assertSame($expectedReturnValue, $result);
         /* @phpstan-ignore-next-line phpstan doesn't understand the callback binding */

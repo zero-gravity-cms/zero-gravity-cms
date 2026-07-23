@@ -54,7 +54,7 @@ final readonly class SerializedSettingValues implements ArrayAccess
     }
 
     /**
-     * @param PageSettingsLoader::KEY_* $offset
+     * @param string|PageSettingsLoader::KEY_* $offset
      */
     public function offsetExists(mixed $offset): bool
     {
@@ -62,7 +62,7 @@ final readonly class SerializedSettingValues implements ArrayAccess
     }
 
     /**
-     * @param PageSettingsLoader::KEY_* $offset
+     * @param string|PageSettingsLoader::KEY_* $offset
      *
      * @return StoredSerializedSettingValue
      */
@@ -72,6 +72,7 @@ final readonly class SerializedSettingValues implements ArrayAccess
             throw new OutOfBoundsException();
         }
 
+        /* @phpstan-ignore property.dynamicName */
         return $this->$offset;
     }
 
