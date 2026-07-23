@@ -60,9 +60,9 @@ use ZeroGravity\Cms\Exception\PageException;
 final class PageSettings
 {
     /**
-     * @var SettingValues|null
+     * @var SettingValues
      */
-    private ?array $values = null;
+    private array $values;
 
     /**
      * @param array<string, SettingValue> $values
@@ -77,11 +77,11 @@ final class PageSettings
     /**
      * Get a single setting value.
      *
-     * @phpstan-return SettingValue
+     * @phpstan-return null|SettingValue
      */
     public function get(string $name): mixed
     {
-        return $this->values[$name];
+        return $this->values[$name] ?? null;
     }
 
     /**
