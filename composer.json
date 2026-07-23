@@ -23,7 +23,9 @@
         "ergebnis/composer-normalize": "^2.52",
         "knplabs/knp-menu": "^3.0",
         "liip/imagine-bundle": "^2.0",
+        "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-webmozart-assert": "^2.0",
         "rector/rector": "^2.5",
         "symfony-cmf/routing": "^3.0",
         "symfony/flex": "^2.11",
@@ -49,6 +51,7 @@
     "config": {
         "allow-plugins": {
             "ergebnis/composer-normalize": true,
+            "phpstan/extension-installer": true,
             "symfony/flex": true
         },
         "sort-packages": true
