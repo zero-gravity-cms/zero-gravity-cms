@@ -365,6 +365,7 @@ class PathTest extends BaseUnit
         if (null === $expectedFilePath) {
             self::assertNull($file);
         } else {
+            self::assertNotNull($file);
             self::assertSame($expectedFilePath, $file->toString());
         }
         self::assertNotSame($path, $file);
@@ -402,6 +403,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsLastElement(): void
     {
         $path = new Path('sample/path/string');
+        self::assertTrue($path->hasElements());
         self::assertSame('string', $path->getLastElement()->getName());
     }
 

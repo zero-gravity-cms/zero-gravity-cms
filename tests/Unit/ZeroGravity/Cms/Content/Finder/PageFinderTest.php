@@ -646,6 +646,8 @@ class PageFinderTest extends BaseUnit
 
     private function getFinder(): PageFinder
     {
+        self::assertNotNull($this->finderPrototype);
+
         return clone $this->finderPrototype;
     }
 }

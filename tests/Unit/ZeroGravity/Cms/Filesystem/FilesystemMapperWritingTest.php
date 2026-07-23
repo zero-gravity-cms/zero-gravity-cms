@@ -182,7 +182,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(3, $page->getFiles());
     }
@@ -209,7 +209,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(1, $page->getFiles());
     }
@@ -236,7 +236,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(2, $page->getFiles());
     }
@@ -344,6 +344,7 @@ class FilesystemMapperWritingTest extends BaseUnit
 
     protected function getTempValidPagesFilesystemMapper(): FilesystemMapper
     {
+        self::assertNotNull($this->tempDir);
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->tempDir);
 
         return new FilesystemMapper($fileFactory, $this->tempDir, true, [], new NullLogger(), new EventDispatcher());

@@ -91,9 +91,9 @@ class PageTest extends BaseUnit
         self::assertSame([
             'foo.pdf',
         ], array_keys($page->getDocuments()));
-        self::assertSame('/page.md', $page->getMarkdownFile()->getPathname());
-        self::assertSame('/page.yaml', $page->getYamlFile()->getPathname());
-        self::assertSame('/page.html.twig', $page->getTwigFile()->getPathname());
+        self::assertSame('/page.md', $page->getMarkdownFile()?->getPathname());
+        self::assertSame('/page.yaml', $page->getYamlFile()?->getPathname());
+        self::assertSame('/page.html.twig', $page->getTwigFile()?->getPathname());
     }
 
     #[Test]
