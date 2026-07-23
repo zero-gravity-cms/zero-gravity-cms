@@ -25,6 +25,8 @@
         "liip/imagine-bundle": "^2.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
         "phpstan/phpstan-webmozart-assert": "^2.0",
         "rector/rector": "^2.5",
         "symfony-cmf/routing": "^3.0",

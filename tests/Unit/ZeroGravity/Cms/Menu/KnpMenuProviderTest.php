@@ -44,12 +44,12 @@ class KnpMenuProviderTest extends BaseUnit
     }
 
     #[Test]
+    #[DoesNotPerformAssertions]
     public function menuProviderReturnsMenuIfExists(): void
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('zero-gravity');
-        self::assertInstanceOf(ItemInterface::class, $rootItem);
+        $provider->get('zero-gravity');
     }
 
     #[Test]

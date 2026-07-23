@@ -9,7 +9,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Filesystem\FilesystemMapper;
-use ZeroGravity\Cms\Filesystem\WritableFilesystemPage;
 
 class FilesystemMapperTest extends BaseUnit
 {
@@ -47,7 +46,6 @@ class FilesystemMapperTest extends BaseUnit
         $page = $pages['/yaml_only'];
 
         $writablePage = $mapper->getWritablePageInstance($page);
-        self::assertInstanceOf(WritableFilesystemPage::class, $writablePage);
         self::assertNotNull($writablePage->getDirectory());
         self::assertSame('01.yaml_only', $writablePage->getName());
     }

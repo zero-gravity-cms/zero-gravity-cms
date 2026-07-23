@@ -11,7 +11,6 @@ use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\Test;
 use stdClass;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
-use ZeroGravity\Cms\Content\Meta\SerializedSettingValues;
 use ZeroGravity\Cms\Content\Meta\SettingValues;
 use ZeroGravity\Cms\Content\Meta\SettingValuesSerializer;
 
@@ -23,7 +22,6 @@ class SettingValuesSerializerTest extends BaseUnit
     {
         $serialized = SettingValuesSerializer::serialize($this->createSettingValues());
 
-        self::assertInstanceOf(SerializedSettingValues::class, $serialized);
         self::assertSame([
             'child_defaults' => [
                 'date' => '2024-03-03 08:00:00',
