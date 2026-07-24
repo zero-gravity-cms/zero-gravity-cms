@@ -26,10 +26,10 @@ final class PathNormalizer
             if (!$element->isParentReference()) {
                 // cool, we found a new part
                 $normalizedElements[] = $element;
-            } elseif (count($normalizedElements) > 0) {
+            } elseif ([] !== $normalizedElements) {
                 // going back up? sure
                 array_pop($normalizedElements);
-            } elseif (count($parentPathElements) > 0) {
+            } elseif ([] !== $parentPathElements) {
                 // parent path allows some stepping out of the safe zone
                 array_pop($parentPathElements);
             } else {

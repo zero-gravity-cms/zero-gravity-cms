@@ -59,7 +59,7 @@ class PageDiffTest extends BaseUnit
         self::assertTrue($diff->contentHasChanged());
         self::assertSame('test', $diff->getNewContentRaw());
 
-        $settings = $newPage->getSettings();
+        $settings = $newPage->getSettings()->toArray();
         $settings['menu_id'] = 'another-menu';
         $newPage->setSettings($settings);
 

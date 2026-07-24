@@ -11,8 +11,6 @@ use ZeroGravity\Cms\Content\Page;
  */
 trait PageTaxonomyTrait
 {
-    abstract public function getSetting(string $name): mixed;
-
     /**
      * Get all defined taxonomy keys and values.
      *
@@ -20,7 +18,7 @@ trait PageTaxonomyTrait
      */
     public function getTaxonomies(): array
     {
-        return $this->getSetting('taxonomy');
+        return $this->settings->taxonomy;
     }
 
     /**
@@ -30,12 +28,9 @@ trait PageTaxonomyTrait
      */
     public function getTaxonomy(string $name): array
     {
-        $taxonomy = $this->getSetting('taxonomy');
-        if (isset($taxonomy[$name])) {
-            return (array) $taxonomy[$name];
-        }
+        $taxonomy = $this->getTaxonomies();
 
-        return [];
+        return $taxonomy[$name] ?? [];
     }
 
     /**

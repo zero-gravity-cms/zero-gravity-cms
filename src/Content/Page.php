@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Content\Meta\PagePublishingTrait;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Content\Meta\PageSettingsTrait;
 use ZeroGravity\Cms\Content\Meta\PageTaxonomyTrait;
 use ZeroGravity\Cms\Path\Path;
@@ -12,8 +13,6 @@ use ZeroGravity\Cms\Path\Path;
 /**
  * This trait contains settings related methods (mostly getters) of the Page class.
  * This helps to separate native properties from validated settings/options.
- *
- * @phpstan-import-type SettingValue from PageSettings
  */
 class Page implements ReadablePage
 {
@@ -39,12 +38,12 @@ class Page implements ReadablePage
      */
     private array $children = [];
 
-    private ?Path $path = null;
+    private Path $path;
 
-    private ?Path $filesystemPath = null;
+    private Path $filesystemPath;
 
     /**
-     * @param array<string, SettingValue> $settings
+     * @param array<string, mixed> $settings raw, unvalidated settings as passed to the OptionsResolver
      */
     public function __construct(
         protected string $name,
@@ -62,7 +61,7 @@ class Page implements ReadablePage
     }
 
     /**
-     * Set parent page and initialize all dependent values.
+     * Set parent page and initialize all dependent values such as $this->path and $this->filesystemPath.
      */
     protected function initParent(ReadablePage|self|null $parent = null): void
     {
@@ -119,7 +118,7 @@ class Page implements ReadablePage
 
     public function hasChildren(): bool
     {
-        return count($this->children) > 0;
+        return [] !== $this->children;
     }
 
     /**

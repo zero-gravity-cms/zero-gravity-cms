@@ -5,6 +5,8 @@ namespace ZeroGravity\Cms\Content;
 use Psr\Cache\InvalidArgumentException as PsrInvalidArgumentException;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Throwable;
+use Webmozart\Assert\Assert;
+use Webmozart\Assert\InvalidArgumentException;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
 use ZeroGravity\Cms\Exception\StructureException;
 use ZeroGravity\Cms\Exception\ZeroGravityException;
@@ -14,12 +16,12 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     private const ALL_PAGES_CACHE_KEY = 'all_pages';
 
     /**
-     * @var ReadablePage[]
+     * @var array<string, ReadablePage>|null
      */
     private ?array $pages = null;
 
     /**
-     * @var ReadablePage[]
+     * @var array<string, ReadablePage>|null
      */
     private ?array $pagesByPath = null;
 
@@ -44,7 +46,7 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     /**
      * Parse filesystem to get all page data.
      *
-     * @return ReadablePage[]
+     * @return array<string, ReadablePage>
      */
     private function loadFromParser(): array
     {
@@ -57,9 +59,10 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     private function fetchPages(): void
     {
         if (null === $this->pages && !$this->loadPagesFromCache()) {
-            $this->pages = $this->loadFromParser();
-            $this->flattenPages($this->pages);
-            $this->refreshCache();
+            $pages = $this->loadFromParser();
+            $this->pages = $pages;
+            $this->flattenPages($pages);
+            $this->refreshCache($pages);
         }
     }
 
@@ -77,30 +80,41 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
             if (!$item->isHit()) {
                 return false;
             }
-            $this->pages = $item->get();
+
+            $pageList = $item->get();
+            Assert::allIsInstanceOf($pageList, ReadablePage::class, 'Found non-page entries in page cache.');
+            $this->pages = [];
+            foreach ($pageList as $page) {
+                $this->pages[$page->getPath()->toString()] = $page;
+            }
             $this->flattenPages($this->pages);
 
             return true;
+        } catch (InvalidArgumentException $exception) {
+            throw $exception;
         } catch (Throwable) {
             return false;
         }
     }
 
-    private function refreshCache(): void
+    /**
+     * @param array<string, ReadablePage> $pages
+     */
+    private function refreshCache(array $pages): void
     {
         try {
             $item = $this->cache->getItem(self::ALL_PAGES_CACHE_KEY);
         } catch (PsrInvalidArgumentException) {
             return;
         }
-        $item->set($this->pages);
+        $item->set($pages);
         $this->cache->save($item);
     }
 
     /**
      * Recursively collect all pages and their children into a single array.
      *
-     * @param ReadablePage[] $pages
+     * @param array<string, ReadablePage> $pages
      */
     private function flattenPages(array $pages): void
     {
@@ -109,7 +123,7 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     }
 
     /**
-     * @param ReadablePage[] $pages
+     * @param array<string, ReadablePage> $pages
      */
     private function doFlattenPages(array $pages): void
     {
@@ -122,25 +136,25 @@ final class ContentRepository implements ReadablePageRepository, WritablePageRep
     /**
      * Get pages as nested tree. This will include unpublished pages.
      *
-     * @return ReadablePage[]
+     * @return array<string, ReadablePage>
      */
     public function getPageTree(): array
     {
         $this->fetchPages();
 
-        return $this->pages;
+        return $this->pages ?? [];
     }
 
     /**
      * Get all pages as flattened array, indexed by full path. This will include unpublished pages.
      *
-     * @return ReadablePage[]
+     * @return array<string, ReadablePage>
      */
     public function getAllPages(): array
     {
         $this->fetchPages();
 
-        return $this->pagesByPath;
+        return $this->pagesByPath ?? [];
     }
 
     public function getPage(string $path): ?ReadablePage

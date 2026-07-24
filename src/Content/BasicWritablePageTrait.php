@@ -2,15 +2,11 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Filesystem\Directory;
 
-/**
- * @phpstan-import-type SettingValue from PageSettings
- */
 trait BasicWritablePageTrait
 {
-    private ?string $contentRaw = null;
+    private string $contentRaw = '';
 
     private readonly ?Directory $directory;
 
@@ -32,7 +28,7 @@ trait BasicWritablePageTrait
     /**
      * Get raw (un-processed) markdown content.
      */
-    public function getContentRaw(): ?string
+    public function getContentRaw(): string
     {
         return $this->contentRaw;
     }
@@ -40,19 +36,19 @@ trait BasicWritablePageTrait
     /**
      * Set raw (un-processed) markdown content.
      */
-    public function setContentRaw(?string $contentRaw = null): void
+    public function setContentRaw(string $contentRaw = ''): void
     {
-        $this->contentRaw = str_replace("\r\n", "\n", (string) $contentRaw);
+        $this->contentRaw = str_replace("\r\n", "\n", $contentRaw);
     }
 
     /**
      * Set page settings as plain array.
      *
-     * @param array<string, SettingValue> $settings
+     * @param array<string, mixed> $settings raw, unvalidated settings as passed to the OptionsResolver
      */
     public function setSettings(array $settings): void
     {
-        $this->settings = new PageSettings($settings, $this->getName());
+        $this->initSettings($settings, $this->name);
         $this->buildPath();
     }
 

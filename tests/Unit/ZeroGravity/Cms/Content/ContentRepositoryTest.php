@@ -30,6 +30,7 @@ class ContentRepositoryTest extends BaseUnit
         ]);
         $repo = new ContentRepository($mapper, new ArrayAdapter(), false);
 
+        /* @phpstan-ignore-next-line assertSame actually works here */
         self::assertSame([
             $page1,
             $page2,

@@ -40,10 +40,12 @@ class SortableIteratorTest extends BaseUnit
         $finder = $this->getFinder();
         if (is_string($method)) {
             $sortMethod = 'sortBy'.ucfirst($method);
+            /* @phpstan-ignore method.dynamicName */
             $finder->$sortMethod();
         } elseif (is_array($method)) {
             [$method, $parameter] = $method;
-            $sortMethod = 'sortBy'.ucfirst((string) $method);
+            $sortMethod = 'sortBy'.ucfirst($method);
+            /* @phpstan-ignore method.dynamicName */
             $finder->$sortMethod($parameter);
         } elseif (is_callable($method)) {
             $finder->sort($method);
@@ -224,8 +226,25 @@ class SortableIteratorTest extends BaseUnit
         new SortableIterator(new ArrayIterator([]), 'invalid method');
     }
 
+    #[Test]
+    public function invalidSortByArrayThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new SortableIterator(new ArrayIterator([]), ['only one array item']);
+    }
+
+    #[Test]
+    public function invalidSortByThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        /* @phpstan-ignore-next-line */
+        new SortableIterator(new ArrayIterator([]), ['invalid', null]);
+    }
+
     private function getFinder(): PageFinder
     {
+        self::assertNotNull($this->finderPrototype);
+
         return clone $this->finderPrototype;
     }
 }

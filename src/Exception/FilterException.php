@@ -22,4 +22,23 @@ class FilterException extends RuntimeException implements ZeroGravityException
             implode(', ', $existingFilters),
         ));
     }
+
+    public static function filterDidNotReturnPageFinder(string $name, mixed $result): self
+    {
+        return new self(sprintf(
+            'The page filter callable %s did not return a PageFinder, but "%s"',
+            $name,
+            get_debug_type($result),
+        ));
+    }
+
+    public static function notAScalar(mixed $value): self
+    {
+        return new self(sprintf('Expected a scalar, got `%s`', get_debug_type($value)));
+    }
+
+    public static function notAString(mixed $value): self
+    {
+        return new self(sprintf('Expected a string, got `%s`', get_debug_type($value)));
+    }
 }

@@ -14,6 +14,7 @@ use RecursiveIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 use Webmozart\Assert\Assert;
+use ZeroGravity\Cms\Content\Finder\Iterator\CustomPageFilterIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\LimitAndOffsetIterator;
 use ZeroGravity\Cms\Content\Finder\Iterator\RecursivePageIterator;
 use ZeroGravity\Cms\Content\ReadablePage;
@@ -39,12 +40,12 @@ final class PageFinder implements IteratorAggregate, Countable
     private int $offset = 0;
 
     /**
-     * @var array<array<string, ReadablePage>>
+     * @var list<array<string, ReadablePage>>
      */
     private array $pageLists = [];
 
     /**
-     * @var callable[]
+     * @var list<Closure>
      */
     private array $filters = [];
 
@@ -67,7 +68,7 @@ final class PageFinder implements IteratorAggregate, Countable
     }
 
     /**
-     * @param ReadablePage[] $pages
+     * @param array<string, ReadablePage> $pages
      */
     public function inPageList(array $pages): self
     {
@@ -140,7 +141,7 @@ final class PageFinder implements IteratorAggregate, Countable
     {
         $this->validatePageListsAndIterators();
 
-        if (1 === count($this->pageLists) && 0 === count($this->iterators)) {
+        if (1 === count($this->pageLists) && [] === $this->iterators) {
             return $this->buildIteratorFromSinglePageList($this->pageLists[0]);
         }
 
@@ -152,27 +153,25 @@ final class PageFinder implements IteratorAggregate, Countable
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param IteratorAggregate<string, ReadablePage>|Iterator<string, ReadablePage>|iterable<ReadablePage>|ReadablePage $iterator
+     * @param IteratorAggregate<string, ReadablePage>|Iterator<string, ReadablePage>|iterable<string, ReadablePage>|ReadablePage $iterator
      *
      * @throws Exception
      */
     public function append(IteratorAggregate|Iterator|iterable|ReadablePage $iterator): self
     {
-        if ($iterator instanceof IteratorAggregate) {
-            $this->iterators[] = $iterator->getIterator();
-        } elseif ($iterator instanceof Iterator) {
+        if ($iterator instanceof Iterator) {
             $this->iterators[] = $iterator;
-        } elseif (is_iterable($iterator)) {
-            $this->iterators[] = $this->appendPageArrayIterator($iterator);
         } elseif ($iterator instanceof ReadablePage) {
             $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);
+        } else {
+            $this->iterators[] = $this->appendPageArrayIterator($iterator);
         }
 
         return $this;
     }
 
     /**
-     * @param iterable<ReadablePage> $iterator
+     * @param IteratorAggregate<string, ReadablePage>|iterable<string, ReadablePage> $iterator
      *
      * @return Iterator<string, ReadablePage>
      */
@@ -180,6 +179,7 @@ final class PageFinder implements IteratorAggregate, Countable
     {
         $pages = [];
         foreach ($iterator as $page) {
+            /* @phpstan-ignore-next-line */
             Assert::isInstanceOf($page, ReadablePage::class);
             /* @var $page ReadablePage */
             $pages[$page->getPath()->toString()] = $page;
@@ -193,10 +193,10 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     private function validatePageListsAndIterators(): void
     {
-        if (0 !== count($this->pageLists)) {
+        if ([] !== $this->pageLists) {
             return;
         }
-        if (0 !== count($this->iterators)) {
+        if ([] !== $this->iterators) {
             return;
         }
 
@@ -208,6 +208,7 @@ final class PageFinder implements IteratorAggregate, Countable
      */
     private function buildIteratorFromPageListsAndIterators(): Iterator
     {
+        /** @var AppendIterator<string, ReadablePage, Iterator<string, ReadablePage>> $iterator */
         $iterator = new AppendIterator();
         foreach ($this->pageLists as $pageList) {
             $iterator->append($this->buildIteratorFromSinglePageList($pageList));
@@ -262,7 +263,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private function applyCustomFiltersIterator(Iterator $iterator): Iterator
     {
         if ([] !== $this->filters) {
-            return new CustomFilterIterator($iterator, $this->filters);
+            return new CustomPageFilterIterator($iterator, $this->filters);
         }
 
         return $iterator;

@@ -44,7 +44,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add tag or tags that pages must provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function tag(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
@@ -55,7 +55,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add tag or tags that pages must provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function notTag(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
@@ -66,7 +66,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add category or categories that pages must provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function category(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
@@ -77,7 +77,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add category or categories that pages must not provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function notCategory(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
@@ -88,7 +88,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add author or authors that pages must provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function author(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self
@@ -99,7 +99,7 @@ trait PageFinderTaxonomyTrait
     /**
      * Add author or authors that pages must not provide.
      *
-     * @param string|array<string>            $values
+     * @param string|list<string>             $values
      * @param TaxonomyTester::OPERATOR_*|null $operator 'AND' or 'OR'. Only applies to this set of taxonomies.
      */
     public function notAuthor(string|array $values, ?string $operator = TaxonomyTester::OPERATOR_AND): self

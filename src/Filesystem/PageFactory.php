@@ -5,7 +5,7 @@ namespace ZeroGravity\Cms\Filesystem;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use ZeroGravity\Cms\Content\File;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
+use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Exception\FilesystemException;
@@ -13,7 +13,7 @@ use ZeroGravity\Cms\Filesystem\Event\AfterPageCreate;
 use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
 /**
- * @phpstan-import-type SettingValue from PageSettings
+ * @phpstan-import-type RawSettingValue from PageSettingsLoader
  */
 final class PageFactory
 {
@@ -31,7 +31,7 @@ final class PageFactory
     /**
      * Create Page from directory content.
      *
-     * @param array<string, SettingValue> $defaultSettings
+     * @param array<string, mixed> $defaultSettings
      */
     public function createPage(
         Directory $directory,
@@ -78,9 +78,9 @@ final class PageFactory
     }
 
     /**
-     * @param array<string, SettingValue> $defaultSettings
+     * @param array<string, mixed> $defaultSettings
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     private function buildPageSettings(array $defaultSettings, Directory $directory, ?Page $parentPage = null): array
     {
@@ -110,24 +110,25 @@ final class PageFactory
     /**
      * Merge 2 or more arrays, deep merging array values while replacing scalar values.
      *
-     * @param array<string, SettingValue> $params 1 or more arrays to merge
+     * @param array<array-key, mixed> ...$settingsToMerge 1 or more arrays to merge
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
-    private function mergeSettings(array ...$params): array
+    private function mergeSettings(array ...$settingsToMerge): array
     {
-        $settings = [];
-        foreach ($params as $param) {
-            foreach ($param as $key => $value) {
-                if (isset($settings[$key]) && is_array($settings[$key]) && is_array($value)) {
-                    $settings[$key] = $this->mergeSettings($settings[$key], $value);
+        $merged = [];
+        foreach ($settingsToMerge as $settings) {
+            foreach ($settings as $key => $value) {
+                $key = (string) $key;
+                if (isset($merged[$key]) && is_array($merged[$key]) && is_array($value)) {
+                    $merged[$key] = $this->mergeSettings($merged[$key], $value);
                 } else {
-                    $settings[$key] = $value;
+                    $merged[$key] = $value;
                 }
             }
         }
 
-        return $settings;
+        return $merged;
     }
 
     /**

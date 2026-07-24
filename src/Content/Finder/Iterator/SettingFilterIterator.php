@@ -36,7 +36,7 @@ final class SettingFilterIterator extends FilterIterator
     {
         $page = $this->current();
         foreach ($this->settings as $settingFilter) {
-            $valuesMatch = $settingFilter->value() === $page->getSetting($settingFilter->name());
+            $valuesMatch = $page->getSettings()->valueMatches($settingFilter->name(), $settingFilter->value());
             $isInverted = $settingFilter->isInverted();
 
             if ($isInverted === $valuesMatch) {

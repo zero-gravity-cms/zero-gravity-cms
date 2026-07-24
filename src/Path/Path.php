@@ -7,7 +7,7 @@ use Webmozart\Assert\Assert;
 
 final class Path implements Stringable
 {
-    private ?string $pathString = null;
+    private string $pathString;
 
     private bool $isAbsolute = false;
 
@@ -96,9 +96,12 @@ final class Path implements Stringable
         return $this->toString();
     }
 
+    /**
+     * @phpstan-assert-if-true PathElement $this->getLastElement()
+     */
     public function hasElements(): bool
     {
-        return count($this->elements) > 0;
+        return [] !== $this->elements;
     }
 
     public function isSingleElement(): bool
@@ -111,6 +114,7 @@ final class Path implements Stringable
      */
     public function setElements(array $elements): void
     {
+        /* @phpstan-ignore-next-line */
         Assert::allIsInstanceOf($elements, PathElement::class);
         $this->elements = $elements;
         $this->rebuildString();

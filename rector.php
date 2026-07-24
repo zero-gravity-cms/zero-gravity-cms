@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Rector\CodingStyle\Rector\Encapsed\EncapsedStringsToSprintfRector;
-use Rector\CodingStyle\Rector\FuncCall\CountArrayToEmptyArrayComparisonRector;
 use Rector\CodingStyle\Rector\Stmt\NewlineAfterStatementRector;
 use Rector\Config\RectorConfig;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitSelfCallRector;
 use Rector\PHPUnit\PHPUnit120\Rector\CallLike\CreateStubOverCreateMockArgRector;
+use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\Symfony\Symfony72\Rector\StmtsAwareInterface\PushRequestToRequestStackConstructorRector;
 
 return RectorConfig::configure()
@@ -47,10 +47,10 @@ return RectorConfig::configure()
     ->withRules([
         PreferPHPUnitSelfCallRector::class,
         CreateStubOverCreateMockArgRector::class,
+        DisallowedEmptyRuleFixerRector::class,
     ])
 
     ->withSkip([
-        CountArrayToEmptyArrayComparisonRector::class,
         EncapsedStringsToSprintfRector::class,
         NewlineAfterStatementRector::class,
 

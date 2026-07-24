@@ -21,7 +21,7 @@ class RouteProviderTest extends BaseUnit
         $routeProvider = new RouteProvider($this->getContentRepository(), 'default_controller');
 
         $collection = $routeProvider->getRouteCollectionForRequest(new Request());
-        self::assertSame(3, $collection->count());
+        self::assertCount(3, $collection);
 
         $routes = $collection->all();
         foreach ($routes as $route) {

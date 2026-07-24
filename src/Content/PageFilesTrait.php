@@ -13,7 +13,7 @@ trait PageFilesTrait
      */
     public function setFiles(array $files): void
     {
-        $this->files = new PageFiles($files, $this->getSetting('file_aliases'));
+        $this->files = new PageFiles($files, $this->settings->file_aliases);
     }
 
     /**
@@ -21,12 +21,12 @@ trait PageFilesTrait
      */
     public function getFiles(): array
     {
-        return $this->files->toArray();
+        return $this->files?->toArray() ?? [];
     }
 
     public function getFile(string $filename): ?File
     {
-        return $this->files->get($filename);
+        return $this->files?->get($filename);
     }
 
     /**
@@ -36,7 +36,7 @@ trait PageFilesTrait
      */
     public function getImages(): array
     {
-        return $this->files->getImages();
+        return $this->files?->getImages() ?? [];
     }
 
     /**
@@ -46,7 +46,7 @@ trait PageFilesTrait
      */
     public function getDocuments(): array
     {
-        return $this->files->getDocuments();
+        return $this->files?->getDocuments() ?? [];
     }
 
     /**
@@ -54,7 +54,7 @@ trait PageFilesTrait
      */
     public function getMarkdownFile(): ?File
     {
-        return $this->files->getMarkdownFile();
+        return $this->files?->getMarkdownFile();
     }
 
     /**
@@ -62,7 +62,7 @@ trait PageFilesTrait
      */
     public function getYamlFile(): ?File
     {
-        return $this->files->getYamlFile();
+        return $this->files?->getYamlFile();
     }
 
     /**
@@ -70,6 +70,6 @@ trait PageFilesTrait
      */
     public function getTwigFile(): ?File
     {
-        return $this->files->getTwigFile();
+        return $this->files?->getTwigFile();
     }
 }

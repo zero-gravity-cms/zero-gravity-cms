@@ -30,6 +30,6 @@ final class StringPatternUtil
         return
             str_contains($pathString, '*')
             || str_contains($pathString, '?')
-            || preg_match('/\{.*\}/', $pathString);
+            || 1 === preg_match('/\{.*\}/', $pathString);
     }
 }
