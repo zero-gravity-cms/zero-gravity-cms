@@ -63,6 +63,7 @@ class ZeroGravityExtensionTest extends BaseUnit
      */
     protected function getFixturesDir(): string
     {
+        /* @phpstan-ignore-next-line phpstan thinks this is not a string */
         return codecept_data_dir('twig_fixtures');
     }
 

@@ -6,16 +6,12 @@ namespace ZeroGravity\Cms\Content;
 
 use DateTimeImmutable;
 use ZeroGravity\Cms\Content\Finder\PageFinder;
-use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\Meta\SettingValues;
 use ZeroGravity\Cms\Path\Path;
 
 /**
  * This trait contains settings related methods (mostly getters) of the Page class.
  * This helps to separate native properties from validated settings/options.
- *
- * @phpstan-import-type RawSettingValue from PageSettingsLoader
- * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 interface ReadablePage
 {

@@ -38,6 +38,6 @@ final class YamlMetadataLoader implements MetadataLoader
             ];
         }
 
-        return new Metadata($data);
+        return new Metadata(array_filter($data, is_string(...), ARRAY_FILTER_USE_KEY));
     }
 }

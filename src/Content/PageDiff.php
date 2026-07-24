@@ -2,13 +2,8 @@
 
 namespace ZeroGravity\Cms\Content;
 
-use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Content\Meta\SettingValuesSerializer;
 
-/**
- * @phpstan-import-type RawSettingValue from PageSettingsLoader
- * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
- */
 final readonly class PageDiff
 {
     public function __construct(

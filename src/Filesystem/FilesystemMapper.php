@@ -22,7 +22,6 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageSaveValidate;
 
 /**
  * @phpstan-import-type RawSettingValue from PageSettingsLoader
- * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
  */
 final readonly class FilesystemMapper implements StructureMapper
 {

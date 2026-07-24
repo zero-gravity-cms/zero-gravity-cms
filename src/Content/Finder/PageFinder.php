@@ -40,7 +40,7 @@ final class PageFinder implements IteratorAggregate, Countable
     private int $offset = 0;
 
     /**
-     * @var array<array<string, ReadablePage>>
+     * @var list<array<string, ReadablePage>>
      */
     private array $pageLists = [];
 
@@ -68,7 +68,7 @@ final class PageFinder implements IteratorAggregate, Countable
     }
 
     /**
-     * @param ReadablePage[] $pages
+     * @param array<string, ReadablePage> $pages
      */
     public function inPageList(array $pages): self
     {
@@ -153,7 +153,7 @@ final class PageFinder implements IteratorAggregate, Countable
      *
      * The set can be another PageFinder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param IteratorAggregate<string, ReadablePage>|Iterator<string, ReadablePage>|iterable<ReadablePage>|ReadablePage $iterator
+     * @param IteratorAggregate<string, ReadablePage>|Iterator<string, ReadablePage>|iterable<string, ReadablePage>|ReadablePage $iterator
      *
      * @throws Exception
      */
@@ -161,17 +161,17 @@ final class PageFinder implements IteratorAggregate, Countable
     {
         if ($iterator instanceof Iterator) {
             $this->iterators[] = $iterator;
-        } elseif ($iterator instanceof IteratorAggregate || is_iterable($iterator)) {
-            $this->iterators[] = $this->appendPageArrayIterator($iterator);
         } elseif ($iterator instanceof ReadablePage) {
             $this->iterators[] = new ArrayIterator([$iterator->getPath()->toString() => $iterator]);
+        } else {
+            $this->iterators[] = $this->appendPageArrayIterator($iterator);
         }
 
         return $this;
     }
 
     /**
-     * @param iterable<ReadablePage> $iterator
+     * @param IteratorAggregate<string, ReadablePage>|iterable<string, ReadablePage> $iterator
      *
      * @return Iterator<string, ReadablePage>
      */

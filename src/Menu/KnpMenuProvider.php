@@ -92,9 +92,9 @@ readonly class KnpMenuProvider implements MenuProviderInterface
         }
 
         $extraItemOptions = $page->getExtra('menu_item_options', []);
-        if (!\is_array($extraItemOptions)) {
-            $extraItemOptions = [];
-        }
+        $extraItemOptions = \is_array($extraItemOptions)
+            ? array_filter($extraItemOptions, is_string(...), ARRAY_FILTER_USE_KEY)
+            : [];
         $itemOptions = array_merge(
             $defaultOptions,
             [

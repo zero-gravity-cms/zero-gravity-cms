@@ -13,30 +13,27 @@ use ZeroGravity\Cms\Content\Page;
 
 /**
  * @phpstan-type TaxonomySettingValue list<string>
- * @phpstan-type RawNestedSettingValue null|int|string|bool|DateTimeInterface
- * @phpstan-type SerializedNestedSettingValue null|int|string|bool
- * @phpstan-type RawSettingValue RawNestedSettingValue|array<string, TaxonomySettingValue>|array<string, RawNestedSettingValue>
- * @phpstan-type SerializedSettingValue SerializedNestedSettingValue|array<string, TaxonomySettingValue>|array<string, SerializedNestedSettingValue>
- * @phpstan-type RawSettingValues array{
- *      child_defaults: null|array<string, mixed>,
- *      content_template: null|string,
- *      content_type: string,
- *      controller: string|null,
- *      date: null|string|int|DateTimeInterface,
- *      extra: array<string, mixed>,
- *      file_aliases: array<string, string>,
- *      layout_template: null|string,
- *      menu_id: string|false,
- *      menu_label: null|string,
- *      modular: bool,
- *      module: bool,
- *      publish: bool,
- *      publish_date: null|string|int|DateTimeInterface,
- *      slug: string,
- *      taxonomy: array<string, list<string>>,
- *      title: null|string,
- *      unpublish_date: null|string|int|DateTimeInterface,
- *      visible: bool
+ * @phpstan-type RawSettingValue null|int|string|bool|DateTimeInterface|array<string, TaxonomySettingValue>|array<string, null|int|string|bool|DateTimeInterface>
+ * @phpstan-type ResolvedSettingValues array{
+ *      self::KEY_CHILD_DEFAULTS: array<string, mixed>,
+ *      self::KEY_CONTENT_TEMPLATE: ?string,
+ *      self::KEY_CONTENT_TYPE: string,
+ *      self::KEY_CONTROLLER: ?string,
+ *      self::KEY_DATE: ?DateTimeImmutable,
+ *      self::KEY_EXTRA: array<string, mixed>,
+ *      self::KEY_FILE_ALIASES: array<string, string>,
+ *      self::KEY_LAYOUT_TEMPLATE: ?string,
+ *      self::KEY_MENU_ID: string|false,
+ *      self::KEY_MENU_LABEL: ?string,
+ *      self::KEY_MODULAR: bool,
+ *      self::KEY_MODULE: bool,
+ *      self::KEY_PUBLISH: bool,
+ *      self::KEY_PUBLISH_DATE: ?DateTimeImmutable,
+ *      self::KEY_SLUG: string,
+ *      self::KEY_TAXONOMY: array<string, TaxonomySettingValue>,
+ *      self::KEY_TITLE: ?string,
+ *      self::KEY_UNPUBLISH_DATE: ?DateTimeImmutable,
+ *      self::KEY_VISIBLE: bool,
  * }
  */
 final class PageSettingsLoader
@@ -158,6 +155,9 @@ final class PageSettingsLoader
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
 
+        /**
+         * @var ResolvedSettingValues $resolvedValues
+         */
         $resolvedValues = $resolver->resolve($rawValues);
         $this->values = new SettingValues(
             child_defaults: $resolvedValues[self::KEY_CHILD_DEFAULTS],
@@ -252,7 +252,7 @@ final class PageSettingsLoader
 
     private function normalizeDates(OptionsResolver $resolver): void
     {
-        $normalizeDateTime = static function (Options $options, $value): ?DateTimeImmutable {
+        $normalizeDateTime = static function (Options $options, string|int|DateTimeInterface|null $value): ?DateTimeImmutable {
             if (null === $value) {
                 return null;
             }
@@ -260,12 +260,13 @@ final class PageSettingsLoader
                 return $value;
             }
             if ($value instanceof DateTimeInterface) {
-                $value = $value->format('c');
-            } elseif (is_int($value)) {
-                $value = '@'.$value;
+                return DateTimeImmutable::createFromInterface($value);
+            }
+            if (is_int($value)) {
+                $value = "@{$value}";
             }
 
-            return new DateTimeImmutable((string) $value);
+            return new DateTimeImmutable($value);
         };
         $resolver->setNormalizer(self::KEY_DATE, $normalizeDateTime);
         $resolver->setNormalizer(self::KEY_PUBLISH_DATE, $normalizeDateTime);
@@ -274,16 +275,16 @@ final class PageSettingsLoader
 
     private function normalizeTitle(OptionsResolver $resolver): void
     {
-        $normalizeTitle = function (Options $options, $value): string {
+        $normalizeTitle = function (Options $options, ?string $value): string {
             if (null !== $value) {
-                return (string) $value;
+                return $value;
             }
             $name = $this->pageName;
             if (1 === preg_match(Page::SORTING_PREFIX_PATTERN, $name, $matches)) {
                 $name = $matches[1];
             }
 
-            return trim(ucwords(str_replace(['-', '_'], ' ', $name)));
+            return ucwords(trim(str_replace(['-', '_'], ' ', $name)));
         };
         $resolver->setNormalizer(self::KEY_TITLE, $normalizeTitle);
     }

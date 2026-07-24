@@ -8,13 +8,9 @@ use LogicException;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
-use ZeroGravity\Cms\Content\Meta\PageSettingsLoader;
 use ZeroGravity\Cms\Filesystem\Event\AfterFileWrite;
 use ZeroGravity\Cms\Filesystem\Event\BeforeFileWrite;
 
-/**
- * @phpstan-import-type SerializedSettingValue from PageSettingsLoader
- */
 trait WritableDirectoryTrait
 {
     /**

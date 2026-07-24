@@ -363,7 +363,11 @@ final class Directory
             $data = $this->getFrontYAMLDocument(false)->getYAML();
         }
 
-        return is_array($data) && !array_is_list($data) ? $data : [];
+        if (!is_array($data)) {
+            return [];
+        }
+
+        return array_filter($data, is_string(...), ARRAY_FILTER_USE_KEY);
     }
 
     /**

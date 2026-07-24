@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Constraint\Exception as FrameworkConstraintException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RuntimeException;
 use SplFileInfo;
 use Twig\Environment;
 use Twig\Error\Error;
@@ -158,10 +159,15 @@ trait TwigExtensionTestTrait
         $loader->addLoader(new ArrayLoader($templates));
 
         foreach ($outputs as $i => $match) {
+            $evalConfig = '' !== $match[2] && '0' !== $match[2] ? eval($match[2].';') : [];
+            if (!is_array($evalConfig)) {
+                throw new RuntimeException(sprintf('Matched expression "%s" did not evaluate to an environment config array. Got "%s" instead.', $match[2], get_debug_type($evalConfig)));
+            }
+
             $config = array_merge([
                 'cache' => false,
                 'strict_variables' => true,
-            ], '' !== $match[2] && '0' !== $match[2] ? eval($match[2].';') : []);
+            ], $evalConfig);
             $twig = new Environment($loader, $config);
             $twig->addGlobal('global', 'global');
             foreach ($this->getRuntimeLoaders() as $runtimeLoader) {
@@ -193,7 +199,11 @@ trait TwigExtensionTestTrait
                         return true;
                     }
 
-                    return null !== $prevHandler ? $prevHandler($type, $msg, $file, $line, $context) : false;
+                    if (null === $prevHandler) {
+                        return false;
+                    }
+
+                    return (bool) $prevHandler($type, $msg, $file, $line, $context);
                 });
 
                 $template = $twig->load('index.twig');
@@ -215,7 +225,11 @@ trait TwigExtensionTestTrait
             self::assertSame($deprecation, implode("\n", $deprecations));
 
             try {
-                $output = trim($template->render(eval($match[1].';')), "\n ");
+                $context = eval($match[1].';');
+                if (!is_array($context)) {
+                    throw new RuntimeException(sprintf('Matched expression "%s" did not evaluate to an array context. Got "%s" instead.', $match[1], get_debug_type($context)));
+                }
+                $output = trim($template->render($context), "\n ");
             } catch (Exception $e) {
                 if (false !== $exception) {
                     self::assertSame(trim($exception), trim(sprintf('%s: %s', $e::class, $e->getMessage())));

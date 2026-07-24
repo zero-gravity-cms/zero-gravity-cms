@@ -641,8 +641,8 @@ class PageFinderTest extends BaseUnit
         $finder
             ->append(new Page('single page'))
             ->append([
-                new Page('page2'),
-                new Page('page3'),
+                'page2' => new Page('page2'),
+                'page3' => new Page('page3'),
             ])
         ;
         self::assertCount(3, $finder);

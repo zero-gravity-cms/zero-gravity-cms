@@ -14,7 +14,6 @@ use ZeroGravity\Cms\Filesystem\Event\BeforePageCreate;
 
 /**
  * @phpstan-import-type RawSettingValue from PageSettingsLoader
- * @phpstan-import-type RawNestedSettingValue from PageSettingsLoader
  */
 final class PageFactory
 {
@@ -32,7 +31,7 @@ final class PageFactory
     /**
      * Create Page from directory content.
      *
-     * @param array<string, RawSettingValue|mixed> $defaultSettings
+     * @param array<string, mixed> $defaultSettings
      */
     public function createPage(
         Directory $directory,
@@ -79,7 +78,7 @@ final class PageFactory
     }
 
     /**
-     * @param array<string, RawSettingValue|mixed> $defaultSettings
+     * @param array<string, mixed> $defaultSettings
      *
      * @return array<string, mixed>
      */
@@ -113,13 +112,14 @@ final class PageFactory
      *
      * @param array<array-key, mixed> ...$settingsToMerge 1 or more arrays to merge
      *
-     * @return array<array-key, mixed>
+     * @return array<string, mixed>
      */
     private function mergeSettings(array ...$settingsToMerge): array
     {
         $merged = [];
         foreach ($settingsToMerge as $settings) {
             foreach ($settings as $key => $value) {
+                $key = (string) $key;
                 if (isset($merged[$key]) && is_array($merged[$key]) && is_array($value)) {
                     $merged[$key] = $this->mergeSettings($merged[$key], $value);
                 } else {

@@ -82,7 +82,7 @@ final readonly class SettingValues implements ArrayAccess
      */
     public function offsetExists(mixed $offset): bool
     {
-        return property_exists(self::class, $offset);
+        return PageSettingsLoader::isValidKey($offset);
     }
 
     /**
@@ -90,14 +90,30 @@ final readonly class SettingValues implements ArrayAccess
      *
      * @return StoredSettingValue
      */
-    public function offsetGet(mixed $offset): mixed
+    public function offsetGet(mixed $offset): string|bool|DateTimeImmutable|array|null
     {
-        if (!property_exists(self::class, $offset)) {
-            throw new OutOfBoundsException();
-        }
-
-        /* @phpstan-ignore property.dynamicName */
-        return $this->$offset;
+        return match ($offset) {
+            PageSettingsLoader::KEY_CHILD_DEFAULTS => $this->child_defaults,
+            PageSettingsLoader::KEY_CONTENT_TEMPLATE => $this->content_template,
+            PageSettingsLoader::KEY_CONTENT_TYPE => $this->content_type,
+            PageSettingsLoader::KEY_CONTROLLER => $this->controller,
+            PageSettingsLoader::KEY_DATE => $this->date,
+            PageSettingsLoader::KEY_EXTRA => $this->extra,
+            PageSettingsLoader::KEY_FILE_ALIASES => $this->file_aliases,
+            PageSettingsLoader::KEY_LAYOUT_TEMPLATE => $this->layout_template,
+            PageSettingsLoader::KEY_MENU_ID => $this->menu_id,
+            PageSettingsLoader::KEY_MENU_LABEL => $this->menu_label,
+            PageSettingsLoader::KEY_MODULAR => $this->modular,
+            PageSettingsLoader::KEY_MODULE => $this->module,
+            PageSettingsLoader::KEY_PUBLISH => $this->publish,
+            PageSettingsLoader::KEY_PUBLISH_DATE => $this->publish_date,
+            PageSettingsLoader::KEY_SLUG => $this->slug,
+            PageSettingsLoader::KEY_TAXONOMY => $this->taxonomy,
+            PageSettingsLoader::KEY_TITLE => $this->title,
+            PageSettingsLoader::KEY_UNPUBLISH_DATE => $this->unpublish_date,
+            PageSettingsLoader::KEY_VISIBLE => $this->visible,
+            default => throw new OutOfBoundsException(),
+        };
     }
 
     public function offsetSet(mixed $offset, mixed $value): void
@@ -118,11 +134,7 @@ final readonly class SettingValues implements ArrayAccess
      */
     public function valueMatches(string $name, mixed $otherValue): bool
     {
-        if (!property_exists(self::class, $name)) {
-            throw new OutOfBoundsException();
-        }
-
-        return SettingValuesSerializer::serializeValue($this->$name) === SettingValuesSerializer::serializeValue($otherValue);
+        return SettingValuesSerializer::serializeValue($this->offsetGet($name)) === SettingValuesSerializer::serializeValue($otherValue);
     }
 
     /**
