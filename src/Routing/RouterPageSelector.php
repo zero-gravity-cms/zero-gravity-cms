@@ -26,6 +26,9 @@ final readonly class RouterPageSelector
         }
 
         $params = $request->attributes->get('_route_params');
+        if (!is_array($params)) {
+            return null;
+        }
         if (!isset($params['_zg_page'])) {
             return null;
         }

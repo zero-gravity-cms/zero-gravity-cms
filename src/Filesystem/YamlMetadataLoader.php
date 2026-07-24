@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Filesystem;
 
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\Meta\Metadata;
 use ZeroGravity\Cms\Content\Meta\MetadataLoader;
+use ZeroGravity\Cms\Exception\FilesystemException;
 
 final class YamlMetadataLoader implements MetadataLoader
 {
@@ -19,8 +22,12 @@ final class YamlMetadataLoader implements MetadataLoader
             return new Metadata([]);
         }
 
+        $contents = file_get_contents($metadataPath);
+        if (false === $contents) {
+            throw FilesystemException::cannotReadFile($metadataPath);
+        }
         try {
-            $data = Yaml::parse(file_get_contents($metadataPath));
+            $data = Yaml::parse($contents);
         } catch (ParseException) {
             $data = [];
         }
@@ -31,6 +38,6 @@ final class YamlMetadataLoader implements MetadataLoader
             ];
         }
 
-        return new Metadata($data);
+        return new Metadata(array_filter($data, is_string(...), ARRAY_FILTER_USE_KEY));
     }
 }

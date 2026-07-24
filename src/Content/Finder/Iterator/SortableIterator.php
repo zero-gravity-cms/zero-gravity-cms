@@ -4,11 +4,11 @@ namespace ZeroGravity\Cms\Content\Finder\Iterator;
 
 use ArrayIterator;
 use Closure;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use Iterator;
 use IteratorAggregate;
 use Webmozart\Assert\Assert;
-use ZeroGravity\Cms\Content\Page;
 use ZeroGravity\Cms\Content\ReadablePage;
 
 /**
@@ -34,6 +34,8 @@ final class SortableIterator implements IteratorAggregate
 
     public const SORT_BY_TITLE = 'title';
 
+    public const SORT_BY_UNPUBLISH_DATE = 'unpublishDate';
+
     /**
      * @var callable
      */
@@ -41,7 +43,7 @@ final class SortableIterator implements IteratorAggregate
 
     /**
      * @param Iterator<string, ReadablePage>       $iterator The Iterator to filter
-     * @param self::SORT_BY_*|Closure|list<string> $sortBy   the sort type (one of the SORT_BY_* constants),
+     * @param self::SORT_BY_*|list<string>|Closure $sortBy   the sort type (one of the SORT_BY_* constants),
      *                                                       a PHP closure or
      *                                                       an array holding a SORT_BY_ type and an additional parameter
      *
@@ -76,12 +78,15 @@ final class SortableIterator implements IteratorAggregate
             self::SORT_BY_PUBLISH_DATE,
             self::SORT_BY_SLUG,
             self::SORT_BY_TITLE,
+            self::SORT_BY_UNPUBLISH_DATE,
         ]);
 
         $this->configureSortFunction($sortBy, $parameter);
     }
 
     /**
+     * @param self::SORT_BY_* $sortBy
+     *
      * @throws InvalidArgumentException
      */
     private function configureSortFunction(string $sortBy, ?string $parameter = null): void
@@ -90,14 +95,14 @@ final class SortableIterator implements IteratorAggregate
             self::SORT_BY_NAME,
             self::SORT_BY_SLUG,
             self::SORT_BY_TITLE,
-            self::SORT_BY_EXTRA_VALUE => $this->sortByGetterOrPath('get'.ucfirst($sortBy), $parameter),
+            self::SORT_BY_EXTRA_VALUE => $this->configureSortByGetterFallbackToPath($sortBy, $parameter),
 
             self::SORT_BY_DATE,
-            self::SORT_BY_PUBLISH_DATE => $this->sortByDateOrPath('get'.ucfirst($sortBy)),
+            self::SORT_BY_PUBLISH_DATE,
+            self::SORT_BY_UNPUBLISH_DATE => $this->configureSortByDateOrPath($sortBy),
 
             self::SORT_BY_PATH,
-            self::SORT_BY_FILESYSTEM_PATH => $this->sortByGetter('get'.ucfirst($sortBy)),
-            default => throw new InvalidArgumentException('The SortableIterator takes a PHP callable or a valid built-in sort algorithm as an argument.'),
+            self::SORT_BY_FILESYSTEM_PATH => $this->configureSortByPath($sortBy),
         };
     }
 
@@ -109,41 +114,82 @@ final class SortableIterator implements IteratorAggregate
         return new ArrayIterator($array);
     }
 
-    private function sortByGetterOrPath(string $getter, ?string $parameter = null): void
+    /**
+     * @param self::SORT_BY_NAME|self::SORT_BY_SLUG|self::SORT_BY_TITLE|self::SORT_BY_EXTRA_VALUE $sortBy
+     */
+    private function configureSortByGetterFallbackToPath(string $sortBy, ?string $parameter = null): void
     {
-        $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter, $parameter): int {
-            $valueA = $pageA->$getter($parameter);
-            $valueB = $pageB->$getter($parameter);
-            if (mb_strtolower($valueA) === mb_strtolower($valueB)) {
-                return strcasecmp($pageA->getPath(), $pageB->getPath());
+        $this->sortBy = function (ReadablePage $pageA, ReadablePage $pageB) use ($sortBy, $parameter): int {
+            $parameter ??= '';
+            $valueA = $this->matchStringGetter($sortBy, $parameter, $pageA);
+            $valueB = $this->matchStringGetter($sortBy, $parameter, $pageB);
+            if ($valueA === $valueB) {
+                return strcmp($this->matchPathGetter(self::SORT_BY_PATH, $pageA), $this->matchPathGetter(self::SORT_BY_PATH, $pageB));
             }
 
-            return strcasecmp($valueA, $valueB);
+            return strcmp($valueA, $valueB);
         };
     }
 
-    private function sortByDateOrPath(string $getter): void
+    /**
+     * @param self::SORT_BY_DATE|self::SORT_BY_PUBLISH_DATE|self::SORT_BY_UNPUBLISH_DATE $sortBy
+     */
+    private function configureSortByDateOrPath(string $sortBy): void
     {
-        $this->sortBy = static function (Page $pageA, Page $pageB) use ($getter): int {
-            $valueA = $pageA->$getter();
-            $valueB = $pageB->$getter();
-            if (null !== $valueA && null === $valueB) {
-                return 1;
-            }
-            if (null === $valueA && null !== $valueB) {
-                return -1;
-            }
-            /* @noinspection TypeUnsafeComparisonInspection */
-            if ($valueA == $valueB) {
-                return strcasecmp($pageA->getPath(), $pageB->getPath());
+        $this->sortBy = function (ReadablePage $pageA, ReadablePage $pageB) use ($sortBy): int {
+            $valueA = $this->matchDateGetter($sortBy, $pageA);
+            $valueB = $this->matchDateGetter($sortBy, $pageB);
+            if ($valueA === $valueB) {
+                return strcmp($this->matchPathGetter(self::SORT_BY_PATH, $pageA), $this->matchPathGetter(self::SORT_BY_PATH, $pageB));
             }
 
-            return (int) ($valueA->format('U') - $valueB->format('U'));
+            return $valueA <=> $valueB;
         };
     }
 
-    private function sortByGetter(string $getter): void
+    /**
+     * @param self::SORT_BY_PATH|self::SORT_BY_FILESYSTEM_PATH $sortBy
+     */
+    private function configureSortByPath(string $sortBy): void
     {
-        $this->sortBy = static fn (Page $pageA, Page $pageB): int => strcasecmp((string) $pageA->$getter()->toString(), (string) $pageB->$getter()->toString());
+        $this->sortBy = fn (ReadablePage $pageA, ReadablePage $pageB): int => strcmp($this->matchPathGetter($sortBy, $pageA), $this->matchPathGetter($sortBy, $pageB));
+    }
+
+    /**
+     * @param self::SORT_BY_NAME|self::SORT_BY_SLUG|self::SORT_BY_TITLE|self::SORT_BY_EXTRA_VALUE $sortBy
+     */
+    private function matchStringGetter(string $sortBy, string $parameter, ReadablePage $page): string
+    {
+        return mb_strtolower((string) match ($sortBy) {
+            self::SORT_BY_SLUG => $page->getSlug(),
+            self::SORT_BY_NAME => $page->getName(),
+            self::SORT_BY_TITLE => $page->getTitle(),
+            self::SORT_BY_EXTRA_VALUE => is_scalar($page->getExtra($parameter)) ? $page->getExtra($parameter) : '',
+        });
+    }
+
+    /**
+     * @param self::SORT_BY_PATH|self::SORT_BY_FILESYSTEM_PATH $sortBy
+     */
+    private function matchPathGetter(string $sortBy, ReadablePage $page): string
+    {
+        return mb_strtolower(match ($sortBy) {
+            self::SORT_BY_PATH => $page->getPath()->toString(),
+            self::SORT_BY_FILESYSTEM_PATH => $page->getFilesystemPath()->toString(),
+        });
+    }
+
+    /**
+     * @param self::SORT_BY_DATE|self::SORT_BY_PUBLISH_DATE|self::SORT_BY_UNPUBLISH_DATE $sortBy
+     */
+    private function matchDateGetter(string $sortBy, ReadablePage $page): int
+    {
+        $date = match ($sortBy) {
+            self::SORT_BY_DATE => $page->getDate(),
+            self::SORT_BY_PUBLISH_DATE => $page->getPublishDate(),
+            self::SORT_BY_UNPUBLISH_DATE => $page->getUnpublishDate(),
+        };
+
+        return $date instanceof DateTimeImmutable ? (int) $date->format('U') : 0;
     }
 }

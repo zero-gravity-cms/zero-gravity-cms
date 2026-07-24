@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Traversable;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Content\ReadablePageRepository;
 
@@ -88,11 +87,12 @@ final readonly class RouteProvider implements RouteProviderInterface
      * that the DynamicRouter will only call this method once per
      * DynamicRouter::getRouteCollection() call.
      *
-     * @param list<string>|null $names The list of names to retrieve, In case of null,
-     *                                 the provider will determine what routes to return
+     * @param array<string>|null $names The list of names to retrieve, In case of null,
+     *                                  the provider will determine what routes to return
      *
-     * @return array<Route>|Traversable<Route> Iterable list with the keys being the names from the
-     *                                         $names array
+     * @return array<string, Route> Iterable list with the keys being the route paths. This will
+     *                              not only include the page paths, but also additional routes
+     *                              such as for documents and images.
      */
     public function getRoutesByNames(?array $names = null): iterable
     {
@@ -104,7 +104,7 @@ final readonly class RouteProvider implements RouteProviderInterface
         $routes = [];
         foreach ($pages as $page) {
             foreach ($this->extractPageRoutes($page) as $route) {
-                $routes[] = $route;
+                $routes[$route->getPath()] = $route;
             }
         }
 
@@ -116,23 +116,29 @@ final readonly class RouteProvider implements RouteProviderInterface
      */
     private function extractPageRoutes(ReadablePage $page): array
     {
+        $controller = $page->getController();
+        if (null === $controller || '' === $controller) {
+            $controller = $this->defaultController;
+        }
+        $path = $page->getPath()->toString();
+
         $routes = [
-            new Route($page->getPath()->toString(), [
+            new Route($path, [
                 '_zg_page' => $page,
-                '_controller' => $page->getController() ?: $this->defaultController,
+                '_controller' => $controller,
             ]),
         ];
         foreach ($page->getDocuments() as $name => $file) {
-            $routes[] = new Route($page->getPath()->toString().'/'.$name, [
+            $routes[] = new Route($path.'/'.$name, [
                 '_zg_page' => $page,
-                '_controller' => $page->getController() ?: $this->defaultController,
+                '_controller' => $controller,
                 '_zg_file' => $file,
             ]);
         }
         foreach ($page->getImages() as $name => $file) {
-            $routes[] = new Route($page->getPath()->toString().'/'.$name, [
+            $routes[] = new Route($path.'/'.$name, [
                 '_zg_page' => $page,
-                '_controller' => $page->getController() ?: $this->defaultController,
+                '_controller' => $controller,
                 '_zg_file' => $file,
             ]);
         }
@@ -142,9 +148,14 @@ final readonly class RouteProvider implements RouteProviderInterface
 
     public function createRouteFromPage(ReadablePage $page): Route
     {
+        $controller = $page->getController();
+        if (null === $controller || '' === $controller) {
+            $controller = $this->defaultController;
+        }
+
         return new Route($page->getPath()->toString(), [
             '_zg_page' => $page,
-            '_controller' => $page->getController() ?: $this->defaultController,
+            '_controller' => $controller,
         ]);
     }
 }

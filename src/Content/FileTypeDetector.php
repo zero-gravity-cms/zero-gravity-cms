@@ -4,6 +4,9 @@ namespace ZeroGravity\Cms\Content;
 
 class FileTypeDetector
 {
+    /**
+     * @var array<string, list<string>>
+     */
     protected const EXTENSIONS = [
         FileTypes::TYPE_DOCUMENT => [
             'pdf',
@@ -38,7 +41,7 @@ class FileTypeDetector
     {
         foreach (static::EXTENSIONS as $type => $extensions) {
             foreach ($extensions as $extension) {
-                $this->extensionMap[(string) $extension] = $type;
+                $this->extensionMap[$extension] = $type;
             }
         }
     }

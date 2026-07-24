@@ -10,11 +10,27 @@ use ZeroGravity\Cms\Path\Path;
 
 /**
  * Class PathTest.
+ *
+ * @phpstan-type PathExpectations array{
+ *      elements: int,
+ *      absolute: bool,
+ *      directory: bool,
+ *      regex: bool,
+ *      glob: bool,
+ *      cannotRebuild: bool,
+ * }
+ * @phpstan-type AppendPathExpectations array{
+ *      elements: int,
+ *      absolute: bool,
+ *      directory: bool,
+ *      regex: bool,
+ *      glob: bool,
+ * }
  */
 class PathTest extends BaseUnit
 {
     /**
-     * @param array<string, int|bool> $expectations
+     * @param PathExpectations $expectations
      */
     #[DataProvider('providePathData')]
     #[Test]
@@ -32,13 +48,13 @@ class PathTest extends BaseUnit
     }
 
     /**
-     * @param array<string, int|bool> $expectations
+     * @param PathExpectations $expectations
      */
     #[DataProvider('providePathData')]
     #[Test]
-    public function toStringRebuildsPath(mixed $pathString, array $expectations): void
+    public function toStringRebuildsPath(string $pathString, array $expectations): void
     {
-        if (isset($expectations['cannotRebuild']) && $expectations['cannotRebuild']) {
+        if ($expectations['cannotRebuild']) {
             // this is for paths containing "empty" elements that get lost during parsing
             return;
         }
@@ -57,6 +73,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => false,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -67,6 +84,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => false,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -77,6 +95,7 @@ class PathTest extends BaseUnit
                 'directory' => true,
                 'regex' => false,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -87,6 +106,7 @@ class PathTest extends BaseUnit
                 'directory' => true,
                 'regex' => false,
                 'glob' => true,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -97,6 +117,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => true,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -107,6 +128,7 @@ class PathTest extends BaseUnit
                 'directory' => true,
                 'regex' => false,
                 'glob' => true,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -117,6 +139,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => true,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -127,6 +150,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => true,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -137,6 +161,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => false,
                 'glob' => true,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -158,6 +183,7 @@ class PathTest extends BaseUnit
                 'directory' => true,
                 'regex' => false,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -168,6 +194,7 @@ class PathTest extends BaseUnit
                 'directory' => false,
                 'regex' => false,
                 'glob' => false,
+                'cannotRebuild' => false,
             ],
         ];
         yield [
@@ -215,7 +242,7 @@ class PathTest extends BaseUnit
     }
 
     /**
-     * @param array<string, int|bool> $expect
+     * @param AppendPathExpectations $expect
      */
     #[DataProvider('provideAppendedPathData')]
     #[Test]
@@ -338,6 +365,7 @@ class PathTest extends BaseUnit
         if (null === $expectedFilePath) {
             self::assertNull($file);
         } else {
+            self::assertNotNull($file);
             self::assertSame($expectedFilePath, $file->toString());
         }
         self::assertNotSame($path, $file);
@@ -375,6 +403,7 @@ class PathTest extends BaseUnit
     public function getLastElementReturnsLastElement(): void
     {
         $path = new Path('sample/path/string');
+        self::assertTrue($path->hasElements());
         self::assertSame('string', $path->getLastElement()->getName());
     }
 

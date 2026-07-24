@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ZeroGravity\Cms\Content;
 
 use Stringable;
@@ -53,7 +55,7 @@ final readonly class File implements Stringable
      */
     public function getBasename(?string $suffix = null): string
     {
-        return basename($this->pathName, $suffix);
+        return basename($this->pathName, $suffix ?? '');
     }
 
     /**

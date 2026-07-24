@@ -12,13 +12,9 @@ use Symfony\Component\Yaml\Yaml;
 use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypes;
-use ZeroGravity\Cms\Content\Meta\PageSettings;
 use ZeroGravity\Cms\Exception\FilesystemException;
 use ZeroGravity\Cms\Exception\StructureException;
 
-/**
- * @phpstan-import-type SettingValue from PageSettings
- */
 final class Directory
 {
     use WritableDirectoryTrait;
@@ -55,12 +51,12 @@ final class Directory
     /**
      * @var array<string, File>
      */
-    private ?array $files = null;
+    private array $files = [];
 
     /**
-     * @var array<string, Directory>|null
+     * @var array<string, Directory>
      */
-    private ?array $directories = null;
+    private array $directories = [];
 
     public function __construct(
         private SplFileInfo $directoryInfo,
@@ -150,7 +146,7 @@ final class Directory
 
     public function getSlug(): string
     {
-        if (preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
+        if (1 === preg_match(self::SORTING_PREFIX_PATTERN, $this->getName(), $matches)) {
             return $matches[1];
         }
 
@@ -202,7 +198,7 @@ final class Directory
     }
 
     /**
-     * Validate basenames of YAML and markdown files.
+     * Validate basenames of YAML and markdown files. Only compares if both files exist.
      */
     private function validateBasenames(): void
     {
@@ -211,6 +207,10 @@ final class Directory
         }
     }
 
+    /**
+     * @phpstan-assert-if-false File $this->getYamlFile()
+     * @phpstan-assert-if-false File $this->getMarkdownFile()
+     */
     private function yamlAndMarkdownBasenamesMatch(): bool
     {
         if (!$this->hasYamlFile()) {
@@ -220,16 +220,19 @@ final class Directory
             return true;
         }
 
-        return $this->getYamlFile()?->getDefaultBasename() === $this->getMarkdownFile()?->getDefaultBasename();
+        return $this->getYamlFile()->getDefaultBasename() === $this->getMarkdownFile()->getDefaultBasename();
     }
 
     public function getYamlFile(): ?File
     {
         $files = $this->getFilesByType(FileTypes::TYPE_YAML);
 
-        return count($files) ? current($files) : null;
+        return [] !== $files ? current($files) : null;
     }
 
+    /**
+     * @phpstan-assert-if-true File $this->getYamlFile()
+     */
     public function hasYamlFile(): bool
     {
         return $this->getYamlFile() instanceof File;
@@ -239,9 +242,12 @@ final class Directory
     {
         $files = $this->getFilesByType(FileTypes::TYPE_MARKDOWN);
 
-        return count($files) ? current($files) : null;
+        return [] !== $files ? current($files) : null;
     }
 
+    /**
+     * @phpstan-assert-if-true File $this->getMarkdownFile()
+     */
     public function hasMarkdownFile(): bool
     {
         return $this->getMarkdownFile() instanceof File;
@@ -327,6 +333,9 @@ final class Directory
         return null;
     }
 
+    /**
+     * @phpstan-assert File $this->getMarkdownFile()
+     */
     public function getFrontYAMLDocument(bool $convertMarkdown): Document
     {
         $markdownFile = $this->getMarkdownFile();
@@ -335,7 +344,7 @@ final class Directory
         }
 
         return (new FrontYAMLParser())->parse(
-            file_get_contents($markdownFile->getFilesystemPathname()),
+            $this->readFile($markdownFile),
             $convertMarkdown
         );
     }
@@ -343,20 +352,22 @@ final class Directory
     /**
      * Fetch page settings from either YAML or markdown/frontmatter.
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     public function fetchPageSettings(): array
     {
+        $data = [];
         if ($this->hasYamlFile()) {
-            $data = Yaml::parse(file_get_contents($this->getYamlFile()->getFilesystemPathname()));
-
-            return is_array($data) ? $data : [];
-        }
-        if ($this->hasMarkdownFile()) {
-            return $this->getFrontYAMLDocument(false)->getYAML() ?: [];
+            $data = Yaml::parse($this->readFile($this->getYamlFile()));
+        } elseif ($this->hasMarkdownFile()) {
+            $data = $this->getFrontYAMLDocument(false)->getYAML();
         }
 
-        return [];
+        if (!is_array($data)) {
+            return [];
+        }
+
+        return array_filter($data, is_string(...), ARRAY_FILTER_USE_KEY);
     }
 
     /**
@@ -366,7 +377,7 @@ final class Directory
     {
         $hasMarkdown = $this->hasMarkdownFile();
         $hasYaml = $this->hasYamlFile();
-        $hasTwig = count($this->getTwigFiles()) > 0;
+        $hasTwig = [] !== $this->getTwigFiles();
 
         if ($hasMarkdown && $hasYaml) {
             return self::CONTENT_STRATEGY_YAML_AND_MARKDOWN;
@@ -382,5 +393,18 @@ final class Directory
         }
 
         return self::CONTENT_STRATEGY_NONE;
+    }
+
+    /**
+     * @throws FilesystemException if the given file cannot be read
+     */
+    private function readFile(File $file): string
+    {
+        $content = file_get_contents($file->getFilesystemPathname());
+        if (false === $content) {
+            throw FilesystemException::cannotReadFile($file);
+        }
+
+        return $content;
     }
 }

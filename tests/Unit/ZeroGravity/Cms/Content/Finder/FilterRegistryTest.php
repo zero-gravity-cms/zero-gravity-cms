@@ -20,7 +20,7 @@ class FilterRegistryTest extends BaseUnit
     public function allowsPageFinderFilterToBeAdded(): void
     {
         $registry = new FilterRegistry();
-        $filter = $this->createStub(PageFinderFilter::class);
+        $filter = self::createStub(PageFinderFilter::class);
         $registry->addFilter('somename', $filter);
     }
 

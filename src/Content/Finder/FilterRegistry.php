@@ -41,11 +41,14 @@ final class FilterRegistry
         }
 
         if ($this->filters[$filterName] instanceof PageFinderFilter) {
-            $pageFinder = $this->filters[$filterName]->apply($pageFinder, $filterOptions);
-        } elseif (is_callable($this->filters[$filterName])) {
-            $pageFinder = call_user_func_array($this->filters[$filterName], [$pageFinder, $filterOptions]);
+            return $this->filters[$filterName]->apply($pageFinder, $filterOptions);
         }
 
-        return $pageFinder;
+        $result = call_user_func($this->filters[$filterName], $pageFinder, $filterOptions);
+        if (!$result instanceof PageFinder) {
+            throw FilterException::filterDidNotReturnPageFinder($filterName, $result);
+        }
+
+        return $result;
     }
 }

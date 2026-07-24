@@ -171,7 +171,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -182,7 +182,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/yaml_and_markdown_and_twig'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(3, $page->getFiles());
     }
@@ -198,7 +198,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -209,7 +209,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/markdown_only'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(1, $page->getFiles());
     }
@@ -225,7 +225,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $oldPage = $mapper->getWritablePageInstance($page);
         $newPage = clone $oldPage;
 
-        $settings = $oldPage->getSettings();
+        $settings = $oldPage->getSettings()->toArray();
         $settings['date'] = '2018-03-14 00:00:00+0000';
         $settings['extra']['new-key'] = 'new-value';
         $newPage->setSettings($settings);
@@ -236,7 +236,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $pages = $mapper->parse();
         $page = $pages['/twig_only'];
 
-        self::assertSame('2018-03-14', $page->getDate()->format('Y-m-d'));
+        self::assertSame('2018-03-14', $page->getDate()?->format('Y-m-d'));
         self::assertSame('new-value', $page->getExtra('new-key'));
         self::assertCount(2, $page->getFiles());
     }
@@ -298,6 +298,7 @@ class FilesystemMapperWritingTest extends BaseUnit
         $mapper = $this->getTempValidPagesFilesystemMapper();
 
         $oldPage = $mapper->getNewWritablePage();
+        self::assertNull($oldPage->getDirectory());
         $newPage = clone $oldPage;
         $newPage->setName('08.totally_new');
         $newPage->setSettings([
@@ -344,6 +345,7 @@ class FilesystemMapperWritingTest extends BaseUnit
 
     protected function getTempValidPagesFilesystemMapper(): FilesystemMapper
     {
+        self::assertNotNull($this->tempDir);
         $fileFactory = new FileFactory(new FileTypeDetector(), new YamlMetadataLoader(), $this->tempDir);
 
         return new FilesystemMapper($fileFactory, $this->tempDir, true, [], new NullLogger(), new EventDispatcher());

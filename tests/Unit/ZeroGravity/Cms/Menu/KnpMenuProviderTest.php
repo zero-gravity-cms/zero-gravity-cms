@@ -44,12 +44,12 @@ class KnpMenuProviderTest extends BaseUnit
     }
 
     #[Test]
+    #[DoesNotPerformAssertions]
     public function menuProviderReturnsMenuIfExists(): void
     {
         $provider = $this->getProvider();
 
-        $rootItem = $provider->get('zero-gravity');
-        self::assertInstanceOf(ItemInterface::class, $rootItem);
+        $provider->get('zero-gravity');
     }
 
     #[Test]
@@ -68,6 +68,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
+        self::assertNotNull($child);
         self::assertCount(2, $child->getChildren());
     }
 
@@ -78,6 +79,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('02.first-sibling');
+        self::assertNotNull($child);
         self::assertSame('first-sibling', $child->getExtra('page_slug'));
     }
 
@@ -88,6 +90,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
+        self::assertNotNull($child);
         self::assertSame('custom second sibling label', $child->getLabel());
     }
 
@@ -98,6 +101,7 @@ class KnpMenuProviderTest extends BaseUnit
 
         $rootItem = $provider->get('zero-gravity');
         $child = $rootItem->getChild('03.second-sibling');
+        self::assertNotNull($child);
         self::assertSame('custom_value', $child->getExtra('custom_extra'));
     }
 
@@ -164,7 +168,7 @@ class KnpMenuProviderTest extends BaseUnit
                     return false;
                 }
 
-                return 'root' === $argument->getParentItem()->getName();
+                return 'root' === $argument->getParentItem()?->getName();
             };
             $beforeAddHomeChildrenCallback = static function ($argument): bool {
                 if (!$argument instanceof BeforeAddChildrenToItem) {
@@ -203,7 +207,7 @@ class KnpMenuProviderTest extends BaseUnit
                     return false;
                 }
 
-                return 'First Sibling' === $argument->getParentItem()->getLabel();
+                return 'First Sibling' === $argument->getParentItem()?->getLabel();
             };
             $afterAddSecondItemChildrenCallback = static function ($argument): bool {
                 if (!$argument instanceof AfterAddChildrenToItem) {

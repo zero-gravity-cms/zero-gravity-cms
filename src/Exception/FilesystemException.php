@@ -3,6 +3,7 @@
 namespace ZeroGravity\Cms\Exception;
 
 use RuntimeException;
+use ZeroGravity\Cms\Content\File;
 use ZeroGravity\Cms\Content\PageDiff;
 use ZeroGravity\Cms\Content\ReadablePage;
 use ZeroGravity\Cms\Filesystem\Directory;
@@ -39,6 +40,14 @@ class FilesystemException extends RuntimeException implements ZeroGravityExcepti
         return new self(sprintf(
             'Directory %s does not contain the requested markdown file.',
             $directory->getPath()
+        ));
+    }
+
+    public static function cannotReadFile(File|string $file): self
+    {
+        return new self(sprintf(
+            'Cannot read file "%s".',
+            $file instanceof File ? $file->getPathname() : $file,
         ));
     }
 }

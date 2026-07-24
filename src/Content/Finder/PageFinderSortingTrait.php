@@ -10,7 +10,7 @@ use ZeroGravity\Cms\Content\ReadablePage;
 trait PageFinderSortingTrait
 {
     /**
-     * @var string|array{string, mixed}|Closure|null
+     * @var SortableIterator::SORT_BY_*|list<string>|Closure|null
      */
     private string|array|Closure|null $sortBy = null;
 

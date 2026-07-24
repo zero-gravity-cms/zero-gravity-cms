@@ -8,34 +8,35 @@ use ZeroGravity\Cms\Content\ReadablePage;
 /**
  * This trait contains settings related methods (mostly getters) of the Page class.
  * This helps to separate native properties from validated settings/options.
- *
- * @phpstan-import-type SettingValue from PageSettings
- * @phpstan-import-type SettingValues from PageSettings
- * @phpstan-import-type SerializedSettingValue from PageSettings
- * @phpstan-import-type SerializedSettingValues from PageSettings
  */
 trait PageSettingsTrait
 {
-    protected PageSettings $settings;
+    protected PageSettingsLoader $settingsLoader;
+
+    public SettingValues $settings;
 
     abstract public function getParent(): ?ReadablePage;
 
     /**
-     * @param array<string, SettingValue> $settings
+     * @param array<string, mixed> $settings raw, unvalidated settings as passed to the OptionsResolver
      */
-    private function initSettings(array $settings, string $name): void
+    protected function initSettings(array $settings, string $name): void
     {
-        $this->settings = new PageSettings($settings, $name);
+        $this->settingsLoader = new PageSettingsLoader($settings, $name);
+        $this->settings = $this->settingsLoader->values;
     }
 
-    public function getSetting(string $name): mixed
+    /**
+     * Get all setting values.
+     */
+    public function getSettings(): SettingValues
     {
-        return $this->settings->get($name);
+        return $this->settings;
     }
 
     public function getSlug(): string
     {
-        return (string) $this->getSetting('slug');
+        return $this->settings->slug;
     }
 
     /**
@@ -48,57 +49,33 @@ trait PageSettingsTrait
 
     public function getTitle(): string
     {
-        return (string) $this->getSetting('title');
+        return (string) $this->settings->title;
     }
 
     public function getContentType(): string
     {
-        return $this->getSetting('content_type');
-    }
-
-    /**
-     * @param bool $serialize set true to convert all object setting types (e.g. dates) to primitive values
-     *
-     * @phpstan-return ($serialize is true ? SerializedSettingValues : SettingValues)
-     */
-    public function getSettings(bool $serialize = false): array
-    {
-        return $this->settings->toArray($serialize);
+        return $this->settings->content_type;
     }
 
     /**
      * Get all non-default setting values. This will remove both OptionResolver defaults and child defaults of
      * the current parent page.
      *
-     * @phpstan-return ($serialize is true ? array<string, SerializedSettingValue> : array<string, SettingValue>)
+     * @return array<string, mixed>
      */
     public function getNonDefaultSettings(bool $serialize = false): array
     {
-        $settings = $this->settings->getNonDefaultValues($serialize);
-        if (null === $this->getParent()) {
-            return $settings;
-        }
-
-        foreach ($this->getParent()->getChildDefaults() as $key => $childDefault) {
-            if (!array_key_exists($key, $settings)) {
-                continue;
-            }
-            if ($settings[$key] === $childDefault) {
-                unset($settings[$key]);
-            }
-        }
-
-        return $settings;
+        return $this->settingsLoader->getNonDefaultValues($serialize, $this->getParent()?->getChildDefaults() ?? []);
     }
 
     /**
      * Get default setting values for child pages.
      *
-     * @return array<string, SettingValue>
+     * @return array<string, mixed>
      */
     public function getChildDefaults(): array
     {
-        return $this->getSetting('child_defaults');
+        return $this->settings->child_defaults;
     }
 
     /**
@@ -106,18 +83,18 @@ trait PageSettingsTrait
      */
     public function getExtraValues(): array
     {
-        return (array) $this->getSetting('extra');
+        return $this->settings->extra;
     }
 
     public function getMenuId(): string|bool
     {
-        return $this->getSetting('menu_id');
+        return $this->settings->menu_id;
     }
 
     public function getMenuLabel(): string
     {
-        if (!empty($this->getSetting('menu_label'))) {
-            return (string) $this->getSetting('menu_label');
+        if (null !== $this->settings->menu_label && '' !== $this->settings->menu_label) {
+            return $this->settings->menu_label;
         }
 
         return $this->getTitle();
@@ -128,7 +105,7 @@ trait PageSettingsTrait
      */
     public function isVisible(): bool
     {
-        return (bool) $this->getSetting('visible');
+        return $this->settings->visible;
     }
 
     /**
@@ -137,7 +114,7 @@ trait PageSettingsTrait
      */
     public function isModular(): bool
     {
-        return (bool) $this->getSetting('modular');
+        return $this->settings->modular;
     }
 
     /**
@@ -148,7 +125,7 @@ trait PageSettingsTrait
      */
     public function isModule(): bool
     {
-        return (bool) $this->getSetting('module');
+        return $this->settings->module;
     }
 
     /**
@@ -156,7 +133,7 @@ trait PageSettingsTrait
      */
     public function getLayoutTemplate(): ?string
     {
-        return $this->getSetting('layout_template');
+        return $this->settings->layout_template;
     }
 
     /**
@@ -164,7 +141,7 @@ trait PageSettingsTrait
      */
     public function getContentTemplate(): ?string
     {
-        return $this->getSetting('content_template');
+        return $this->settings->content_template;
     }
 
     /**
@@ -172,7 +149,7 @@ trait PageSettingsTrait
      */
     public function getController(): ?string
     {
-        return (string) $this->getSetting('controller');
+        return $this->settings->controller;
     }
 
     public function getExtra(string $name, mixed $default = null): mixed
@@ -190,6 +167,6 @@ trait PageSettingsTrait
      */
     public function getDate(): ?DateTimeImmutable
     {
-        return $this->getSetting('date');
+        return $this->settings->date;
     }
 }

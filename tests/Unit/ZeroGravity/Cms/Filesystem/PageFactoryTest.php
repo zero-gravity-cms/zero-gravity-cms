@@ -11,6 +11,7 @@ use Psr\Log\NullLogger;
 use SplFileInfo;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Tests\Unit\ZeroGravity\Cms\Test\BaseUnit;
+use Webmozart\Assert\Assert;
 use ZeroGravity\Cms\Content\FileFactory;
 use ZeroGravity\Cms\Content\FileTypeDetector;
 use ZeroGravity\Cms\Content\Page;
@@ -65,6 +66,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, []);
 
+        self::assertNotNull($page);
         self::assertSame('testtitle', $page->getTitle());
     }
 
@@ -79,6 +81,7 @@ class PageFactoryTest extends BaseUnit
             'menu_id' => 'defaultmenu',
         ]);
 
+        self::assertNotNull($page);
         self::assertSame('testtitle', $page->getTitle(), 'YAML settings override default settings');
         self::assertSame('defaultmenu', $page->getMenuId(), 'default settings override empty settings');
     }
@@ -91,6 +94,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/04.with_children');
         $page = $pageFactory->createPage($dir, false, []);
 
+        self::assertNotNull($page);
         self::assertSame([
             'page.yaml',
             '03.empty/child_file5.png',
@@ -109,11 +113,13 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/03.yaml_and_markdown_and_twig');
         $parentPage = null;
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
+        self::assertNotNull($page);
         self::assertSame('@ZeroGravity/03.yaml_and_markdown_and_twig/name.html.twig', $page->getContentTemplate());
 
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/06.yaml_and_twig');
         $parentPage = new Page('');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
+        self::assertNotNull($page);
         self::assertSame('@ZeroGravity/06.yaml_and_twig/page.html.twig', $page->getContentTemplate());
     }
 
@@ -144,6 +150,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, [], $parentPage);
 
+        self::assertNotNull($page);
         self::assertSame('some value', $page->getExtra('some key'));
         self::assertSame('another_custom_value', $page->getExtra('custom'));
     }
@@ -198,7 +205,10 @@ class PageFactoryTest extends BaseUnit
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(BeforePageCreate::class, static function (BeforePageCreate $event): void {
             $settings = $event->getSettings();
-            $settings['extra']['very_custom_key'] = 'very custom value';
+            $extra = $settings['extra'];
+            Assert::isArray($extra);
+            $extra['very_custom_key'] = 'very custom value';
+            $settings['extra'] = $extra;
             $event->setSettings($settings);
         });
 
@@ -206,6 +216,7 @@ class PageFactoryTest extends BaseUnit
         $dir = $this->createParsedDirectoryFromPath($this->getValidPagesDir().'/01.yaml_only');
         $page = $pageFactory->createPage($dir, false, []);
 
+        self::assertNotNull($page);
         self::assertSame('very custom value', $page->getExtra('very_custom_key'));
     }
 
